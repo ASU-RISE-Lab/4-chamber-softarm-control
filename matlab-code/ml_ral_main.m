@@ -22,7 +22,7 @@ par_set.L=0.185;%actuator length
 par_set.n=4;% # of joints for augmented rigid arm
 par_set.m0=0.35;%kg segment weight
 par_set.g=9.8;%% gravity constant
-
+par_set.R1_stand_off = 0.05;% m
 fprintf('System initialization done \n')
 %% Read txt file or mat file
 if par_set.flag_read_exp==1
@@ -38,16 +38,31 @@ else
     fprintf( 'Data loaded \n' );
 end
 %% PLot raw data
-testData = par_set.trial1;
-if par_set.flag_plot_rawData == true
-    close all;
-    figure(1)
-    title('xyz pos in cam frame')
-    plot3(testData.rigid_1_pose(:,1),testData.rigid_1_pose(:,2),testData.rigid_1_pose(:,3),'r')
-    hold on
-    plot3(testData.rigid_2_pose(:,1),testData.rigid_2_pose(:,2),testData.rigid_2_pose(:,3),'b')
-    hold on
-    plot3(testData.rigid_3_pose(:,1),testData.rigid_3_pose(:,2),testData.rigid_3_pose(:,3),'k')
-    hold on
-    legend('R1','R2','R3')
+testData = par_set.trial2;
+if par_set.flag_plot_rawData == 1
+    funcPlotRawData(testData)
 end
+%% Calculate bending angle
+% Encoder reading based theta = (si-r - si-l)/ r0
+
+% Mocap based theta = 2 * (pi/2 - atan2(R2.pose.x - R1.pos.x,R1.pose.z -
+% 0.05 - R2.pos.z))
+
+testData = par_set.trial2;
+par_set.R1_stand_off = 0.05;% m
+% testData.theta_mocap = 2 * (pi/2 - atan2(testData.rigid_2_pose(:,1) - testData.rigid_1_pose(:,1),...
+%     testData.rigid_1_pose(:,3) - par_set.R1_stand_off - testData.rigid_2_pose(:,3))); 
+
+testData.theta_mocap =2 * (atan2(testData.rigid_2_pose(:,1) - testData.rigid_1_pose(:,1),...
+    testData.rigid_1_pose(:,3) - par_set.R1_stand_off - testData.rigid_2_pose(:,3)));  
+close all;
+figure(1)
+subplot(2,1,1)
+plot(rad2deg(testData.theta_mocap))
+ylabel('rad')
+subplot(2,1,2)
+plot((testData.enco_volts(:,2) - (testData.enco_volts(:,1))))
+ylabel('m')
+ylim([-0.1 0.1])
+yy = testData.enco_volts(:,2) - testData.enco_volts(:,1);
+xx = testData.theta_mocap;
