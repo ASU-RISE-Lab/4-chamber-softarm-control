@@ -28,9 +28,9 @@ function [] = funcPlotRawData(testData)
     hold on
     plot(testData.enco_volts(:,2))
     hold on
-    plot(testData.enco_volts(:,3))
-    hold on
     plot(testData.enco_volts(:,4))
+    hold on
+    plot(testData.enco_volts(:,3))
     hold on
     legend('s1-l','s1-r','s2-l','s2-r')
     xlabel('index (30Hz)');ylabel('Volts');
