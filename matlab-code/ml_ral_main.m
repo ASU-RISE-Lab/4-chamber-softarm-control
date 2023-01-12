@@ -42,6 +42,12 @@ testData = par_set.trial2;
 if par_set.flag_plot_rawData == 1
     funcPlotRawData(testData)
 end
+%%
+par_set.EOM = 1
+if par_set.EOM ==1
+    par_set = funcEOMbaseFrame2seg(par_set);
+end
+return
 %% Calculate bending angle
 % Encoder reading based theta = (si-r - si-l)/ r0
 testData = par_set.trial1;
