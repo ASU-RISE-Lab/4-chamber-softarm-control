@@ -29,7 +29,7 @@ par_set.EOM = 1
 if par_set.EOM ==1
     par_set = funcEOMbaseFrame2seg_v2(par_set);
 end
-simplify(par_set.rigid_2_htm)
+simplify(par_set.rigid_3_htm)
 return
 %% Read txt file or mat file
 if par_set.flag_read_exp==1

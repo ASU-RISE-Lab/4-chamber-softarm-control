@@ -2,15 +2,15 @@ function par =funcEOMbaseFrame2seg_v2(par)
 fprintf( 'EOM... \n' )
 % par=[];
 %% Transformations
-par.n= 8;%DOF
+par.n= 6;%DOF
 %q1=phi_i, q2=theta_i/2 - zeta_theta_i, q3 = zeta_theta_i,q4=bi
 % pi =sym('pi');
-syms m0 g h
+syms m0 g h0
 xi = sym('xi', [par.n 1]);
 %q1=phi_i, q2=theta_i/2 - zeta_theta_i, q3 = zeta_theta_i,q4=bi
 dxi = sym('dxi', [par.n 1]);
 
-rigid_a=sym(zeros(1,par.n));
+rigid_r=sym(zeros(1,par.n));
 rigid_alpha=sym(zeros(1,par.n));%alpha
 rigid_d=sym(zeros(1,par.n));    
 rigid_theta=sym(zeros(1,par.n));
@@ -23,56 +23,53 @@ rigid_m = sym(zeros(1,par.n));
 %%% 4       0       xi(4)  -pi/2   0   
 %%% 5       xi(5)   xi(6)  pi/2
 rigid_alpha(1)= -pi/2;
-rigid_alpha(3)= pi/2;
+rigid_alpha(2)= pi/2;
 rigid_alpha(4)= -pi/2;
-rigid_alpha(5)= -pi/2;
-rigid_alpha(7)= pi/2;
-rigid_alpha(8)= -pi/2;
-
-rigid_a(5)= h;
-
-rigid_d(2)= xi(2);
-rigid_d(3)= xi(3);
-rigid_d(6)= xi(6);
-rigid_d(7)= xi(7);
+rigid_alpha(5)= pi/2;
 
 
-rigid_theta(1)= xi(1);
-rigid_theta(4)= xi(4);
+
+rigid_d(1)= xi(1)+h0;
+rigid_d(3)= xi(3)+h0;
+rigid_d(4)= xi(4)+h0;
+rigid_d(6)= xi(6)+h0;
+
+
+rigid_theta(2)= xi(2);
 rigid_theta(5)= xi(5);
-rigid_theta(8)= xi(8);
+
 
 rigid_m(1)= m0/2;
+rigid_m(3)= m0/2;
 rigid_m(4)= m0/2;
-rigid_m(5)= m0/2;
-rigid_m(8)= m0/2;
+rigid_m(6)= m0/2;
 % n=length(q);% DOF
 % cell array of your homogeneous transformations; each Ti{i} is a 4x4 symbolic transform matrix
 T_old_to_i = cell(par.n,1);% z0 z_end_effector
-Ti = T_old_to_i;
+Ti = cell(par.n+1,1);
 % Ti(1) = {[1 0 0 0;0 1 0 0; 0 0 1 0; 0 0 0 1]};
-for i =1:length(rigid_m)-1
-    T_old_to_i{i} = [cos(rigid_theta(i+1)), -sin(rigid_theta(i+1)), 0, rigid_a(i);...
-                     sin(rigid_theta(i+1)) * cos(rigid_alpha(i)), cos(rigid_theta(i+1)) * cos(rigid_alpha(i)), -sin(rigid_alpha(i)), -sin(rigid_alpha(i))*rigid_d(i);...
-                     sin(rigid_theta(i)) * sin(rigid_alpha(i)), cos(rigid_theta(i)) * sin(rigid_alpha(i)), cos(rigid_alpha(i)),cos(rigid_alpha(i))*rigid_d(i);...
+for i =1:length(rigid_m)
+    T_old_to_i{i} = [cos(rigid_theta(i)), -sin(rigid_theta(i)) * cos(rigid_alpha(i)), sin(rigid_theta(i)) * sin(rigid_alpha(i)), rigid_r(i) * cos(rigid_theta(i));...
+                     sin(rigid_theta(i)),  cos(rigid_theta(i)) * cos(rigid_alpha(i)), -cos(rigid_theta(i)) * sin(rigid_alpha(i)), rigid_r(i) * sin(rigid_theta(i));...
+                     0, sin(rigid_alpha(i)), cos(rigid_alpha(i)),rigid_d(i);...
                      0, 0, 0, 1   ];
 end
-Ti{1} = T_old_to_i{1};
+Ti{1} = eye(4);
 p_i{1}=Ti{1}(1:3,4);
 z_i{1}=Ti{1}(1:3,3);
-for i = 2:length(rigid_m)
-    Ti{i} =  Ti{i-1} * T_old_to_i{i};
+for i = 2:length(rigid_m)+1
+    Ti{i} =  Ti{i-1} * T_old_to_i{i-1};
     p_i{i}=Ti{i}(1:3,4);
     z_i{i}=Ti{i}(1:3,3);
 end
 par.Ti=Ti;
 fprintf( 'P.. \n' )
-par.rigid_2_htm = Ti{4};
-par.rigid_3_htm = Ti{8};
+par.rigid_2_htm = Ti{3};
+par.rigid_3_htm = Ti{end};
 return
 %% Protential energy
 E_p=0;
-for link_i=1:length(rigid_a)
+for link_i=1:length(rigid_r)
     E_p=E_p+rigid_m(link_i)*g*p_i{link_i}(3);
 end
 fprintf( 'J_v... \n' )
