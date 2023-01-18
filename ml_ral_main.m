@@ -9,7 +9,7 @@ par_set=[];
 %flag for EOM deriviation
 par_set.EOM=0;
 %flag for plot
-par_set.flag_plot_rawData =1;
+par_set.flag_plot_rawData =0;
 %flag for read txt file or mat file 1: txt 0: mat
 par_set.flag_read_exp = 1;
 
@@ -49,13 +49,18 @@ testData = par_set.trial2;
 if par_set.flag_plot_rawData == 1
     funcPlotRawData(testData)
 end
-%%
-par_set.EOM = 1
+%% EOM deriviation with 6 joints virtual rigid robot
+% par_set.EOM = 1
 if par_set.EOM ==1
     par_set = funcEOMbaseFrame2seg_v2(par_set);
 end
-
-
+%% Grey-box system ID
+testData=[];
+testData=par_set.trial1;
+return
+testData=funcGreyBoxSysID2seg(testData,par_set);
+% testData=func_greyBox(testData);
+par_set.trial1=testData;
 %% Calculate bending angle
 % Encoder reading based theta = (si-r - si-l)/ r0
 testData = par_set.trial1;

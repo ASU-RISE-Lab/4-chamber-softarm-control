@@ -3,6 +3,8 @@ function [dx, y] = funcGreyBoxOde2seg(t, x, u, k_ele,d_ele,alpha_ele, varargin)
   y = [x(1);x(3);x(5);x(7)];% a1 l1 a2 l2
 % State equations.
     m0 = (100 + 34*2 +100)/1000; %kg
+    h0 = 0.01; %m
+    g = 9.8; %N/kg
     tauy1 = u(1);
     fz1 = u(2);
     tauy2 = u(1);
