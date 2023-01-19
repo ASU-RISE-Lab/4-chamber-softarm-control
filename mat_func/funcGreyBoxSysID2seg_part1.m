@@ -1,5 +1,5 @@
-function testData=funcGreyBoxSysID2seg(testData,par_set)
-nlgr =funcBuildGreyBox2seg();   % get grey box model
+function testData=funcGreyBoxSysID2seg_part1(testData,par_set)
+nlgr =funcBuildGreyBox2seg_part1();   % get grey box model
 %%%% Estimation Options
 opt = nlgreyestOptions;
 opt.Display='on';
@@ -8,7 +8,7 @@ opt.SearchMethod='lsqnonlin';
 %%%% calculate input output data
 s1.l_t0 = 205.7796;s1.r_t0 = 209.0839; 
 s2.l_t0 = 223.6281;s2.r_t0 = 222.3360;
-r0 = 62.2254*0.75
+r0 = 43;
 green_t0 = 31.92;yellow_t0 = 46.33; purple_t0 =21.99;
 s1.red_l = s1.l_t0 - green_t0;
 s1.red_r = s1.r_t0 - green_t0;

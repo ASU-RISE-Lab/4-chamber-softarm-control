@@ -18,10 +18,10 @@ par_set.plot_fwdKinematic = 0;
 % Check data readme.txt for detail input reference
 par_set.Ts=1/30;
 
-par_set.L=0.185;%actuator length
-par_set.n=4;% # of joints for augmented rigid arm
-par_set.m0=0.35;%kg segment weight
-par_set.g=9.8;%% gravity constant
+% par_set.L=0.185;%actuator length
+% par_set.n=4;% # of joints for augmented rigid arm
+% par_set.m0=0.35;%kg segment weight
+% par_set.g=9.8;%% gravity constant
 par_set.R1_stand_off = 0.05;% m
 fprintf('System initialization done \n')
 %% EOM per element
@@ -33,10 +33,12 @@ simplify(par_set.rigid_3_htm)
 return
 %% Read txt file or mat file
 if par_set.flag_read_exp==1
-    par_set= funcLoadExp2Seg(par_set,1);
-    par_set= funcLoadExp2Seg(par_set,2);
-    par_set= funcLoadExp2Seg(par_set,3);
-
+    for i = 1:11
+    par_set= funcLoadExp2Seg(par_set,i);
+    end
+%     par_set= funcLoadExp2Seg(par_set,1);
+%     par_set= funcLoadExp2Seg(par_set,2);
+%     par_set= funcLoadExp2Seg(par_set,3);
     save('raw_id_data.mat','par_set');
     fprintf( 'Saved \n' )
 else
@@ -57,10 +59,59 @@ end
 %% Grey-box system ID
 testData=[];
 testData=par_set.trial1;
-return
 testData=funcGreyBoxSysID2seg(testData,par_set);
 % testData=func_greyBox(testData);
 par_set.trial1=testData;
+
+%% Grey-box system ID
+testData=[];
+testData=par_set.trial1;
+testData=funcGreyBoxSysID2seg_part1(testData,par_set);
+% testData=func_greyBox(testData);
+%%
+testData =par_set.trial11;
+output_struct = funcKnownTerm(testData);
+tauy1 = testData.pd_psi(:,1) - testData.pd_psi(:,2);
+fz1 = testData.pd_psi(:,1) + testData.pd_psi(:,2) + testData.pd_psi(:,3);
+tauy2 = testData.pd_psi(:,4) - testData.pd_psi(:,5);
+fz2 = testData.pd_psi(:,4) + testData.pd_psi(:,5) + testData.pd_psi(:,6);
+input_array= [tauy1,fz1,tauy2,fz2]';
+output_array = output_struct.output_array;
+state_array = output_struct.state_array;
+close all
+figure(1)
+i =4
+subplot(4,1,1)
+plot(output_array(i,:))
+hold on
+subplot(4,1,2)
+plot(input_array(i,:))
+hold on
+subplot(4,1,3)
+plot(state_array(:,2*i-1))
+hold on
+subplot(4,1,4)
+plot(state_array(:,2*i))
+hold on
+
+figure(2)
+subplot(3,1,1)
+plot(output_struct.Mi(i,:))
+hold on
+subplot(3,1,2)
+plot(output_struct.Ci(i,:))
+hold on
+subplot(3,1,3)
+plot(output_struct.Gi(i,:))
+hold on
+
+gp_y=output_array(i,:)';
+gp_u=[input_array(i,:)',state_array(:,2*i-1),state_array(:,2*i)];
+gp_obj=iddata(gp_y,gp_u,Ts);
+%%
+gp_y=output_array';
+gp_u=[input_array',state_array];
+gp_obj=iddata(gp_y,gp_u,Ts);
 %% Calculate bending angle
 % Encoder reading based theta = (si-r - si-l)/ r0
 testData = par_set.trial1;
