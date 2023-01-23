@@ -75,11 +75,12 @@ par.rigid_3_htm = Ti{end};
 %% Protential energy
 E_p=0;
 for link_i=2:length(rigid_r)
-    Epi = rigid_m(link_i)*[0;0;g].'*p_i{link_i+1}
+%     Epi = rigid_m(link_i)*[0;0;g].'*p_i{link_i+1}
 % p_i{link_i+1}
     E_p=E_p+rigid_m(link_i)*[0;0;g].'*p_i{link_i+1};
 end
 fprintf( 'J_v... \n' )
+par.Ep = E_p;
 % simplify(E_p)
 
 % return
@@ -222,6 +223,11 @@ end
 par.B_rigid=D;
 par.C_rigid=cor;
 par.G_rigid=Phi;
+
+par.xi_0_G_rigid=subs(Phi,[xi(2),xi(5)],[0,0]);
+par.xi2_0_G_rigid=subs(Phi,[xi(2)],[0]);
+par.xi5_0_G_rigid=subs(Phi,[xi(5)],[0]);
+
 % for i =1:3
 %     T_p{i}=Ti{end}*[eye(3),par.r_p{i};0 0 0 1];
 %     r_p_base{i}=T_p{i}(1:3,4);
@@ -238,8 +244,8 @@ par.G_rigid=Phi;
 
 syms theta1 dtheta1 ddtheta1 theta1_t(t) lc1 dlc1 ddlc1 lc1_t(t)
 syms theta2 dtheta2 ddtheta2 theta2_t(t) lc2 dlc2 ddlc2 lc2_t(t)
-b_theta1 = lc1/(theta1)*sin(theta1/2);
-b_theta2 = lc2/(theta2)*sin(theta2/2);
+b_theta1 = lc1/(theta1)*tan(theta1/2);
+b_theta2 = lc2/(theta2)*tan(theta2/2);
 
 m_q=[b_theta1 theta1 b_theta1 b_theta2 theta2 b_theta2 ].';% 6x1
 J_f=[diff(m_q,theta1),diff(m_q,lc1),diff(m_q,theta2),diff(m_q,lc2)];%6x4
