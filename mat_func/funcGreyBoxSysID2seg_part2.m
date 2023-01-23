@@ -1,5 +1,5 @@
-function testData=funcGreyBoxSysID2seg_part1(testData,par_set)
-nlgr =funcBuildGreyBox2seg_part1();   % get grey box model
+function testData=funcGreyBoxSysID2seg_part2(testData,par_set)
+nlgr =funcBuildGreyBox2seg_part2();   % get grey box model
 %%%% Estimation Options
 opt = nlgreyestOptions;
 opt.Display='on';

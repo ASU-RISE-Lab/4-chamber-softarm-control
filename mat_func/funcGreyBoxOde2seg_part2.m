@@ -1,6 +1,7 @@
-function [dx, y] = funcGreyBoxOde2seg_part1(t, x, u,alpha_ele, varargin)
+function [dx, y] = funcGreyBoxOde2seg_part2(t, x, u,alpha_ele, varargin)
 % Output equations.
-  y = [x(1);x(3);x(5);x(7)];% a1 l1 a2 l2
+%   y = [x(1);x(3);x(5);x(7)];% a1 l1 a2 l2
+  y = x;% a1 l1 a2 l2
 % State equations.
     m0 = (100 + 34*2 + 25*5)/1000; %kg
     h0 = 0.01; %m
