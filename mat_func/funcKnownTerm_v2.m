@@ -3,7 +3,7 @@ function [output] = funcKnownTerm_v2(testData)
 % State equations.
     m0 = (100 + 34*2 + 25*5)/1000; %kg
     h0 = 0.01; %m
-    g = -9.8; %N/kg
+    g = 9.8; %N/kg
     timestamp=testData.time_stamp;%sec
     Ts=timestamp(2)-timestamp(1);
     %%%%% calculate tau, fz, theta and lc

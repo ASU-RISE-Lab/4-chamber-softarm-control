@@ -69,7 +69,7 @@ testData=par_set.trial11;
 testData=funcGreyBoxSysID2seg_part2(testData,par_set);
 % testData=func_greyBox(testData);
 %%
-testData =par_set.trial7;
+testData =par_set.trial1;
 output_struct = funcKnownTerm_v2(testData);
 tauy1 = testData.pd_psi(:,1) - testData.pd_psi(:,2);
 fz1 = testData.pd_psi(:,1) + testData.pd_psi(:,2) + testData.pd_psi(:,3);
@@ -140,12 +140,17 @@ i =1
 temp_y=filtfilt(d1,output_array(i,:));
 temp_u=[input_array(i,:)',filtfilt(d1,state_array(:,2*i-1)),filtfilt(d1,state_array(:,2*i))];
 obj1f =iddata(temp_y',temp_u,Ts);
+% xx = input_array(i,:)';
+% yy = filtfilt(d1,state_array(:,2*i-1));
+% zz = filtfilt(d1,output_array(i,:));
 
 i =2
 temp_y=filtfilt(d1,output_array(i,:));
 temp_u=[input_array(i,:)',filtfilt(d1,state_array(:,2*i-1)),filtfilt(d1,state_array(:,2*i))];
 obj2f =iddata(temp_y',temp_u,Ts);
-
+xx = input_array(i,150:250)';
+yy = filtfilt(d1,state_array(150:250,2*i-1));
+zz = filtfilt(d1,output_array(i,150:250));
 i =3
 temp_y=filtfilt(d1,output_array(i,:));
 temp_u=[input_array(i,:)',filtfilt(d1,state_array(:,2*i-1)),filtfilt(d1,state_array(:,2*i))];
