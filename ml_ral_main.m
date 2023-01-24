@@ -71,10 +71,17 @@ testData=funcGreyBoxSysID2seg_part2(testData,par_set);
 %%
 testData =par_set.trial1;
 output_struct = funcKnownTerm_v2(testData);
-tauy1 = testData.pd_psi(:,1) - testData.pd_psi(:,2);
-fz1 = testData.pd_psi(:,1) + testData.pd_psi(:,2) + testData.pd_psi(:,3);
-tauy2 = testData.pd_psi(:,4) - testData.pd_psi(:,5);
-fz2 = testData.pd_psi(:,4) + testData.pd_psi(:,5) + testData.pd_psi(:,6);
+
+% tauy1 = testData.pd_psi(:,1) - testData.pd_psi(:,2);
+% fz1 = testData.pd_psi(:,1) + testData.pd_psi(:,2) + testData.pd_psi(:,3);
+% tauy2 = testData.pd_psi(:,4) - testData.pd_psi(:,5);
+% fz2 = testData.pd_psi(:,4) + testData.pd_psi(:,5) + testData.pd_psi(:,6);
+
+tauy1 = testData.pm_psi(:,1) - testData.pm_psi(:,2);
+fz1 = testData.pm_psi(:,1) + testData.pm_psi(:,2) + testData.pm_psi(:,3);
+tauy2 = testData.pm_psi(:,4) - testData.pm_psi(:,5);
+fz2 = testData.pm_psi(:,4) + testData.pm_psi(:,5) + testData.pm_psi(:,6);
+
 input_array= [tauy1,fz1,tauy2,fz2]';
 output_array = output_struct.output_array;
 state_array = output_struct.state_array;
@@ -140,7 +147,7 @@ i =1
 temp_y=filtfilt(d1,output_array(i,:));
 temp_u=[input_array(i,:)',filtfilt(d1,state_array(:,2*i-1)),filtfilt(d1,state_array(:,2*i))];
 obj1f =iddata(temp_y',temp_u,Ts);
-% xx = input_array(i,:)';
+% xx = input_array(i,:)';q
 % yy = filtfilt(d1,state_array(:,2*i-1));
 % zz = filtfilt(d1,output_array(i,:));
 
