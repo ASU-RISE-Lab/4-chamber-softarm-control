@@ -25,7 +25,7 @@ par_set.Ts=1/30;
 par_set.R1_stand_off = 0.05;% m
 fprintf('System initialization done \n')
 %% EOM per element
-par_set.EOM = 1
+par_set.EOM = 0
 if par_set.EOM ==1
     par_set = funcEOMbaseFrame2seg_v2(par_set);
 end
@@ -140,7 +140,7 @@ gp_y1=-input_array'-output_array';
 gp_u1=[input_array',state_array(:,1:4)];
 gp_obj1=iddata(gp_y1,gp_u1,Ts);
 %% Linear curve fit yi = ai*ui -ki*qi -di*dot_qi
-d1 = designfilt("lowpassiir",FilterOrder=3, ...
+d1 = designfilt("lowpassiir",FilterOrder=10, ...
     HalfPowerFrequency=0.15,DesignMethod="butter");
 
 i =1

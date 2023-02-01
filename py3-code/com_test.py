@@ -183,8 +183,8 @@ class pc_client(object):
 
                 self.pd_pm_array_1 = self.recv_zipped_socket3()
                 self.pd_pm_array_2 = self.recv_zipped_socket5()
-                self.array_wireEnco = self.recv_zipped_socket6()
-                self.arr_comb_record=np.concatenate((self.pd_pm_array_1, self.pd_pm_array_2, self.array_wireEnco, self.array3setswithrotation), axis=None)
+                # self.array_wireEnco = self.recv_zipped_socket6()
+                # self.arr_comb_record=np.concatenate((self.pd_pm_array_1, self.pd_pm_array_2, self.array_wireEnco, self.array3setswithrotation), axis=None)
                 print(self.pd_pm_array_1[0:3],self.pd_pm_array_2[0:3])
                 if self.flag_reset==0:
                     self.send_zipped_socket1(self.arr_comb_record)
@@ -192,6 +192,24 @@ class pc_client(object):
                 break
                 self.th1_flag=False
                 self.th2_flag=False
+                exit()
+
+
+    def th_data_exchange_high(self):# thread config of read data from mocap and send packed msg to record file.
+        while self.run_event.is_set() and self.th3_flag:
+            try:
+                # if self.flag_use_mocap == True:
+                    # self.array3setswithrotation = self.recv_cpp_socket2()
+
+                # self.pd_pm_array_1 = self.recv_zipped_socket3()
+                # self.pd_pm_array_2 = self.recv_zipped_socket5()
+                self.array_wireEnco = self.recv_zipped_socket6()
+                self.arr_comb_record=np.concatenate((self.pd_pm_array_1, self.pd_pm_array_2, self.array_wireEnco, self.array3setswithrotation), axis=None)
+                print(self.pd_pm_array_1[0:3],self.pd_pm_array_2[0:3])
+                if self.flag_reset==0:
+                    self.send_zipped_socket1(self.arr_comb_record)
+            except KeyboardInterrupt:
+                break
                 exit()
 
     def pres_single_step_response(self,pd_array,step_time):
