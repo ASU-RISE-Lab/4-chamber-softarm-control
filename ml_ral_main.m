@@ -70,7 +70,7 @@ testData=funcGreyBoxSysID2seg_part2(testData,par_set);
 % testData=func_greyBox(testData);
 %%
 testData =par_set.trial1;
-output_struct = funcKnownTerm_v2(testData);
+output_struct = funcKnownTerm_v3(testData);
 
 % tauy1 = testData.pd_psi(:,1) - testData.pd_psi(:,2);
 % fz1 = testData.pd_psi(:,1) + testData.pd_psi(:,2) + testData.pd_psi(:,3);
@@ -85,7 +85,59 @@ fz2 = testData.pm_psi(:,4) + testData.pm_psi(:,5) + testData.pm_psi(:,6);
 input_array= [tauy1,fz1,tauy2,fz2]';
 output_array = output_struct.output_array;
 state_array = output_struct.state_array;
+%%
+close all
+figure(1)
+i =4
+subplot(4,1,1)
+plot(output_array(i,:))
+hold on
+plot((output_array(i,:)))
+ylabel('y_i')
+title("i =" + i)
+hold on
+subplot(4,1,2)
+plot(input_array(i,:))
+ylabel('u_i')
+hold on
+subplot(4,1,3)
+plot(state_array(:,2*i-1))
+hold on
+plot((state_array(:,2*i-1)))
+ylabel('xi')
+hold on
+subplot(4,1,4)
+plot(state_array(:,2*i))
+hold on
+plot((state_array(:,2*i)))
+ylabel('xi+1')
+hold on
 
+figure(2)
+subplot(3,1,1)
+title("i =" + i)
+plot(output_struct.Mi(i,:))
+ylabel('Mi')
+hold on
+title("i =" + i)
+subplot(3,1,2)
+plot(output_struct.Ci(i,:))
+ylabel('Ci')
+hold on
+subplot(3,1,3)
+plot(output_struct.Gi(i,:))
+ylabel('Gi')
+hold on
+Ts = par_set.Ts;
+gp_y=-input_array'-output_array';
+gp_u=[input_array',state_array];
+gp_obj=iddata(gp_y,gp_u,Ts);
+
+gp_y1=-input_array'-output_array';
+gp_u1=[input_array',state_array(:,1:4)];
+gp_obj1=iddata(gp_y1,gp_u1,Ts);
+
+%% 3pt filter
 d1 = designfilt("lowpassiir",FilterOrder=3, ...
     HalfPowerFrequency=0.15,DesignMethod="butter");
 

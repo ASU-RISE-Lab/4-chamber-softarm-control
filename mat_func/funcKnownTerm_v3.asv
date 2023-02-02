@@ -41,47 +41,35 @@ function [output] = funcKnownTerm_v3(testData)
     ddlc2_array = zeros(length(theta1_array),1);
     for i = 1:length(s1.theta_wire_rad)
         if i ==1
-            dtheta1_array(i,1) = 0; 
-            dtheta2_array(i,1) = 0; 
-            dlc1_array(i,1) = 0; 
-            dlc2_array(i,1) = 0;
+            dtheta1_array(i,1) = 0; dtheta2_array(i,1) = 0; 
+
+
+            dlc1_array(i,1) = 0; dlc2_array(i,1) = 0;
 
         else
-            dtheta1_array(i,1) = (theta1_array(i,1)-theta1_array(i-1))/Ts; 
-            dtheta2_array(i,1) = (theta2_array(i,1)-theta2_array(i-1))/Ts; 
+            dtheta1_array(i,1) = (theta1_array(i,1)-theta1_array(i-1))/Ts; dtheta2_array(i,1) = (theta2_array(i,1)-theta2_array(i-1))/Ts; 
 
-            dlc1_array(i,1) = (lc1_array(i)-lc1_array(i-1))/Ts;
-            dlc2_array(i,1) = (lc2_array(i)-lc2_array(i-1))/Ts;
+            dlc1_array(i,1) = (lc1_array(i)-lc1_array(i-1))/Ts;dlc2_array(i,1) = (lc2_array(i)-lc2_array(i-1))/Ts;
         end
     windowSize = 2;
     filt_dlc1_array = filter((1/windowSize)*ones(1,windowSize),1,dlc1_array);
     filt_dlc2_array = filter((1/windowSize)*ones(1,windowSize),1,dlc2_array);
     filt_dtheta1_array = filter((1/windowSize)*ones(1,windowSize),1,dtheta1_array);
-    filt_dtheta2_array = filter((1/windowSize)*ones(1,windowSize),1,dtheta2_array);
+    filt_dtheta2 = filter((1/windowSize)*ones(1,windowSize),1,dtheta2_array);
     for i = 1:length(s1.theta_wire_rad)
         if i ==1
             ddtheta1_array(i,1) = 0; ddtheta2_array(i,1) = 0;
 
             ddlc1_array(i,1) = 0; ddlc2_array(i,1) =0;
         else
-        ddtheta1_array(i,1) =  (filt_dtheta1_array(i,1)-filt_dtheta1_array(i-1))/Ts; 
-        ddtheta2_array(i,1) =  (filt_dtheta2_array(i,1)-filt_dtheta2_array(i-1))/Ts;
+        ddtheta1_array(i,1) =  (filt_dtheta1_array(i,1)-dtheta1_array(i-1))/Ts; ddtheta2_array(i,1) =  (dtheta2_array(i,1)-dtheta2_array(i-1))/Ts;
 
-        ddlc1_array(i,1) = (filt_dlc1_array(i)-filt_dlc1_array(i-1))/Ts; 
-        ddlc2_array(i,1) =(filt_dlc2_array(i,1)-filt_dlc2_array(i-1))/Ts;
+            dlc1_array(i,1) = (lc1_array(i)-lc1_array(i-1))/Ts;dlc2_array(i,1) = (lc2_array(i)-lc2_array(i-1))/Ts;
+            ddlc1_array(i,1) = (dlc1_array(i)-dlc1_array(i-1))/Ts; ddlc2_array(i,1) =(dlc2_array(i,1)-dlc2_array(i-1))/Ts;
         end
-    filt_ddlc1_array = filter((1/windowSize)*ones(1,windowSize),1,ddlc1_array);
-    filt_ddlc2_array = filter((1/windowSize)*ones(1,windowSize),1,ddlc2_array);
-    filt_ddtheta1_array = filter((1/windowSize)*ones(1,windowSize),1,ddtheta1_array);
-    filt_ddtheta2_array = filter((1/windowSize)*ones(1,windowSize),1,ddtheta2_array);
 
-
-    theta1 = theta1_array(i);lc1 = lc1_array(i);
-    dtheta1 = filt_dtheta1_array(i);dlc1 = filt_dlc1_array(i);
-    ddtheta1 = filt_ddtheta1_array(i);ddlc1 = filt_ddlc1_array(i);
-    theta2 = theta2_array(i);lc2 = lc2_array(i);
-    dtheta2 = filt_dtheta2_array(i);dlc2 = filt_dlc2_array(i);
-    ddtheta2 = filt_ddtheta2_array(i);ddlc2 = filt_ddlc2_array(i);
+    theta1 = theta1_array(i);lc1 = lc1_array(i);dtheta1 = dtheta1_array(i);dlc1 = dlc1_array(i);ddtheta1 = ddtheta1_array(i);ddlc1 = ddlc1_array(i);
+    theta2 = theta2_array(i);lc2 = lc2_array(i);dtheta2 = dtheta2_array(i);dlc2 = dlc2_array(i);ddtheta2 = ddtheta2_array(i);ddlc2 = ddlc2_array(i);
     if theta1 <= 0.005
         r3 = 0.5 * lc1;
     else

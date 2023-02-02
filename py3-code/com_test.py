@@ -25,8 +25,9 @@ class pc_client(object):
         self.trial_start_reset = 1
         """ Initiate ZMQ communication"""
         context = zmq.Context()
-        self.addr_pub_pres_to_low_1 = "tcp://10.203.52.227:4444"
-        self.addr_pub_pres_to_low_2 = "tcp://10.203.52.227:5555"
+
+        self.addr_pub_pres_to_low_1 = "tcp://10.203.51.138:4444"
+        self.addr_pub_pres_to_low_2 = "tcp://10.203.51.138:5555"
 
         self.addr_sub_wireEnco_from_low_1 = "tcp://10.203.54.76:5555"
 
@@ -76,21 +77,44 @@ class pc_client(object):
         self.array3setswithrotation=np.array([0.]*21)# base(x y z qw qx qy qz) top(x1 y1 z1 qw1 qx1 qy1 qz1)
         self.pd_pm_array_1=np.array([0.]*6) #pd1 pd2 pd3 + pm1 +pm2 +pm3 (psi)
         self.pd_pm_array_2 = self.pd_pm_array_1
-        self.array_wireEnco = np.array([0.]*4)
+        self.filt_array_wireEnco = np.array([0.]*4)
         # assmble all to recording
-        self.arr_comb_record=np.concatenate((self.pd_pm_array_1, self.pd_pm_array_2, self.array_wireEnco, self.array3setswithrotation), axis=None)
+        self.arr_comb_record=np.concatenate((self.pd_pm_array_1, self.pd_pm_array_2, self.filt_array_wireEnco, self.array3setswithrotation), axis=None)
         
 
         """ Thearding Setup """
         self.th1_flag=True
         self.th2_flag=True
+        self.th3_flag = True
         self.run_event=threading.Event()
         self.run_event.set()
         self.th1=threading.Thread(name='raspi_client',target=self.th_pd_gen)
         self.th2=threading.Thread(name='mocap',target=self.th_data_exchange)
+        self.th3 = threading.Thread(name='pub2rec',target=self.th_data_exchange_high)
 
         """ Common variable"""
         self.t0_on_glob = time()
+        self.filter_size = 2
+        self.rawVel_array_wireEnco_0 = np.array([0.0]*(self.filter_size))
+        self.rawVel_array_wireEnco_1 = np.array([0.0]*(self.filter_size))
+        self.rawVel_array_wireEnco_2 = np.array([0.0]*(self.filter_size))
+        self.rawVel_array_wireEnco_3 = np.array([0.0]*(self.filter_size))
+
+        self.filtVel_array_wireEnco_0 = np.array([0.0]*(self.filter_size))
+        self.filtVel_array_wireEnco_1 = np.array([0.0]*(self.filter_size))
+        self.filtVel_array_wireEnco_2 = np.array([0.0]*(self.filter_size))
+        self.filtVel_array_wireEnco_3 = np.array([0.0]*(self.filter_size))
+
+        self.rawAcc_array_wireEnco_0 = np.array([0.0]*(self.filter_size))
+        self.rawAcc_array_wireEnco_1 = np.array([0.0]*(self.filter_size))
+        self.rawAcc_array_wireEnco_2 = np.array([0.0]*(self.filter_size))
+        self.rawAcc_array_wireEnco_3 = np.array([0.0]*(self.filter_size))
+
+        self.filtAcc_array_wireEnco_0 = np.array([0.0]*(self.filter_size))
+        self.filtAcc_array_wireEnco_1 = np.array([0.0]*(self.filter_size))
+        self.filtAcc_array_wireEnco_2 = np.array([0.0]*(self.filter_size))
+        self.filtAcc_array_wireEnco_3 = np.array([0.0]*(self.filter_size)) 
+
         """Initialize SMC Parameter """
         # Actuator geometic parameters
 
@@ -183,11 +207,10 @@ class pc_client(object):
 
                 self.pd_pm_array_1 = self.recv_zipped_socket3()
                 self.pd_pm_array_2 = self.recv_zipped_socket5()
-                # self.array_wireEnco = self.recv_zipped_socket6()
-                # self.arr_comb_record=np.concatenate((self.pd_pm_array_1, self.pd_pm_array_2, self.array_wireEnco, self.array3setswithrotation), axis=None)
+                self.filt_array_wireEnco = self.recv_zipped_socket6()
                 print(self.pd_pm_array_1[0:3],self.pd_pm_array_2[0:3])
-                if self.flag_reset==0:
-                    self.send_zipped_socket1(self.arr_comb_record)
+                # if self.flag_reset==0:
+                #     self.send_zipped_socket1(self.arr_comb_record)
             except KeyboardInterrupt:
                 break
                 self.th1_flag=False
@@ -198,13 +221,7 @@ class pc_client(object):
     def th_data_exchange_high(self):# thread config of read data from mocap and send packed msg to record file.
         while self.run_event.is_set() and self.th3_flag:
             try:
-                # if self.flag_use_mocap == True:
-                    # self.array3setswithrotation = self.recv_cpp_socket2()
-
-                # self.pd_pm_array_1 = self.recv_zipped_socket3()
-                # self.pd_pm_array_2 = self.recv_zipped_socket5()
-                self.array_wireEnco = self.recv_zipped_socket6()
-                self.arr_comb_record=np.concatenate((self.pd_pm_array_1, self.pd_pm_array_2, self.array_wireEnco, self.array3setswithrotation), axis=None)
+                self.arr_comb_record=np.concatenate((self.pd_pm_array_1, self.pd_pm_array_2, self.filt_array_wireEnco, self.array3setswithrotation), axis=None)
                 print(self.pd_pm_array_1[0:3],self.pd_pm_array_2[0:3])
                 if self.flag_reset==0:
                     self.send_zipped_socket1(self.arr_comb_record)
@@ -227,9 +244,8 @@ class pc_client(object):
                 break
                 self.th1_flag = 0
                 self.th2_flag = 0
-        # self.trial_start_reset == 1
                 
-            
+
     def send_zipped_socket0(self, obj, flags=0, protocol=-1):
         """pack and compress an object with pickle and zlib."""
         pobj = pickle.dumps(obj, protocol)
