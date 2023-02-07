@@ -100,6 +100,7 @@ fprintf( 'Finishing calculation... \n' );
     else
         r3 = lc1/(theta1)*sin(theta1/2);
     end
+    
     if theta2 <= 0.005
         r6 = 0.5*lc2;
     else
@@ -187,4 +188,10 @@ output.state_array = state_array;
 output.Mi = Mi;
 output.Gi = Gi;
 output.Ci = Ci;
+
+output.u_pm = [];
+output.u_pm(:,1) = testData.pm_psi(:,1) - testData.pm_psi(:,2);
+output.u_pm(:,2) = testData.pm_psi(:,1) + testData.pm_psi(:,2) + 2*testData.pm_psi(:,3);
+output.u_pm(:,3) = testData.pm_psi(:,4) - testData.pm_psi(:,5);
+output.u_pm(:,4) = testData.pm_psi(:,4) + testData.pm_psi(:,5) + 2*testData.pm_psi(:,6); 
 end 

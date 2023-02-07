@@ -18,10 +18,9 @@ par_set.plot_fwdKinematic = 0;
 % Check data readme.txt for detail input reference
 par_set.Ts=1/60;
 
-% par_set.L=0.185;%actuator length
-% par_set.n=4;% # of joints for augmented rigid arm
-% par_set.m0=0.35;%kg segment weight
-% par_set.g=9.8;%% gravity constant
+par_set.fz_a0 = (25/1000)*(60/1000);%m^2
+par_set.tau_l0 =48/1000;%m
+
 par_set.R1_stand_off = 0.05;% m
 fprintf('System initialization done \n')
 %% EOM per element
