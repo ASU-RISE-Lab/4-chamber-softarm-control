@@ -16,7 +16,7 @@ par_set.flag_read_exp = 1;
 %flag for plotting fwd kinematic results
 par_set.plot_fwdKinematic = 0;
 % Check data readme.txt for detail input reference
-par_set.Ts=1/30;
+par_set.Ts=1/60;
 
 % par_set.L=0.185;%actuator length
 % par_set.n=4;% # of joints for augmented rigid arm
@@ -85,6 +85,72 @@ fz2 = testData.pm_psi(:,4) + testData.pm_psi(:,5) + testData.pm_psi(:,6);
 input_array= [tauy1,fz1,tauy2,fz2]';
 output_array = output_struct.output_array;
 state_array = output_struct.state_array;
+
+
+close all
+figure(1)
+i =4
+subplot(4,1,1)
+plot(output_array(i,:))
+hold on
+plot((output_array(i,:)))
+ylabel('y_i')
+title("i =" + i)
+hold on
+subplot(4,1,2)
+plot(input_array(i,:))
+ylabel('u_i')
+hold on
+subplot(4,1,3)
+plot(state_array(:,2*i-1))
+hold on
+plot((state_array(:,2*i-1)))
+ylabel('xi')
+hold on
+subplot(4,1,4)
+plot(state_array(:,2*i))
+hold on
+plot((state_array(:,2*i)))
+ylabel('xi+1')
+hold on
+
+figure(2)
+subplot(3,1,1)
+title("i =" + i)
+plot(output_struct.Mi(i,:))
+ylabel('Mi')
+hold on
+title("i =" + i)
+subplot(3,1,2)
+plot(output_struct.Ci(i,:))
+ylabel('Ci')
+hold on
+subplot(3,1,3)
+plot(output_struct.Gi(i,:))
+ylabel('Gi')
+hold on
+Ts = par_set.Ts;
+st_pt = 1;
+i =1
+temp_y=output_array(i,st_pt:end)';
+temp_u=[input_array(i,st_pt:end)',state_array(st_pt:end,2*i-1),state_array(st_pt:end,2*i)];
+obj1 =iddata(temp_y,temp_u,Ts);
+lg1 = regress(temp_y,temp_u)
+i =2
+temp_y=output_array(i,st_pt:end)';
+temp_u=[input_array(i,st_pt:end)',state_array(st_pt:end,2*i-1),state_array(st_pt:end,2*i)];
+obj2 =iddata(temp_y,temp_u,Ts);
+lg2 = regress(temp_y,temp_u)
+i =3
+temp_y=output_array(i,st_pt:end)';
+temp_u=[input_array(i,st_pt:end)',state_array(st_pt:end,2*i-1),state_array(st_pt:end,2*i)];
+obj3 =iddata(temp_y,temp_u,Ts);
+lg3 = regress(temp_y,temp_u)
+i =4
+temp_y=output_array(i,st_pt:end)';
+temp_u=[input_array(i,st_pt:end)',state_array(st_pt:end,2*i-1),state_array(st_pt:end,2*i)];
+obj4 =iddata(temp_y,temp_u,Ts);
+lg4 = regress(temp_y,temp_u)
 %%
 close all
 figure(1)

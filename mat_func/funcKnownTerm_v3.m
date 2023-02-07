@@ -39,6 +39,13 @@ function [output] = funcKnownTerm_v3(testData)
     dlc2_array = zeros(length(theta1_array),1);
     ddlc1_array = zeros(length(theta1_array),1);
     ddlc2_array = zeros(length(theta1_array),1);
+    fprintf( 'Filtering pos... \n' );
+    windowSize = 1;
+    filt_lc1_array = filter((1/windowSize)*ones(1,windowSize),1,lc1_array);
+    filt_lc2_array = filter((1/windowSize)*ones(1,windowSize),1,lc2_array);
+    filt_theta1_array = filter((1/windowSize)*ones(1,windowSize),1,theta1_array);
+    filt_theta2_array = filter((1/windowSize)*ones(1,windowSize),1,theta2_array);
+    fprintf( 'Filtering vel... \n' );
     for i = 1:length(s1.theta_wire_rad)
         if i ==1
             dtheta1_array(i,1) = 0; 
@@ -47,13 +54,15 @@ function [output] = funcKnownTerm_v3(testData)
             dlc2_array(i,1) = 0;
 
         else
-            dtheta1_array(i,1) = (theta1_array(i,1)-theta1_array(i-1))/Ts; 
-            dtheta2_array(i,1) = (theta2_array(i,1)-theta2_array(i-1))/Ts; 
+            dtheta1_array(i,1) = (filt_theta1_array(i,1)-filt_theta1_array(i-1))/Ts; 
+            dtheta2_array(i,1) = (filt_theta2_array(i,1)-filt_theta2_array(i-1))/Ts; 
 
-            dlc1_array(i,1) = (lc1_array(i)-lc1_array(i-1))/Ts;
-            dlc2_array(i,1) = (lc2_array(i)-lc2_array(i-1))/Ts;
+            dlc1_array(i,1) = (filt_lc1_array(i)-filt_lc1_array(i-1))/Ts;
+            dlc2_array(i,1) = (filt_lc2_array(i)-filt_lc2_array(i-1))/Ts;
         end
-    windowSize = 2;
+    end
+    
+    windowSize = 10;
     filt_dlc1_array = filter((1/windowSize)*ones(1,windowSize),1,dlc1_array);
     filt_dlc2_array = filter((1/windowSize)*ones(1,windowSize),1,dlc2_array);
     filt_dtheta1_array = filter((1/windowSize)*ones(1,windowSize),1,dtheta1_array);
@@ -70,18 +79,22 @@ function [output] = funcKnownTerm_v3(testData)
         ddlc1_array(i,1) = (filt_dlc1_array(i)-filt_dlc1_array(i-1))/Ts; 
         ddlc2_array(i,1) =(filt_dlc2_array(i,1)-filt_dlc2_array(i-1))/Ts;
         end
+    end
+     fprintf( 'Filtering acc... \n' );
+      windowSize = 10;
     filt_ddlc1_array = filter((1/windowSize)*ones(1,windowSize),1,ddlc1_array);
     filt_ddlc2_array = filter((1/windowSize)*ones(1,windowSize),1,ddlc2_array);
     filt_ddtheta1_array = filter((1/windowSize)*ones(1,windowSize),1,ddtheta1_array);
     filt_ddtheta2_array = filter((1/windowSize)*ones(1,windowSize),1,ddtheta2_array);
-
-
+fprintf( 'Finishing calculation... \n' );
+    for i = 1:length(s1.theta_wire_rad)
     theta1 = theta1_array(i);lc1 = lc1_array(i);
     dtheta1 = filt_dtheta1_array(i);dlc1 = filt_dlc1_array(i);
     ddtheta1 = filt_ddtheta1_array(i);ddlc1 = filt_ddlc1_array(i);
     theta2 = theta2_array(i);lc2 = lc2_array(i);
     dtheta2 = filt_dtheta2_array(i);dlc2 = filt_dlc2_array(i);
     ddtheta2 = filt_ddtheta2_array(i);ddlc2 = filt_ddlc2_array(i);
+     
     if theta1 <= 0.005
         r3 = 0.5 * lc1;
     else
@@ -156,15 +169,20 @@ G =[(3*g*m0*((lc1*(tan(theta1/2)^2/2 + 1/2))/theta1 - (lc1*tan(theta1/2))/theta1
  
 
 end
- 
+
     tau_f_array(1:4,i) = M * [ddtheta1;ddlc1;ddtheta2;ddlc2] + C * [dtheta1;dlc1;dtheta2;dlc2] + G;
     Mi(1:4,i)  =  M * [ddtheta1;ddlc1;ddtheta2;ddlc2];
     Ci(1:4,i) = C * [dtheta1;dlc1;dtheta2;dlc2];
     Gi(1:4,i) = G;
     end
-state_array = [theta1_array,dtheta1_array,lc1_array,dlc1_array,...
-               theta2_array,dtheta2_array,lc2_array,dlc2_array];
-output.output_array = tau_f_array;
+    windowSize = 1;
+    filt_tau_f_array(1,:) = filter((1/windowSize)*ones(1,windowSize),1,tau_f_array(1,:));
+    filt_tau_f_array(2,:) = filter((1/windowSize)*ones(1,windowSize),1,tau_f_array(2,:));
+    filt_tau_f_array(3,:) = filter((1/windowSize)*ones(1,windowSize),1,tau_f_array(3,:));
+    filt_tau_f_array(4,:) = filter((1/windowSize)*ones(1,windowSize),1,tau_f_array(4,:));
+state_array = [filt_theta1_array,filt_dtheta1_array,filt_lc1_array,filt_dlc1_array,...
+               filt_theta2_array,filt_dtheta2_array,filt_lc2_array,filt_dlc2_array];
+output.output_array = filt_tau_f_array;
 output.state_array = state_array;
 output.Mi = Mi;
 output.Gi = Gi;
