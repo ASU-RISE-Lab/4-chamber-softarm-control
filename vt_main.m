@@ -67,30 +67,28 @@ testData=[];
 testData=par_set.trial11;
 testData=funcGreyBoxSysID2seg_part2(testData,par_set);
 % testData=func_greyBox(testData);
-%% filtering velocity and acc
+%%
 testData =par_set.trial1;
 output_struct = funcKnownTerm_v3(testData);
-st_pt = 500; ed_pt = length(testData.pm_psi);
+
 % tauy1 = testData.pd_psi(:,1) - testData.pd_psi(:,2);
 % fz1 = testData.pd_psi(:,1) + testData.pd_psi(:,2) + testData.pd_psi(:,3);
 % tauy2 = testData.pd_psi(:,4) - testData.pd_psi(:,5);
 % fz2 = testData.pd_psi(:,4) + testData.pd_psi(:,5) + testData.pd_psi(:,6);
 
+tauy1 = testData.pm_psi(:,1) - testData.pm_psi(:,2);
+fz1 = testData.pm_psi(:,1) + testData.pm_psi(:,2) + testData.pm_psi(:,3);
+tauy2 = testData.pm_psi(:,4) - testData.pm_psi(:,5);
+fz2 = testData.pm_psi(:,4) + testData.pm_psi(:,5) + testData.pm_psi(:,6);
 
-tauy1 = testData.pm_psi(st_pt:ed_pt,1) - testData.pm_psi(st_pt:ed_pt,2);
-fz1 = testData.pm_psi(st_pt:ed_pt,1) + testData.pm_psi(st_pt:ed_pt,2) + testData.pm_psi(st_pt:ed_pt,3);
-tauy2 = testData.pm_psi(st_pt:ed_pt,4) - testData.pm_psi(st_pt:ed_pt,5);
-fz2 = testData.pm_psi(st_pt:ed_pt,4) + testData.pm_psi(st_pt:ed_pt,5) + testData.pm_psi(st_pt:ed_pt,6);
-
-input_array= [tauy1*par_set.fz_a0*par_set.tau_l0,fz1*par_set.fz_a0...
-             ,tauy2*par_set.fz_a0*par_set.tau_l0,fz2*par_set.fz_a0]';
-output_array = output_struct.output_array(:,st_pt:ed_pt);
-state_array = output_struct.state_array(st_pt:ed_pt,:);
+input_array= [tauy1,fz1,tauy2,fz2]';
+output_array = output_struct.output_array;
+state_array = output_struct.state_array;
 
 
 close all
-for i  =1 :4
-figure(i)
+figure(1)
+i =4
 subplot(4,1,1)
 plot(output_array(i,:))
 hold on
@@ -114,20 +112,20 @@ hold on
 plot((state_array(:,2*i)))
 ylabel('xi+1')
 hold on
-end
-figure(5)
+
+figure(2)
 subplot(3,1,1)
 title("i =" + i)
-plot(output_struct.Mi(i,st_pt:ed_pt))
+plot(output_struct.Mi(i,:))
 ylabel('Mi')
 hold on
 title("i =" + i)
 subplot(3,1,2)
-plot(output_struct.Ci(i,st_pt:ed_pt))
+plot(output_struct.Ci(i,:))
 ylabel('Ci')
 hold on
 subplot(3,1,3)
-plot(output_struct.Gi(i,st_pt:ed_pt))
+plot(output_struct.Gi(i,:))
 ylabel('Gi')
 hold on
 Ts = par_set.Ts;

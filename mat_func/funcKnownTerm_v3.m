@@ -40,7 +40,7 @@ function [output] = funcKnownTerm_v3(testData)
     ddlc1_array = zeros(length(theta1_array),1);
     ddlc2_array = zeros(length(theta1_array),1);
     fprintf( 'Filtering pos... \n' );
-    windowSize = 1;
+    windowSize = 10;
     filt_lc1_array = filter((1/windowSize)*ones(1,windowSize),1,lc1_array);
     filt_lc2_array = filter((1/windowSize)*ones(1,windowSize),1,lc2_array);
     filt_theta1_array = filter((1/windowSize)*ones(1,windowSize),1,theta1_array);
@@ -88,10 +88,10 @@ function [output] = funcKnownTerm_v3(testData)
     filt_ddtheta2_array = filter((1/windowSize)*ones(1,windowSize),1,ddtheta2_array);
 fprintf( 'Finishing calculation... \n' );
     for i = 1:length(s1.theta_wire_rad)
-    theta1 = theta1_array(i);lc1 = lc1_array(i);
+    theta1 = filt_theta1_array(i);lc1 = filt_lc1_array(i);
     dtheta1 = filt_dtheta1_array(i);dlc1 = filt_dlc1_array(i);
     ddtheta1 = filt_ddtheta1_array(i);ddlc1 = filt_ddlc1_array(i);
-    theta2 = theta2_array(i);lc2 = lc2_array(i);
+    theta2 = filt_theta2_array(i);lc2 = filt_lc2_array(i);
     dtheta2 = filt_dtheta2_array(i);dlc2 = filt_dlc2_array(i);
     ddtheta2 = filt_ddtheta2_array(i);ddlc2 = filt_ddlc2_array(i);
      
