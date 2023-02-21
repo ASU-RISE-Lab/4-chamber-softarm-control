@@ -16,7 +16,7 @@ par_set.flag_read_exp = 1;
 %flag for plotting fwd kinematic results
 par_set.plot_fwdKinematic = 0;
 % Check data readme.txt for detail input reference
-par_set.Ts=1/80;
+par_set.Ts=1/60;
 
 par_set.fz_a0 = (25/1000)*(60/1000);%m^2
 par_set.tau_l0 =48/1000;%m

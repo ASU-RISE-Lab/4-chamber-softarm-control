@@ -16,7 +16,7 @@ from time import sleep
 def main():
     try:
         #### Select control method ####
-        flag_ctrl_mode=1
+        flag_ctrl_mode=0
         if flag_ctrl_mode==0:
             p_client=com_test.pc_client()
         elif flag_ctrl_mode==1:

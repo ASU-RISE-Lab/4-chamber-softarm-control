@@ -158,13 +158,13 @@ class pc_client(object):
                         self.array3setswithrotation=self.recv_cpp_socket2()
                     
                     # print(self.pd_pm_array_2)
-                    seg1_r= 10.0
-                    seg1_l = 1.0
-                    seg1_m = 1.0
+                    seg1_r= 15.0
+                    seg1_l = 15.0
+                    seg1_m = 15.0
 
-                    seg2_r = 10.0
-                    seg2_l = 1.0
-                    seg2_m = 1.0
+                    seg2_r = 15.0
+                    seg2_l = 15.0
+                    seg2_m = 15.0
 
                     td = 10
                     pd_array=np.array([seg1_r,seg1_l,seg1_m,seg2_r,seg2_l,seg2_m])
