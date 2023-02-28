@@ -40,7 +40,7 @@ function [output] = funcKnownTerm_v3(testData)
     ddlc1_array = zeros(length(theta1_array),1);
     ddlc2_array = zeros(length(theta1_array),1);
     fprintf( 'Filtering pos... \n' );
-    windowSize = 10;
+    windowSize = 1;
     filt_lc1_array = filter((1/windowSize)*ones(1,windowSize),1,lc1_array);
     filt_lc2_array = filter((1/windowSize)*ones(1,windowSize),1,lc2_array);
     filt_theta1_array = filter((1/windowSize)*ones(1,windowSize),1,theta1_array);
@@ -62,7 +62,7 @@ function [output] = funcKnownTerm_v3(testData)
         end
     end
     
-    windowSize = 10;
+    windowSize = 20;
     filt_dlc1_array = filter((1/windowSize)*ones(1,windowSize),1,dlc1_array);
     filt_dlc2_array = filter((1/windowSize)*ones(1,windowSize),1,dlc2_array);
     filt_dtheta1_array = filter((1/windowSize)*ones(1,windowSize),1,dtheta1_array);
@@ -81,7 +81,8 @@ function [output] = funcKnownTerm_v3(testData)
         end
     end
      fprintf( 'Filtering acc... \n' );
-      windowSize = 10;
+
+      windowSize = 20;
     filt_ddlc1_array = filter((1/windowSize)*ones(1,windowSize),1,ddlc1_array);
     filt_ddlc2_array = filter((1/windowSize)*ones(1,windowSize),1,ddlc2_array);
     filt_ddtheta1_array = filter((1/windowSize)*ones(1,windowSize),1,ddtheta1_array);
