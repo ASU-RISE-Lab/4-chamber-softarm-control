@@ -199,7 +199,7 @@ lg4 = regress(temp_y,temp_u)
 %%
 i =2
 temp_y=input_array(i,st_pt:end)'-output_array_1st(i,st_pt:end)';
-temp_y2=0.25*input_array(i,st_pt:end)'-output_array(i,st_pt:end)';
+temp_y2=0.5*input_array(i,st_pt:end)'-output_array(i,st_pt:end)';
 temp_x=state_array(st_pt:end,2*i-1);
 temp_xdot = state_array(st_pt:end,2*i);
 temp_u = [temp_x,temp_xdot];
