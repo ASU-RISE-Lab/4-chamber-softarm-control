@@ -22,6 +22,7 @@ par_set.fz_a0 = (25/1000)*(60/1000);%m^2
 par_set.tau_l0 =48/1000;%m
 
 par_set.R1_stand_off = 0.05;% m
+% par_set.R1_stand_off = 0.03;% m
 fprintf('System initialization done \n')
 %% EOM per element
 par_set.EOM = 0
@@ -67,6 +68,91 @@ testData=[];
 testData=par_set.trial11;
 testData=funcGreyBoxSysID2seg_part2(testData,par_set);
 % testData=func_greyBox(testData);
+%% Mar 7th 2023
+%%% Use mocap for angle estimation  
+%%% Use wire encoder for arc length estimation
+%%% End %%%
+testData =par_set.trial2;
+% output_struct = funcKnownTerm_v4(testData,par_set);
+%%% optional update using alpha parameters
+output_struct = funcKnownTerm_v5(testData,par_set);
+
+st_pt = 1; ed_pt = length(testData.pm_psi);
+tauy1 = testData.pm_Pa(st_pt:ed_pt,1) - testData.pm_Pa(st_pt:ed_pt,2);
+fz1 = testData.pm_Pa(st_pt:ed_pt,1) + testData.pm_Pa(st_pt:ed_pt,2) + testData.pm_Pa(st_pt:ed_pt,3);
+tauy2 = testData.pm_Pa(st_pt:ed_pt,4) - testData.pm_Pa(st_pt:ed_pt,5);
+fz2 = testData.pm_Pa(st_pt:ed_pt,4) + testData.pm_Pa(st_pt:ed_pt,5) + testData.pm_Pa(st_pt:ed_pt,6);
+
+input_array= [tauy1*par_set.fz_a0*par_set.tau_l0, fz1*par_set.fz_a0...
+             ,tauy2*par_set.fz_a0*par_set.tau_l0, fz2*par_set.fz_a0]';
+output_array = output_struct.output_array(:,st_pt:ed_pt);
+state_array = output_struct.state_array(st_pt:ed_pt,:);
+acc_array =  output_struct.acc_array(st_pt:ed_pt,:);
+
+title_str = {'$\theta_1$','$l_1$','$\theta_2$','$l_2$'};
+xi_str = {'$\theta_1$','$l_1$','$\theta_2$','$l_2$'};
+xidot_str = {'$\dot{\theta}_1$','$\dot{l}_1$','$\dot{\theta}_2$','$\dot{l}_2$'};
+xiddot_str = {'$\ddot{\theta}_1$','$\ddot{l}_1$','$\ddot{\theta}_2$','$\ddot{l}_2$'};
+ui_str = {'$\tau$','$f$','$\tau$','$f$'};
+close all
+for i  =1 :4
+figure(i)
+subplot(4,1,1)
+plot(input_array(i,:))
+ylabel(ui_str{i},'Interpreter','latex','FontSize',20)
+title(title_str{i},'Interpreter','latex','FontSize',20)
+hold on
+
+subplot(4,1,2)
+plot((state_array(:,2*i-1)))
+ylabel(xi_str{i},'Interpreter','latex','FontSize',20)
+hold on
+
+subplot(4,1,3)
+plot((state_array(:,2*i)))
+ylabel(xidot_str{i},'Interpreter','latex','FontSize',20)
+
+hold on
+subplot(4,1,4)
+plot((acc_array(:,i)))
+ylabel(xiddot_str{i},'Interpreter','latex','FontSize',20)
+hold on
+end
+%%% toolbox
+Ts = par_set.Ts;
+i =1
+temp_y=output_array(i,st_pt:end)';
+% temp_u=[input_array(i,st_pt:end)',state_array(st_pt:end,2*i-1),state_array(st_pt:end,2*i)];
+% obj1 =iddata(temp_y,temp_u,Ts);
+temp_y1=input_array(i,st_pt:end)'-output_array(i,st_pt:end)';
+temp_x1=state_array(st_pt:end,2*i-1);
+temp_x1dot = state_array(st_pt:end,2*i);
+lg1 = regress(temp_y,temp_u)
+i =2
+temp_y=output_array(i,st_pt:end)';
+% temp_u=[input_array(i,st_pt:end)',state_array(st_pt:end,2*i-1),state_array(st_pt:end,2*i)];
+% obj2 =iddata(temp_y,temp_u,Ts);
+temp_y2=input_array(i,st_pt:end)'-output_array(i,st_pt:end)';
+temp_x2=state_array(st_pt:end,2*i-1);
+temp_x2dot = state_array(st_pt:end,2*i);
+lg2 = regress(temp_y,temp_u)
+i =3
+temp_y=output_array(i,st_pt:end)';
+% temp_u=[input_array(i,st_pt:end)',state_array(st_pt:end,2*i-1),state_array(st_pt:end,2*i)];
+% obj3 =iddata(temp_y,temp_u,Ts);
+temp_y3=input_array(i,st_pt:end)'-output_array(i,st_pt:end)';
+temp_x3=state_array(st_pt:end,2*i-1);
+temp_x3dot = state_array(st_pt:end,2*i);
+lg3 = regress(temp_y,temp_u)
+i =4
+temp_y=output_array(i,st_pt:end)';
+% temp_u=[input_array(i,st_pt:end)',state_array(st_pt:end,2*i-1),state_array(st_pt:end,2*i)];
+% obj4 =iddata(temp_y,temp_u,Ts);
+temp_y4=input_array(i,st_pt:end)'-output_array(i,st_pt:end)';
+temp_x4=state_array(st_pt:end,2*i-1);
+temp_x4dot = state_array(st_pt:end,2*i);
+lg4 = regress(temp_y,temp_u)
+%%% End %%%
 %% filtering velocity and acc
 testData =par_set.trial1;
 output_struct = funcKnownTerm_v3(testData);
@@ -94,6 +180,7 @@ state_array = output_struct.state_array(st_pt:ed_pt,:);
 
 
 close all
+
 for i  =1 :4
 figure(i)
 subplot(4,1,1)
@@ -319,7 +406,7 @@ gp_u=[input_array',state_array];
 gp_obj=iddata(gp_y,gp_u,Ts);
 %% Calculate bending angle
 % Encoder reading based theta = (si-r - si-l)/ r0
-testData = par_set.trial1;
+testData = par_set.trial2;
 s1.l_t0 = 205.7796;s1.r_t0 = 209.0839; 
 s2.l_t0 = 223.6281;s2.r_t0 = 222.3360;
 r0 = 62.2254*0.75
@@ -344,7 +431,7 @@ s2.l_wire_mm = (s2.r_t + s2.l_t)/2;
 % Mocap based theta = 2 * (pi/2 - atan2(R2.pose.x - R1.pos.x,R1.pose.z -
 % 0.05 - R2.pos.z))
 
-testData = par_set.trial2;
+testData = par_set.trial1;
 par_set.R1_stand_off = 0.03;% m
 % testData.theta_mocap = 2 * (pi/2 - atan2(testData.rigid_2_pose(:,1) - testData.rigid_1_pose(:,1),...
 %     testData.rigid_1_pose(:,3) - par_set.R1_stand_off - testData.rigid_2_pose(:,3))); 
@@ -357,7 +444,9 @@ testData.s1.theta_mocap = 2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2));
 d_x = testData.rigid_3_pose(:,1) - testData.rigid_1_pose(:,1);
 d_y = testData.rigid_3_pose(:,2) - testData.rigid_1_pose(:,2);
 d_z = testData.rigid_3_pose(:,3) - testData.rigid_1_pose(:,3)  + 0.004;
-testData.s2.theta_mocap = 2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2)).*sign(d_x);
+testData.s2.theta_mocap = 2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2));
+
+testData.s2.theta21_mocap = testData.s2.theta_mocap-testData.s1.theta_mocap;
 % testData.theta_mocap =2 * (atan2(testData.rigid_2_pose(:,1) - testData.rigid_1_pose(:,1),...
 %     testData.rigid_1_pose(:,3) - par_set.R1_stand_off - testData.rigid_2_pose(:,3)));  
 close all;
@@ -406,6 +495,35 @@ hold on
 plot(testData.enco_volts(:,4))
 hold on
 legend('')
+%%
+L1_term = s1.l_t/r0;
+R1_term = s1.r_t/r0;
+theta1_term = testData.s1.theta_mocap;
+alpha_l1 = 1.084;
+alpha_r1 = 1.09;
+L2_term = s2.l_t/r0;
+R2_term = s2.r_t/r0;
+theta2_term = testData.s2.theta21_mocap;
+alpha_r2 = 0.7825;
+alpha_l2 = 0.716;
+
+s1.theta_wire_rad = (alpha_r1*s1.r_t - alpha_l1*s1.l_t)/r0;
+s1.l_wire_mm = (alpha_r1*s1.r_t + alpha_l1*s1.l_t)/2;
+
+s2.theta_wire_rad = (alpha_r2*s2.r_t - alpha_l2*s2.l_t)/r0;
+s2.l_wire_mm = (alpha_r2*s2.r_t + alpha_l2*s2.l_t)/2;
+close all
+figure(1)
+plot((testData.s1.theta_mocap))
+hold on
+plot((s1.theta_wire_rad))
+hold on
+plot((testData.s2.theta21_mocap))
+hold on
+plot((s2.theta_wire_rad))
+hold on
+ylabel('rad')
+legend('s1-m','s1-w','s2-m','s2-w')
 %%
 for i = 1:length(testData.rigid_3_rot)
 R3_mat{i} = quat2rotm(testData.rigid_3_rot(i,:));
