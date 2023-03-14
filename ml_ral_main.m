@@ -84,8 +84,8 @@ tauy2 = testData.pm_Pa(st_pt:ed_pt,4) - testData.pm_Pa(st_pt:ed_pt,5);
 fz2 = testData.pm_Pa(st_pt:ed_pt,4) + testData.pm_Pa(st_pt:ed_pt,5) + testData.pm_Pa(st_pt:ed_pt,6);
 
 input_array= [tauy1*par_set.fz_a0*par_set.tau_l0, fz1*par_set.fz_a0...
-             ,tauy2*par_set.fz_a0*par_set.tau_l0, fz2*par_set.fz_a0]';
-output_array = output_struct.output_array(:,st_pt:ed_pt);
+             tauy2*par_set.fz_a0*par_set.tau_l0,fz2*par_set.fz_a0'];
+output_array = output_struct.output_array(1:end,st_pt:ed_pt);
 state_array = output_struct.state_array(st_pt:ed_pt,:);
 acc_array =  output_struct.acc_array(st_pt:ed_pt,:);
 
