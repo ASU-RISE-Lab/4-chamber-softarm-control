@@ -59,14 +59,28 @@ z.InputUnit = {'$Nm$';'$Nm$'};
 z.OutputName = {'$\theta_1$';'$\theta_2$'};
 z.OutputUnit = {'$Nm/rad$','$Nm/rad$'};
 present(z)
+FileName      = 'func2segODE_m';       % File describing the model structure.
+Order         = [2 2 4];           % Model orders [ny nu nx].
+Parameters    = [9.182;11.79; 6.263;4.7];         % Initial parameters. Np = 3*4
+InitialStates = zeros(4,1);            % Initial initial states.
+Ts            = 0;                 % Time-continuous system.
+nlgr = idnlgrey(FileName, Order, Parameters,InitialStates, Ts, ...
+    'Name', 'Arm');
+present(nlgr)
+compare(nlgr,z)
+% set(nlgr, 'InputName', {'tauy1','tauy2'}, ...
+%     'InputUnit', {'Nm','N','Nm','N'},               ...
+%     'OutputName', {'a1','a2'}, ...
+%     'OutputUnit', {'rad','rad'},                         ...
+%     'TimeUnit', 's');
 return
 
 FileName      = 'func2segODE_m';       % File describing the model structure.
-Order         = [8 4 8];           % Model orders [ny nu nx].
-Parameters    = ones(12,1);         % Initial parameters. Np = 3*4
+Order         = [2 2 4];           % Model orders [ny nu nx].
+Parameters    = [9.182;11.79; 6.263;4.7];         % Initial parameters. Np = 3*4
 InitialStates = zeros(8,1);            % Initial initial states.
 Ts            = 0;                 % Time-continuous system.
-nlgr = idnlgrey(FileName, Order, Parameters, InitialStates, Ts, ...
+nlgr = idnlgrey(FileName, Ts, ...
     'Name', 'Arm');
 set(nlgr, 'InputName', {'tauy1','fz1','tauy2','fz2'}, ...
     'InputUnit', {'Nm','N','Nm','N'},               ...
