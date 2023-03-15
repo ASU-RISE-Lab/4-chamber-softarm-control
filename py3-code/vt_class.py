@@ -147,7 +147,7 @@ class pc_client(object):
             if self.flag_reset==1:
                 self.t0_on_trial = time()
                 # self.pres_single_step_response(np.array([0.0]*6),10)
-                self.pres_single_step_response(np.array([13.0, 0.0, 13.0, 0.0, 0.0, 0.0]),10)
+                self.pres_single_step_response(np.array([13.0, 0.0, 5.0, 0.0, 0.0, 0.0]),10)
                 # self.pres_single_step_response(np.array([13.0, 0.0, 13.0, 1.0, 1.0, 1.0]),10)
                 self.flag_reset=0
             self.t0_on_glob = time()
@@ -206,7 +206,7 @@ class pc_client(object):
                 self.pd_pm_array_1 = self.recv_zipped_socket3()
                 self.pd_pm_array_2 = self.recv_zipped_socket5()
                 # self.filt_array_wireEnco = self.recv_zipped_socket6()
-                print(self.pd_pm_array_1[3:5],self.pd_pm_array_2[3:5])
+                print(self.pd_pm_array_1[2:5],self.pd_pm_array_2[2:5])
                 # if self.flag_reset==0:
                 #     self.send_zipped_socket1(self.arr_comb_record)
             except KeyboardInterrupt:

@@ -9,14 +9,14 @@ par_set=[];
 %flag for EOM deriviation
 par_set.EOM=0;
 %flag for plot
-par_set.flag_plot_rawData =0;
+par_set.flag_plot_rawData =1;
 %flag for read txt file or mat file 1: txt 0: mat
 par_set.flag_read_exp = 1;
 
 %flag for plotting fwd kinematic results
 par_set.plot_fwdKinematic = 0;
 % Check data readme.txt for detail input reference
-par_set.Ts=1/80;
+par_set.Ts=1/60;
 
 par_set.fz_a0 = (25/1000)*(60/1000);%m^2
 par_set.tau_l0 =48/1000;%m
@@ -45,6 +45,30 @@ else
     load('raw_id_data.mat');
     fprintf( 'Data loaded \n' );
 end
+%%
+testData = par_set.trial1;
+d_x = testData.rigid_2_pose(:,1) - testData.rigid_1_pose(:,1);
+d_y = testData.rigid_2_pose(:,2) - testData.rigid_1_pose(:,2);
+d_z = testData.rigid_2_pose(:,3) - testData.rigid_1_pose(:,3);
+testData.theta_mocap_rad = 2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2)).*sign(d_x);
+st = 1;
+et = 1800;
+figure(1)
+subplot(3,1,1)
+
+plot(testData.time_stamp(st:et),testData.pm_psi(st:et,4:6))
+ylabel('pm(psi)')
+legend('top','mid','bot','Location','north','Orientation','horizontal')
+ylim([6 9])
+title('60Hz sample rate')
+subplot(3,1,2)
+plot(testData.time_stamp(st:et),testData.pd_psi(st:et,1))
+ylabel('pd(psi)')
+subplot(3,1,3)
+plot(testData.time_stamp(st:et),rad2deg(testData.theta_mocap_rad(st:et)))
+ylabel('$\theta$(deg)','Interpreter','latex')
+xlabel('t(sec)')
+
 %% PLot raw data
 testData = par_set.trial1;
 if par_set.flag_plot_rawData == 1
