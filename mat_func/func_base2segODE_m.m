@@ -1,4 +1,4 @@
-function [dx, y] = func_base2segODE_m(t, x, u,diag_k,diag_d,varargin)
+function [dx,y] = func_base2segODE_m(t, x, u,k1,k3,d1,d3, varargin)
 % Output equations.
 %   y = [x(1);x(3);x(5);x(7)];% a1 l1 a2 l2
 % y = x;% full state feedback
@@ -96,10 +96,10 @@ else
 
 end
 
-temp_dx = M\([tauy1;tauy2]...
-    - diag(diag_k)*[x(1);x(3);] ...
-    - (diag(diag_d) + C)*[x(2);x(4);] ...
+temp_dx = M\([tauy1;0;tauy2;0]...
+    - diag([k1;0;k3;0])*[x(1);lc1;x(3);lc2] ...
+    - (diag([d1;0;d3;0]) + C)*[x(2);dlc1;x(4);dlc2] ...
     - G );
-dx = [x(2);temp_dx(1);x(4);temp_dx(2);];
+dx = [x(2);temp_dx(1);x(4);temp_dx(3);];
 y = [x(1);x(3)];
 end
