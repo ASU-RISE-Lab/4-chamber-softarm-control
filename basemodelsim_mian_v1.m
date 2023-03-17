@@ -61,14 +61,29 @@ z.OutputUnit = {'$Nm/rad$','$Nm/rad$'};
 present(z)
 FileName      = 'func_base2segODE_m';       % File describing the model structure.
 Order         = [2 2 4];           % Model orders [ny nu nx].
-Parameters    = [9.182;11.79; 6.263;4.7];         % Initial parameters. Np = 3*4
+ParName = {'k1';'k2';'d1';'d2';};
+ParUnit = {'N/m';'N/m';'Nm';'Nm'};
+ParVal    = {9.182;11.79; 6.263;4.7};         % Initial parameters. Np = 3*4
 InitialStates = zeros(4,1);            % Initial initial states.
 Ts            = 0;                 % Time-continuous system.
+
+ParMin   = {eps(0);eps(0);eps(0);eps(0);};
+ParMax   = Inf;   % No maximum constraint.
+Parameters = struct('Name', ParName, 'Unit', ParUnit,'Value',ParVal,'Minimum', ParMin, 'Maximum', ParMax, 'Fixed', false)
 nlgr = idnlgrey(FileName, Order, Parameters,InitialStates, Ts, ...
     'Name', 'Arm');
 present(nlgr)
+return
 compare(nlgr,z)
-opt = nlgreyestOptions('Display', 'on');
+
+return
+%%
+figure('Name', [z.Name ': tau input 1 -> Angular position output 1']);
+plot(z(:,1,1))
+figure('Name', [z.Name ': tau input 2 -> Angular position output 2']);
+plot(z(:,2,2))
+%%
+opt = nlgreyestOptions('SearchMethod', 'lm','Display', 'on');
 nlgr1 = nlgreyest(z, nlgr, opt);
 return
 %%
