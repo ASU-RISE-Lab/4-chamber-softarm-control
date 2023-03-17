@@ -68,7 +68,15 @@ subplot(3,1,3)
 plot(testData.time_stamp(st:et),rad2deg(testData.theta_mocap_rad(st:et)))
 ylabel('$\theta$(deg)','Interpreter','latex')
 xlabel('t(sec)')
-
+%% Data export
+st = 1;
+et = 1800;
+dataMar17 = [];
+dataMar17.output_angle_deg = rad2deg(testData.theta_mocap_rad);
+dataMar17.input_top_pm_psi = testData.pm_psi(st:et,4);
+dataMar17.input_mid_pm_psi = testData.pm_psi(st:et,5);
+dataMar17.input_bot_pm_psi = testData.pm_psi(st:et,6);
+dataMar17.actuation_profile_pd_psi = testData.pd_psi(st:et,1);
 %% PLot raw data
 testData = par_set.trial1;
 if par_set.flag_plot_rawData == 1
