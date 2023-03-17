@@ -59,7 +59,7 @@ end
 %% filtering velocity and acc
 testData =par_set.trial1;
 output_struct = funcKnownTerm_v3(testData);
-st_pt = 500; ed_pt = length(testData.pm_psi);
+st_pt = 1; ed_pt = length(testData.pm_psi);
 
 
 tauy1 = testData.pm_Pa(st_pt:ed_pt,1) - testData.pm_Pa(st_pt:ed_pt,2);
@@ -196,15 +196,21 @@ temp_xdot = state_array(st_pt:end,2*i);
 temp_u = [temp_x,temp_xdot];
 obj4 =iddata(temp_y,temp_u,Ts);
 lg4 = regress(temp_y,temp_u)
+x4 = temp_x;
+x4dot = temp_xdot;
+x4left = temp_y;
 %%
 i =2
 temp_y=input_array(i,st_pt:end)'-output_array_1st(i,st_pt:end)';
-temp_y2=0.5*input_array(i,st_pt:end)'-output_array(i,st_pt:end)';
+temp_y2=input_array(i,st_pt:end)'-output_array(i,st_pt:end)';
 temp_x=state_array(st_pt:end,2*i-1);
 temp_xdot = state_array(st_pt:end,2*i);
 temp_u = [temp_x,temp_xdot];
 obj2 =iddata(temp_y,temp_u,Ts);
 lg2 = regress(temp_y,temp_u)
+x2 = temp_x;
+x2dot = temp_xdot;
+x2left = temp_y;
 %%
 close all
 figure(1)
