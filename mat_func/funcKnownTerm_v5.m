@@ -23,8 +23,8 @@ function [output] = funcKnownTerm_v5(testData,par_set)
     s2.l_t = testData.enco_volts(:,4)/5*1000 - purple_t0 - s1.l_t - s2.red_l;
     s2.r_t = testData.enco_volts(:,3)/5*1000 - purple_t0 - s1.r_t - s2.red_r;
     
-%     s1.theta_wire_rad = (s1.r_t - s1.l_t)/r0;
-%     s1.l_wire_mm = (s1.r_t + s1.l_t)/2;
+    s1.theta_wire_rad = (s1.r_t - s1.l_t)/r0;
+    s1.l_wire_mm = (s1.r_t + s1.l_t)/2;
     d_x = testData.rigid_2_pose(:,1) - testData.rigid_1_pose(:,1);
     d_y = testData.rigid_2_pose(:,2) - testData.rigid_1_pose(:,2);
     d_z = testData.rigid_2_pose(:,3) - testData.rigid_1_pose(:,3) + par_set.R1_stand_off;
@@ -35,8 +35,8 @@ function [output] = funcKnownTerm_v5(testData,par_set)
     d_z = testData.rigid_3_pose(:,3) - testData.rigid_1_pose(:,3)  + 0.004;
     s2.theta_mocap_rad = 2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2)).*sign(d_x) - s1.theta_mocap_rad;
 
-%     s2.theta_wire_rad = (s2.r_t - s2.l_t)/r0;
-%     s2.l_wire_mm = (s2.r_t + s2.l_t)/2;
+    s2.theta_wire_rad = (s2.r_t - s2.l_t)/r0;
+    s2.l_wire_mm = (s2.r_t + s2.l_t)/2;
 alpha_r2 = 0.7825;
 alpha_l2 = 0.716;
 alpha_l1 = 1.084;
@@ -196,29 +196,31 @@ G =[(3*g*m0*((lc1*(tan(theta1/2)^2/2 + 1/2))/theta1 - (lc1*tan(theta1/2))/theta1
 
 end
 
-    tau_f_array(1:4,i) = M * [ddtheta1;ddlc1;ddtheta2;ddlc2] + C * [dtheta1;dlc1;dtheta2;dlc2] + G;
+    mcg_array(1:4,i) = M * [ddtheta1;ddlc1;ddtheta2;ddlc2] + C * [dtheta1;dlc1;dtheta2;dlc2] + G;
     Mi(1:4,i)  =  M * [ddtheta1;ddlc1;ddtheta2;ddlc2];
     Ci(1:4,i) = C * [dtheta1;dlc1;dtheta2;dlc2];
     Gi(1:4,i) = G;
     end
     windowSize = 1;
-    filt_tau_f_array(1,:) = filter((1/windowSize)*ones(1,windowSize),1,tau_f_array(1,:));
-    filt_tau_f_array(2,:) = filter((1/windowSize)*ones(1,windowSize),1,tau_f_array(2,:));
-    filt_tau_f_array(3,:) = filter((1/windowSize)*ones(1,windowSize),1,tau_f_array(3,:));
-    filt_tau_f_array(4,:) = filter((1/windowSize)*ones(1,windowSize),1,tau_f_array(4,:));
+    filt_tau_f_array(1,:) = filter((1/windowSize)*ones(1,windowSize),1,mcg_array(1,:));
+    filt_tau_f_array(2,:) = filter((1/windowSize)*ones(1,windowSize),1,mcg_array(2,:));
+    filt_tau_f_array(3,:) = filter((1/windowSize)*ones(1,windowSize),1,mcg_array(3,:));
+    filt_tau_f_array(4,:) = filter((1/windowSize)*ones(1,windowSize),1,mcg_array(4,:));
 state_array = [filt_theta1_array,filt_dtheta1_array,filt_lc1_array,filt_dlc1_array,...
                filt_theta2_array,filt_dtheta2_array,filt_lc2_array,filt_dlc2_array];
-output.output_array = filt_tau_f_array;
+output.mcg_array = filt_tau_f_array;
 output.state_array = state_array;
+output.wire_angle_rad = [s1.theta_wire_rad,s2.theta_wire_rad];
 output.Mi = Mi;
 output.Gi = Gi;
 output.Ci = Ci;
 
 output.u_pm = [];
-output.u_pm(:,1) = testData.pm_psi(:,1) - testData.pm_psi(:,2);
-output.u_pm(:,2) = testData.pm_psi(:,1) + testData.pm_psi(:,2) + 2*testData.pm_psi(:,3);
-output.u_pm(:,3) = testData.pm_psi(:,4) - testData.pm_psi(:,5);
-output.u_pm(:,4) = testData.pm_psi(:,4) + testData.pm_psi(:,5) + 2*testData.pm_psi(:,6);
+output.u_pm_psi(:,1) = testData.pm_psi(:,1) - testData.pm_psi(:,2);
+output.u_pm_psi(:,2) = testData.pm_psi(:,1) + testData.pm_psi(:,2) + 2*testData.pm_psi(:,3);
+output.u_pm_psi(:,3) = testData.pm_psi(:,4) - testData.pm_psi(:,5);
+output.u_pm_psi(:,4) = testData.pm_psi(:,4) + testData.pm_psi(:,5) + 2*testData.pm_psi(:,6);
+output.u_pm_pa = output.u_pm_psi * 6894.76;
 
 output.acc_array = [filt_ddtheta1_array,filt_ddlc1_array,filt_ddtheta2_array,filt_ddlc2_array];
 end 
