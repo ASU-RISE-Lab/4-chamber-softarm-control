@@ -77,6 +77,36 @@ nlgr = idnlgrey(FileName, Order, Parameters,InitialStates, Ts, ...
 present(nlgr)
 compare(nlgr,z)
 return
+
+%%
+testData =par_set.trial2;
+% output_struct = funcKnownTerm_v4(testData,par_set);
+%%% optional update using alpha parameters
+output_struct = funcKnownTerm_v5(testData,par_set);
+st_pt = 1; ed_pt = length(testData.pm_psi);
+
+input_array= [output_struct.u_pm_pa(:,1)*par_set.fz_a0*par_set.tau_l0,...
+              output_struct.u_pm_pa(:,2)*par_set.fz_a0,...
+             output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...
+             output_struct.u_pm_pa(:,4)*par_set.fz_a0]';
+output_array = output_struct.state_array(st_pt:ed_pt,1:2:end);
+
+z = iddata(output_array(:,1:2:end),input_array',par_set.Ts,'Name','2-segArm');
+z.InputName = {'$\tau_1$','$f1$','$\tau_2$','$f2$'};
+z.InputUnit = {'$Nm$';'$N$';'$Nm$';'$N$'};
+z.OutputName = {'$\theta_1$';'$\theta_2$'};
+z.OutputUnit = {'$rad$','$rad$'};
+present(z)
+FileName      = 'func_staticlc2segODE_m';       % File describing the model structure.
+Order         = [2 4 4];           % Model orders [ny nu nx].
+Parameters    = [9.182;11.79; 6.263;4.7];         % Initial parameters. Np = 3*4
+InitialStates = zeros(4,1);            % Initial initial states.
+Ts            = 0;                 % Time-continuous system.
+nlgr = idnlgrey(FileName, Order, Parameters,InitialStates, Ts, ...
+    'Name', 'Arm');
+present(nlgr)
+compare(nlgr,z)
+return
 %%
 opt = nlgreyestOptions('Display', 'on');
 nlgr1 = nlgreyest(z, nlgr, opt);

@@ -62,6 +62,27 @@ z.InputUnit = {'$Nm$';'$N$';'$Nm$';'$N$'};
 z.OutputName = {'$\theta_1$';'$l_{c1}$';'$\theta_2$';'$l_{c2}$';};
 z.OutputUnit = {'$rad$';'$m$';'$rad$';'$m$'};
 present(z)
+%% For elongation motion
+testData =par_set.trial1;
+output_struct = funcKnownTerm_v6(testData,par_set);
+lc1z = output_struct.u_pm_pa(:,2)*par_set.fz_a0 - output_struct.mcg_array(2,:)';
+lc1x = output_struct.state_array(:,3);
+lc1dotx = output_struct.state_array(:,4);
+%%
+testData =par_set.trial1;
+output_struct = funcKnownTerm_v6(testData,par_set);
+lc1x = output_struct.u_pm_pa(:,2)*par_set.fz_a0;
+lc1y = output_struct.state_array(:,3); 
+
+lc2x = output_struct.u_pm_pa(:,4)*par_set.fz_a0;
+lc2y = output_struct.state_array(:,7); 
+%%% lc1 = 6.093e-05 * fz1 + 0.1155
+%%% lc2 = 2.319e-05 * fz2 + 0.09438
+% lc1dotx = output_struct.state_array(:,4);
+% 
+% lc2z = output_struct.u_pm_pa(:,4)*par_set.fz_a0 - output_struct.mcg_array(4,:)';
+% lc2x = output_struct.state_array(:,7);
+% lc2dotx = output_struct.state_array(:,8);
 %%
 FileName      = 'func_fullstate2segODE_m';       % File describing the model structure.
 Order         = [4 4 8];           % Model orders [ny nu nx].
