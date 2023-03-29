@@ -77,9 +77,10 @@ class pc_client(object):
         self.array3setswithrotation=np.array([0.]*21)# base(x y z qw qx qy qz) top(x1 y1 z1 qw1 qx1 qy1 qz1)
         self.pd_pm_array_1=np.array([0.]*6) #pd1 pd2 pd3 + pm1 +pm2 +pm3 (psi)
         self.pd_pm_array_2 = self.pd_pm_array_1
+        self.pd_pm_array_add =np.array([0.]*8)
         self.filt_array_wireEnco = np.array([0.]*4)
         # assmble all to recording
-        self.arr_comb_record=np.concatenate((self.pd_pm_array_1, self.pd_pm_array_2, self.filt_array_wireEnco, self.array3setswithrotation), axis=None)
+        self.arr_comb_record=np.concatenate((self.pd_pm_array_1, self.pd_pm_array_2, self.filt_array_wireEnco, self.array3setswithrotation,self.pd_pm_array_add), axis=None)
         
 
         """ Thearding Setup """
@@ -204,7 +205,10 @@ class pc_client(object):
                     self.array3setswithrotation = self.recv_cpp_socket2()
 
                 self.pd_pm_array_1 = self.recv_zipped_socket3()
-                self.pd_pm_array_2 = self.recv_zipped_socket5()
+                temp_array = np.array([0.0]*(6+8))
+                temp_array = self.recv_zipped_socket5()
+                self.pd_pm_array_2 = temp_array[0:6]
+                self.pd_pm_array_add = temp_array[6:14]
                 # self.filt_array_wireEnco = self.recv_zipped_socket6()
                 print(self.pd_pm_array_1[2:5],self.pd_pm_array_2[2:5])
                 # if self.flag_reset==0:
