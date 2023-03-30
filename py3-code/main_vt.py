@@ -28,7 +28,7 @@ def main():
 
         p_client.positionProfile_flag=3 
         p_client.flag_use_mocap=1
-        p_client.trailDuriation=30.
+        p_client.trailDuriation=240.
 
         # p_client.rampRateAbs=np.radians(0.5) # 1 deg/sec
         # p_client.rampAmpAbs=np.radians(15) # x1(t0)-rampAmp

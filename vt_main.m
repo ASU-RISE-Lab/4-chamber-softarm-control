@@ -23,17 +23,10 @@ par_set.tau_l0 =48/1000;%m
 
 par_set.R1_stand_off = 0.05;% m
 fprintf('System initialization done \n')
-%% EOM per element
-par_set.EOM = 0
-if par_set.EOM ==1
-    par_set = funcEOMbaseFrame2seg_v2(par_set);
-end
-simplify(par_set.rigid_3_htm)
-return
 %% Read txt file or mat file
 if par_set.flag_read_exp==1
     for i = 1:11
-    par_set= funcLoadExp2Seg(par_set,i);
+    par_set= funcLoadExpVT(par_set,i);
     end
 %     par_set= funcLoadExp2Seg(par_set,1);
 %     par_set= funcLoadExp2Seg(par_set,2);
@@ -52,14 +45,16 @@ d_y = testData.rigid_2_pose(:,2) - testData.rigid_1_pose(:,2);
 d_z = testData.rigid_2_pose(:,3) - testData.rigid_1_pose(:,3);
 testData.theta_mocap_rad = 2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2)).*sign(d_x);
 st = 1;
-et = 1800;
+et = length(testData.rigid_1_pose);
 figure(1)
 subplot(3,1,1)
-
-plot(testData.time_stamp(st:et),testData.pm_psi(st:et,4:6))
-ylabel('pm(psi)')
-legend('top','mid','bot','Location','north','Orientation','horizontal')
-ylim([6 9])
+for i = 1:size(testData.pm_add_array_v,2)-3
+    plot(testData.time_stamp(st:et),testData.pm_add_array_v(st:et,i))
+    hold on
+end
+ylabel('pm(V)')
+% legend('top','mid','bot','Location','north','Orientation','horizontal')
+% ylim([6 9])
 title('60Hz sample rate')
 subplot(3,1,2)
 plot(testData.time_stamp(st:et),testData.pd_psi(st:et,1))

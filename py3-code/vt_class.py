@@ -148,7 +148,7 @@ class pc_client(object):
             if self.flag_reset==1:
                 self.t0_on_trial = time()
                 # self.pres_single_step_response(np.array([0.0]*6),10)
-                self.pres_single_step_response(np.array([13.0, 0.0, 5.0, 0.0, 0.0, 0.0]),10)
+                self.pres_single_step_response(np.array([13.0, 0.0, 3.0, 0.0, 0.0, 0.0]),10)
                 # self.pres_single_step_response(np.array([13.0, 0.0, 13.0, 1.0, 1.0, 1.0]),10)
                 self.flag_reset=0
             self.t0_on_glob = time()
@@ -159,17 +159,63 @@ class pc_client(object):
                         # print("here")
                         self.array3setswithrotation=self.recv_cpp_socket2()
                     up_rate = 5 # psi/s
-                    down_rate = 2.5 # psi/s
+                    down_rate = 5.0 # psi/s
                     lower_bound = 13.0 #psi
-                    upper_bound = 23.0 #psi
-                    if self.trial_start_reset == 1:
-                        self.t0_on_trial = time()
-                        self.trial_start_reset = 0
-                    self.pres_single_ramp_response(up_rate,down_rate,upper_bound,lower_bound)
+                    upper_bound = 33.0 #psi
+                    # up_rate = 0 # psi/s
+                    # down_rate = 0 # psi/s
+                    # lower_bound = 23.0 #psi
+                    # upper_bound = 23.0 #psi
+                    # # for i in range(8):
+                    #     if self.trial_start_reset == 1:
+                    #         self.t0_on_trial = time()
+                    #         self.trial_start_reset = 0
+                    #     self.pres_single_ramp_response(up_rate,down_rate,upper_bound,lower_bound)
                     if self.trial_start_reset == 0:
                         self.t0_on_trial = time()
                         self.trial_start_reset = 1
                     self.pres_single_ramp_response(up_rate,down_rate,upper_bound,lower_bound)
+
+                    if self.trial_start_reset == 1:
+                        self.t0_on_trial = time()
+                        self.trial_start_reset = 0
+                    self.pres_single_ramp_response(up_rate,down_rate,upper_bound,lower_bound)
+
+                    if self.trial_start_reset == 1:
+                        self.t0_on_trial = time()
+                        self.trial_start_reset = 0
+                    self.pres_single_ramp_response(up_rate,down_rate,upper_bound,lower_bound)
+
+                    if self.trial_start_reset == 1:
+                        self.t0_on_trial = time()
+                        self.trial_start_reset = 0
+                    self.pres_single_ramp_response(up_rate,down_rate,upper_bound,lower_bound)
+
+                    if self.trial_start_reset == 0:
+                        self.t0_on_trial = time()
+                        self.trial_start_reset = 1
+                    self.pres_single_ramp_response(up_rate,down_rate,upper_bound,lower_bound)
+
+                    if self.trial_start_reset == 1:
+                        self.t0_on_trial = time()
+                        self.trial_start_reset = 0
+                    self.pres_single_ramp_response(up_rate,down_rate,upper_bound,lower_bound)
+
+                    if self.trial_start_reset == 1:
+                        self.t0_on_trial = time()
+                        self.trial_start_reset = 0
+                    self.pres_single_ramp_response(up_rate,down_rate,upper_bound,lower_bound)
+
+                    if self.trial_start_reset == 1:
+                        self.t0_on_trial = time()
+                        self.trial_start_reset = 0
+                    self.pres_single_ramp_response(up_rate,down_rate,upper_bound,lower_bound)
+
+                    if self.trial_start_reset == 1:
+                        self.t0_on_trial = time()
+                        self.trial_start_reset = 0
+                    self.pres_single_ramp_response(up_rate,down_rate,upper_bound,lower_bound)
+
                     if self.trial_start_reset == 1:
                         self.t0_on_trial = time()
                         self.trial_start_reset = 0
@@ -180,6 +226,21 @@ class pc_client(object):
                         self.trial_start_reset = 0
                     self.pres_single_ramp_response(up_rate,down_rate,upper_bound,lower_bound)
  
+                    if self.trial_start_reset == 1:
+                        self.t0_on_trial = time()
+                        self.trial_start_reset = 0
+                    self.pres_single_ramp_response(up_rate,down_rate,upper_bound,lower_bound)
+
+                    if self.trial_start_reset == 1:
+                        self.t0_on_trial = time()
+                        self.trial_start_reset = 0
+                    self.pres_single_ramp_response(up_rate,down_rate,upper_bound,lower_bound)
+
+                    if self.trial_start_reset == 1:
+                        self.t0_on_trial = time()
+                        self.trial_start_reset = 0
+                    self.pres_single_ramp_response(up_rate,down_rate,upper_bound,lower_bound)
+  
                 except KeyboardInterrupt:
                     break
                     print("E-stop")
@@ -223,7 +284,7 @@ class pc_client(object):
     def th_data_exchange_high(self):# thread config of read data from mocap and send packed msg to record file.
         while self.run_event.is_set() and self.th3_flag:
             try:
-                self.arr_comb_record=np.concatenate((self.pd_pm_array_1, self.pd_pm_array_2, self.filt_array_wireEnco, self.array3setswithrotation), axis=None)
+                self.arr_comb_record=np.concatenate((self.pd_pm_array_1, self.pd_pm_array_2, self.filt_array_wireEnco, self.array3setswithrotation,self.pd_pm_array_add), axis=None)
                 # print(self.pd_pm_array_1[0:3],self.pd_pm_array_2[0:3])
                 if self.flag_reset==0:
                     self.send_zipped_socket1(self.arr_comb_record)
