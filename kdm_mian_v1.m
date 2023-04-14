@@ -23,11 +23,11 @@ fprintf('System initialization done \n')
 %% Read txt file or mat file
 if par_set.flag_read_exp==1
     for i = 1:11
-    par_set= funcLoadExp2Seg(par_set,i);
+        par_set= funcLoadExp2Seg(par_set,i);
     end
-%     par_set= funcLoadExp2Seg(par_set,1);
-%     par_set= funcLoadExp2Seg(par_set,2);
-%     par_set= funcLoadExp2Seg(par_set,3);
+    %     par_set= funcLoadExp2Seg(par_set,1);
+    %     par_set= funcLoadExp2Seg(par_set,2);
+    %     par_set= funcLoadExp2Seg(par_set,3);
     save('raw_id_data.mat','par_set');
     fprintf( 'Saved \n' )
 else
@@ -36,7 +36,7 @@ else
     fprintf( 'Data loaded \n' );
 end
 %%
-%%% Use mocap for angle estimation  
+%%% Use mocap for angle estimation
 %%% Use wire encoder for arc length estimation
 %%% End %%%
 testData =par_set.trial1;
@@ -46,7 +46,27 @@ output_struct = funcKnownTerm_v5(testData,par_set);
 st_pt = 1; ed_pt = length(testData.pm_psi);
 
 input_array= [output_struct.u_pm_pa(:,1)*par_set.fz_a0*par_set.tau_l0,...
-             output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0]';
+    output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0]';
+output_array = output_struct.state_array(st_pt:ed_pt,1:2:end);
+
+z = iddata(output_array(:,1:2:end),input_array',par_set.Ts,'Name','2-segArm');
+z.InputName = {'$\tau_1$';'$\tau_2$'};
+z.InputUnit = {'$Nm$';'$Nm$'};
+z.OutputName = {'$\theta_1$';'$\theta_2$'};
+z.OutputUnit = {'$rad$','$rad$'};
+present(z)
+return
+%% full state GPs
+testData =par_set.trial1;
+% output_struct = funcKnownTerm_v4(testData,par_set);
+%%% optional update using alpha parameters
+output_struct = funcKnownTerm_v5(testData,par_set);
+st_pt = 1; ed_pt = length(testData.pm_psi);
+input_array = []; output_array = [];
+input_array= [output_struct.u_pm_pa(:,1)*par_set.fz_a0*par_set.tau_l0,...
+    output_struct.u_pm_pa(:,1)*par_set.fz_a0*par_set.tau_l0,...
+    output_struct.u_pm_pa(:,1)*par_set.fz_a0*par_set.tau_l0,...
+    output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0]';
 output_array = output_struct.state_array(st_pt:ed_pt,1:2:end);
 
 z = iddata(output_array(:,1:2:end),input_array',par_set.Ts,'Name','2-segArm');
@@ -86,9 +106,9 @@ output_struct = funcKnownTerm_v5(testData,par_set);
 st_pt = 1; ed_pt = length(testData.pm_psi);
 
 input_array= [output_struct.u_pm_pa(:,1)*par_set.fz_a0*par_set.tau_l0,...
-              output_struct.u_pm_pa(:,2)*par_set.fz_a0,...
-             output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...
-             output_struct.u_pm_pa(:,4)*par_set.fz_a0]';
+    output_struct.u_pm_pa(:,2)*par_set.fz_a0,...
+    output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...
+    output_struct.u_pm_pa(:,4)*par_set.fz_a0]';
 output_array = output_struct.state_array(st_pt:ed_pt,1:2:end);
 
 z = iddata(output_array(:,1:2:end),input_array',par_set.Ts,'Name','2-segArm');
@@ -113,11 +133,11 @@ nlgr1 = nlgreyest(z, nlgr, opt);
 return
 %%
 Parameters    = [9.182;11.79;9.182;11.79;...
-                6.263;4.7;9.182;11.79];         % Initial parameters. Np = 3*4
+    6.263;4.7;9.182;11.79];         % Initial parameters. Np = 3*4
 FileName      = 'func2segODE_m';       % File describing the model structure.
 Order         = [2 2 4];           % Model orders [ny nu nx].
 Parameters    = [9.182;11.79;9.182;11.79;...
-                6.263;4.7;9.182;11.79];         % Initial parameters. Np = 3*4
+    6.263;4.7;9.182;11.79];         % Initial parameters. Np = 3*4
 InitialStates = zeros(8,1);            % Initial initial states.
 Ts            = 0;                 % Time-continuous system.
 
@@ -133,12 +153,13 @@ st_pt = 1; ed_pt = length(testData.pm_psi);
 
 input_array = [];output_array=[];
 y_array= [output_struct.u_pm_pa(:,1)*par_set.fz_a0*par_set.tau_l0,...
-              output_struct.u_pm_pa(:,2)*par_set.fz_a0,...
-             output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...
-             output_struct.u_pm_pa(:,4)*par_set.fz_a0]- output_struct.mcg_array';
-input_array = output_struct.state_array(:,1:2:end);
+    output_struct.u_pm_pa(:,2)*par_set.fz_a0,...
+    output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...
+    output_struct.u_pm_pa(:,4)*par_set.fz_a0]- output_struct.mcg_array';
+input_array = output_struct.state_array;
 
 z1 = iddata(y_array(:,1),input_array(:,1),par_set.Ts,'Name','2-segArm');
+zall  = iddata(y_array,input_array,par_set.Ts,'Name','2-segArm-all');
 nn_pred1 = input_array(:,1);
 nn_resp1 = y_array(:,1);
 
@@ -148,4 +169,17 @@ nn_resp2 = y_array(:,2)/(40*6894.76*par_set.fz_a0);
 nn_pred3 = input_array(:,3);
 nn_resp3 = y_array(:,3);
 %%
- 
+testData =par_set.trial2;
+% output_struct = funcKnownTerm_v4(testData,par_set);
+%%% optional update using alpha parameters
+output_struct = funcKnownTerm_v5(testData,par_set);
+st_pt = 1; ed_pt = length(testData.pm_psi);
+
+input_array = [];output_array=[];
+y_array= [output_struct.u_pm_pa(:,1)*par_set.fz_a0*par_set.tau_l0,...
+    output_struct.u_pm_pa(:,2)*par_set.fz_a0,...
+    output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...
+    output_struct.u_pm_pa(:,4)*par_set.fz_a0]- output_struct.mcg_array';
+input_array = output_struct.state_array;
+zv  = iddata(y_array,input_array,par_set.Ts,'Name','2-segArm-all');
+% yp = predict(nlarx2,input_array');
