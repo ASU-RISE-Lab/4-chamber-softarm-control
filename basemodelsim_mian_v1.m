@@ -44,10 +44,6 @@ testData =par_set.trial1;
 %%% optional update using alpha parameters
 output_struct = funcKnownTerm_v5(testData,par_set);
 st_pt = 1; ed_pt = length(testData.pm_psi);
-% tauy1 = testData.pm_Pa(st_pt:ed_pt,1) - testData.pm_Pa(st_pt:ed_pt,2);
-% fz1 = testData.pm_Pa(st_pt:ed_pt,1) + testData.pm_Pa(st_pt:ed_pt,2) + testData.pm_Pa(st_pt:ed_pt,3);
-% tauy2 = testData.pm_Pa(st_pt:ed_pt,4) - testData.pm_Pa(st_pt:ed_pt,5);
-% fz2 = testData.pm_Pa(st_pt:ed_pt,4) + testData.pm_Pa(st_pt:ed_pt,5) + testData.pm_Pa(st_pt:ed_pt,6);
 input_array = [];output_array=[];
 input_array= [output_struct.u_pm_pa(:,1)*par_set.fz_a0*par_set.tau_l0,...
               output_struct.u_pm_pa(:,2)*par_set.fz_a0,...
@@ -62,6 +58,147 @@ z.InputUnit = {'$Nm$';'$N$';'$Nm$';'$N$'};
 z.OutputName = {'$\theta_1$';'$l_{c1}$';'$\theta_2$';'$l_{c2}$';};
 z.OutputUnit = {'$rad$';'$m$';'$rad$';'$m$'};
 present(z)
+%% GP training with more data
+testData =par_set.trial1;
+% output_struct = funcKnownTerm_v4(testData,par_set);
+%%% optional update using alpha parameters
+output_struct = funcKnownTerm_v5(testData,par_set);
+st_pt = 1; ed_pt = length(testData.pm_psi);
+input_array = [];output_array=[];
+input_array= [output_struct.u_pm_pa(:,1)*par_set.fz_a0*par_set.tau_l0,...
+              output_struct.u_pm_pa(:,2)*par_set.fz_a0,...
+             output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...
+             output_struct.u_pm_pa(:,4)*par_set.fz_a0]';
+output_array = output_struct.state_array(st_pt:ed_pt,1:2:end);
+
+z1 = iddata(output_array,input_array',par_set.Ts,'Name','2-segArm');
+
+z1.InputName = {'$\tau_1$','$f1$','$\tau_2$','$f2$'};
+z1.InputUnit = {'$Nm$';'$N$';'$Nm$';'$N$'};
+z1.OutputName = {'$\theta_1$';'$l_{c1}$';'$\theta_2$';'$l_{c2}$';};
+z1.OutputUnit = {'$rad$';'$m$';'$rad$';'$m$'};
+% present(z)
+
+testData =par_set.trial2;
+% output_struct = funcKnownTerm_v4(testData,par_set);
+%%% optional update using alpha parameters
+output_struct = funcKnownTerm_v5(testData,par_set);
+st_pt = 1; ed_pt = length(testData.pm_psi);
+input_array = [];output_array=[];
+input_array= [output_struct.u_pm_pa(:,1)*par_set.fz_a0*par_set.tau_l0,...
+              output_struct.u_pm_pa(:,2)*par_set.fz_a0,...
+             output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...
+             output_struct.u_pm_pa(:,4)*par_set.fz_a0]';
+output_array = output_struct.state_array(st_pt:ed_pt,1:2:end);
+
+z2 = iddata(output_array,input_array',par_set.Ts,'Name','2-segArm');
+
+z2.InputName = {'$\tau_1$','$f1$','$\tau_2$','$f2$'};
+z2.InputUnit = {'$Nm$';'$N$';'$Nm$';'$N$'};
+z2.OutputName = {'$\theta_1$';'$l_{c1}$';'$\theta_2$';'$l_{c2}$';};
+z2.OutputUnit = {'$rad$';'$m$';'$rad$';'$m$'};
+% present(z2)
+
+testData =par_set.trial3;
+% output_struct = funcKnownTerm_v4(testData,par_set);
+%%% optional update using alpha parameters
+output_struct = funcKnownTerm_v5(testData,par_set);
+st_pt = 1; ed_pt = length(testData.pm_psi);
+input_array = [];output_array=[];
+input_array= [output_struct.u_pm_pa(:,1)*par_set.fz_a0*par_set.tau_l0,...
+              output_struct.u_pm_pa(:,2)*par_set.fz_a0,...
+             output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...
+             output_struct.u_pm_pa(:,4)*par_set.fz_a0]';
+output_array = output_struct.state_array(st_pt:ed_pt,1:2:end);
+
+z3 = iddata(output_array,input_array',par_set.Ts,'Name','2-segArm');
+
+z3.InputName = {'$\tau_1$','$f1$','$\tau_2$','$f2$'};
+z3.InputUnit = {'$Nm$';'$N$';'$Nm$';'$N$'};
+z3.OutputName = {'$\theta_1$';'$l_{c1}$';'$\theta_2$';'$l_{c2}$';};
+z3.OutputUnit = {'$rad$';'$m$';'$rad$';'$m$'};
+% present(z)
+
+testData =par_set.trial4;
+% output_struct = funcKnownTerm_v4(testData,par_set);
+%%% optional update using alpha parameters
+output_struct = funcKnownTerm_v5(testData,par_set);
+st_pt = 1; ed_pt = length(testData.pm_psi);
+input_array = [];output_array=[];
+input_array= [output_struct.u_pm_pa(:,1)*par_set.fz_a0*par_set.tau_l0,...
+              output_struct.u_pm_pa(:,2)*par_set.fz_a0,...
+             output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...
+             output_struct.u_pm_pa(:,4)*par_set.fz_a0]';
+output_array = output_struct.state_array(st_pt:ed_pt,1:2:end);
+
+z4 = iddata(output_array,input_array',par_set.Ts,'Name','2-segArm');
+
+z4.InputName = {'$\tau_1$','$f1$','$\tau_2$','$f2$'};
+z4.InputUnit = {'$Nm$';'$N$';'$Nm$';'$N$'};
+z4.OutputName = {'$\theta_1$';'$l_{c1}$';'$\theta_2$';'$l_{c2}$';};
+z4.OutputUnit = {'$rad$';'$m$';'$rad$';'$m$'};
+% present(z)
+
+testData =par_set.trial5;
+% output_struct = funcKnownTerm_v4(testData,par_set);
+%%% optional update using alpha parameters
+output_struct = funcKnownTerm_v5(testData,par_set);
+st_pt = 1; ed_pt = length(testData.pm_psi);
+input_array = [];output_array=[];
+input_array= [output_struct.u_pm_pa(:,1)*par_set.fz_a0*par_set.tau_l0,...
+              output_struct.u_pm_pa(:,2)*par_set.fz_a0,...
+             output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...
+             output_struct.u_pm_pa(:,4)*par_set.fz_a0]';
+output_array = output_struct.state_array(st_pt:ed_pt,1:2:end);
+
+z5 = iddata(output_array,input_array',par_set.Ts,'Name','2-segArm');
+
+z5.InputName = {'$\tau_1$','$f1$','$\tau_2$','$f2$'};
+z5.InputUnit = {'$Nm$';'$N$';'$Nm$';'$N$'};
+z5.OutputName = {'$\theta_1$';'$l_{c1}$';'$\theta_2$';'$l_{c2}$';};
+z5.OutputUnit = {'$rad$';'$m$';'$rad$';'$m$'};
+% present(z)
+
+testData =par_set.trial6;
+% output_struct = funcKnownTerm_v4(testData,par_set);
+%%% optional update using alpha parameters
+output_struct = funcKnownTerm_v5(testData,par_set);
+st_pt = 1; ed_pt = length(testData.pm_psi);
+input_array = [];output_array=[];
+input_array= [output_struct.u_pm_pa(:,1)*par_set.fz_a0*par_set.tau_l0,...
+              output_struct.u_pm_pa(:,2)*par_set.fz_a0,...
+             output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...
+             output_struct.u_pm_pa(:,4)*par_set.fz_a0]';
+output_array = output_struct.state_array(st_pt:ed_pt,1:2:end);
+
+z6 = iddata(output_array,input_array',par_set.Ts,'Name','2-segArm');
+
+z6.InputName = {'$\tau_1$','$f1$','$\tau_2$','$f2$'};
+z6.InputUnit = {'$Nm$';'$N$';'$Nm$';'$N$'};
+z6.OutputName = {'$\theta_1$';'$l_{c1}$';'$\theta_2$';'$l_{c2}$';};
+z6.OutputUnit = {'$rad$';'$m$';'$rad$';'$m$'};
+% present(z)
+
+testData =par_set.trial7;
+% output_struct = funcKnownTerm_v4(testData,par_set);
+%%% optional update using alpha parameters
+output_struct = funcKnownTerm_v5(testData,par_set);
+st_pt = 1; ed_pt = length(testData.pm_psi);
+input_array = [];output_array=[];
+input_array= [output_struct.u_pm_pa(:,1)*par_set.fz_a0*par_set.tau_l0,...
+              output_struct.u_pm_pa(:,2)*par_set.fz_a0,...
+             output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...
+             output_struct.u_pm_pa(:,4)*par_set.fz_a0]';
+output_array = output_struct.state_array(st_pt:ed_pt,1:2:end);
+
+z7 = iddata(output_array,input_array',par_set.Ts,'Name','2-segArm');
+
+z7.InputName = {'$\tau_1$','$f1$','$\tau_2$','$f2$'};
+z7.InputUnit = {'$Nm$';'$N$';'$Nm$';'$N$'};
+z7.OutputName = {'$\theta_1$';'$l_{c1}$';'$\theta_2$';'$l_{c2}$';};
+z7.OutputUnit = {'$rad$';'$m$';'$rad$';'$m$'};
+% present(z)
+z_total = merge(z1,z2,z3,z4,z5,z6,z7);
 %% For elongation motion
 testData =par_set.trial1;
 output_struct = funcKnownTerm_v6(testData,par_set);
