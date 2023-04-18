@@ -5,7 +5,7 @@ recorvery to compliant
 
 
 """
-import com_test # mode 0high -- low1-pressure + low1-sensor + low2-pressure
+import arm_main # mode 0high -- low1-pressure + low1-sensor + low2-pressure
 import vt_main
 # import sensor_test # mode 1
 # import ramp_test # mode 2
@@ -18,7 +18,7 @@ def main():
         #### Select control method ####
         flag_ctrl_mode=0
         if flag_ctrl_mode==0:
-            p_client=com_test.pc_client()
+            p_client=arm_main.pc_client()
         elif flag_ctrl_mode==1:
             p_client=vt_main.pc_client()
         # elif flag_ctrl_mode==2:
@@ -28,7 +28,7 @@ def main():
 
         p_client.positionProfile_flag=3 
         p_client.flag_use_mocap=1
-        p_client.trailDuriation=60.
+        p_client.trailDuriation= 300
 
         # p_client.rampRateAbs=np.radians(0.5) # 1 deg/sec
         # p_client.rampAmpAbs=np.radians(15) # x1(t0)-rampAmp
