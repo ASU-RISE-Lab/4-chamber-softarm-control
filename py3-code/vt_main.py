@@ -154,11 +154,12 @@ class pc_client(object):
             while (time()-self.t0_on_glob < self.trailDuriation):
                 # print("here")
                 try:
-                    if self.flag_use_mocap == True:
-                        # print("here")
-                        self.array3setswithrotation=self.recv_cpp_socket2()
+                    # if self.flag_use_mocap == True:
+                    #     # print("here")
+                    #     self.array3setswithrotation=self.recv_cpp_socket2()
                     up_rate = 5 # psi/s
-                    down_rate = 2.5 # psi/s
+                    # down_rate = 2.5 # psi/s
+                    down_rate = 1 # psi/s
                     lower_bound = 13.0 #psi
                     upper_bound = 23.0 #psi
                     if self.trial_start_reset == 1:
