@@ -280,3 +280,99 @@ plot(predy4_3,'c.')
 hold on
 legend('exp','sig1e-2','sig2e-2','sig1e-3')
 title('L2')
+%%
+testData =par_set.trial2;
+% output_struct = funcKnownTerm_v4(testData,par_set);
+%%% optional update using alpha parameters
+output_struct = funcKnownTerm_v5(testData,par_set);
+st_pt = 1; ed_pt = length(testData.pm_psi);
+U_id_array =[]; Y_id_array = [];
+Y_id_array= [output_struct.u_pm_pa(:,1)*par_set.fz_a0*par_set.tau_l0,...               output_struct.u_pm_pa(:,2)*par_set.fz_a0,...              output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...              output_struct.u_pm_pa(:,4)*par_set.fz_a0] - output_struct.mcg_array;               output_struct.u_pm_pa(:,2)*par_set.fz_a0,...              output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...              output_struct.u_pm_pa(:,4)*par_set.fz_a0] - output_struct.mcg_array;               output_struct.u_pm_pa(:,2)*par_set.fz_a0,...              output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...              output_struct.u_pm_pa(:,4)*par_set.fz_a0] - output_struct.mcg_array;               output_struct.u_pm_pa(:,2)*par_set.fz_a0,...              output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...              output_struct.u_pm_pa(:,4)*par_set.fz_a0] - output_struct.mcg_array;               output_struct.u_pm_pa(:,2)*par_set.fz_a0,...              output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...              output_struct.u_pm_pa(:,4)*par_set.fz_a0] - output_struct.mcg_array;               output_struct.u_pm_pa(:,2)*par_set.fz_a0,...              output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...              output_struct.u_pm_pa(:,4)*par_set.fz_a0] - output_struct.mcg_array;               output_struct.u_pm_pa(:,2)*par_set.fz_a0,...              output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...              output_struct.u_pm_pa(:,4)*par_set.fz_a0] - output_struct.mcg_array;               output_struct.u_pm_pa(:,2)*par_set.fz_a0,...              output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...              output_struct.u_pm_pa(:,4)*par_set.fz_a0] - output_struct.mcg_array;
+              output_struct.u_pm_pa(:,2)*par_set.fz_a0,...
+             output_struct.u_pm_pa(:,3)*par_set.fz_a0*par_set.tau_l0,...
+             output_struct.u_pm_pa(:,4)*par_set.fz_a0] - output_struct.mcg_array';
+U_id_array = output_struct.state_array(st_pt:ed_pt,1:2:end);
+
+%%
+close all
+y_temp = [];X_temp = [];
+y_temp = Y_id_array(:,1); 
+X_temp = output_struct.state_array(:,1);
+X_temp(:,2) = [0;output_struct.state_array(1:end-1,1)];
+X_temp(:,3) = [0;0;output_struct.state_array(1:end-2,1)];
+predy1_1 = predict(gpy1_1,X_temp);
+predy1_2 = predict(gpy1_2,X_temp);
+predy1_3 = predict(gpy1_3,X_temp);
+figure(1)
+plot(y_temp,'r.')
+hold on
+plot(predy1_1,'b.')
+hold on
+plot(predy1_2,'k.')
+hold on
+plot(predy1_3,'c.')
+hold on
+legend('exp','sig1e-2','sig2e-2','sig1e-3')
+title('theta1')
+
+
+y_temp = [];X_temp = [];
+y_temp = Y_id_array(:,2); 
+X_temp = output_struct.state_array(:,3);
+X_temp(:,2) = [0;output_struct.state_array(1:end-1,1)];
+X_temp(:,3) = [0;0;output_struct.state_array(1:end-2,1)];
+predy2_1 = predict(gpy2_1,X_temp);
+predy2_2 = predict(gpy2_2,X_temp);
+predy2_3 = predict(gpy2_3,X_temp);
+figure(2)
+plot(y_temp,'r.')
+hold on
+plot(predy2_1,'b.')
+hold on
+plot(predy2_2,'k.')
+hold on
+plot(predy2_3,'c.')
+hold on
+legend('exp','sig1e-2','sig2e-2','sig1e-3')
+title('L1')
+
+y_temp = [];X_temp = [];
+y_temp = Y_id_array(:,3); 
+X_temp = output_struct.state_array(:,5);
+X_temp(:,2) = [0;output_struct.state_array(1:end-1,1)];
+X_temp(:,3) = [0;0;output_struct.state_array(1:end-2,1)];
+predy3_1 = predict(gpy3_1,X_temp);
+predy3_2 = predict(gpy3_2,X_temp);
+predy3_3 = predict(gpy3_3,X_temp);
+figure(3)
+plot(y_temp,'r.')
+hold on
+plot(predy3_1,'b.')
+hold on
+plot(predy3_2,'k.')
+hold on
+plot(predy3_3,'c.')
+hold on
+legend('exp','sig1e-2','sig2e-2','sig1e-3')
+title('theta2')
+
+
+y_temp = [];X_temp = [];
+y_temp = Y_id_array(:,4); 
+X_temp = output_struct.state_array(:,7);
+X_temp(:,2) = [0;output_struct.state_array(1:end-1,1)];
+X_temp(:,3) = [0;0;output_struct.state_array(1:end-2,1)];
+predy4_1 = predict(gpy4_1,X_temp);
+predy4_2 = predict(gpy4_2,X_temp);
+predy4_3 = predict(gpy4_3,X_temp);
+figure(4)
+plot(y_temp,'r.')
+hold on
+plot(predy4_1,'b.')
+hold on
+plot(predy4_2,'k.')
+hold on
+plot(predy4_3,'c.')
+hold on
+legend('exp','sig1e-2','sig2e-2','sig1e-3')
+title('L2')

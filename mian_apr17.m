@@ -129,7 +129,9 @@ Y_id_array= [output_struct.u_pm_pa(:,1)*par_set.fz_a0*par_set.tau_l0,...        
              output_struct.u_pm_pa(:,4)*par_set.fz_a0]- output_struct.mcg_array';
 U_id_array = output_struct.state_array(st_pt:ed_pt,:);
 z7=iddata(Y_id_array,U_id_array,par_set.Ts,'Name','2-segArm');
+
 z_total = merge(z1,z2,z3,z4,z5,z6,z7);
+%%
 
 %%
 %%% Use mocap for angle estimation  
@@ -226,6 +228,28 @@ Y_id_array= [output_struct.u_pm_pa(:,1)*par_set.fz_a0*par_set.tau_l0,...        
 U_id_array = output_struct.state_array(st_pt:ed_pt,1:2:end);
 z7=iddata(Y_id_array,U_id_array,par_set.Ts,'Name','2-segArm');
 z_total_2 = merge(z1,z2,z3,z4,z5,z6,z7);
+%%
+figure(1)
+for i  =1 :4
+subplot(4,1,i)
+plot(z1(:,i,i))
+hold on
+plot(z2(:,i,i))
+hold on
+plot(z3(:,i,i))
+hold on
+plot(z4(:,i,i))
+hold on
+plot(z5(:,i,i))
+hold on
+plot(z6(:,i,i))
+hold on
+plot(z7(:,i,i))
+hold on
+end
+%%
+figure(2)
+plot(par_set.trial1.)
 %%
 st_pt = 1; ed_pt = length(testData.pm_psi);
 
