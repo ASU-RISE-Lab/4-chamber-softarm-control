@@ -1,4 +1,5 @@
-function [dx] = funcGP2segODE_m(t, x, u,temp_gp)
+function [A,B] = funcGetMatA(x,u)
+
 m0 = (100 + 34*2 + 25*5)/1000; %kg
 h0 = 0.01; %m
 g = 9.8; %N/kg
@@ -6,7 +7,6 @@ tauy1 = u(1);
 fz1 = u(2);
 tauy2 = u(3);
 fz2 = u(4);
-
 theta1 = x(1); dtheta1 = x(2); lc1 = x(3); dlc1 = x(4);
 theta2 = x(5); dtheta2 = x(6); lc2 = x(7); dlc2 = x(8);
 if theta1 <= 0.005
@@ -86,10 +86,11 @@ else
 
 end
 
+
 temp_dx = M\([tauy1;fz1;tauy2;fz2]...
     - ( C)*[x(2);x(4);x(6);x(8)] ...
     - G ...
-    -temp_gp...
+    -[pred1;pred2;pred3;pred4]...
     );
 dx = [x(2);temp_dx(1);x(4);temp_dx(2);x(6);temp_dx(3);x(8);temp_dx(4);];
 end
