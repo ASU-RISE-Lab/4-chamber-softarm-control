@@ -534,14 +534,23 @@ result_mat =[];
     temp_roll = gp_input_vec(1,1:8);
     gp_input_vec = [mean(temp_x,1),temp_roll];
     x0 = mean(temp_y,1);
-end
+    end
+    close all
+
 figure(1)
 subplot(4,1,1)
 plot(result_mat(:,1))
 hold on
+plot(output_struct.state_array(1:10,1))
+subplot(4,1,2)
 plot(result_mat(:,3))
 hold on
+plot(output_struct.state_array(1:10,3))
+subplot(4,1,3)
 plot(result_mat(:,5))
 hold on
+plot(output_struct.state_array(1:10,5))
+subplot(4,1,4)
 plot(result_mat(:,7))
 hold on
+plot(output_struct.state_array(1:10,7))
