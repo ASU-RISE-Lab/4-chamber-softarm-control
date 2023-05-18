@@ -512,45 +512,233 @@ X_temp(:,5:8) = [0, 0, 0, 0;output_struct.state_array(st_pt:ed_pt-1,1:2:end)];
 X_temp(:,9:12) = [0, 0, 0, 0; 0, 0, 0, 0; output_struct.state_array(st_pt:ed_pt-2,1:2:end)];
 gp_input_vec = X_temp(1,:);
 x0 = output_struct.state_array(1,:);
+% x0 = zeros(8,1);
 u_array= [output_struct.u_pm_pa(st_pt:ed_pt,1)*par_set.fz_a0*par_set.tau_l0,...
     output_struct.u_pm_pa(st_pt:ed_pt,2)*par_set.fz_a0,...
     output_struct.u_pm_pa(st_pt:ed_pt,3)*par_set.fz_a0*par_set.tau_l0,...
     output_struct.u_pm_pa(st_pt:ed_pt,4)*par_set.fz_a0];
+%% Initial state with 0 input values
 % result_mat =zeros(length(X_temp)-1,8);
 result_mat =[];
 % for ti = 1:length(testData.time_stamp)-1
-    for ti = 1:10
+    for ti = 1:100
     result_mat(ti,:) = x0;
-    temp_tspan = testData.time_stamp(ti):dt:testData.time_stamp(ti+1);
+%     temp_tspan = testData.time_stamp(ti):dt:testData.time_stamp(ti+1);
+        temp_tspan = 0:dt:testData.time_stamp(ti+1)-testData.time_stamp(ti);
     temp_gp = [];
     temp_gp= [predict(gpy1_1,gp_input_vec);...
             predict(gpy2_1,gp_input_vec);...
             predict(gpy3_1,gp_input_vec);
             predict(gpy4_1,gp_input_vec)];
     u = u_array(ti,:);
+%     u =  u_array(1,:);
+    u = zeros(4,1);
     [temp_t,temp_y] = ode45(@(t,x) funcGP2segODE_m(t, x, u,temp_gp),temp_tspan,x0);
+%     [temp_t,temp_y] = ode45(@(t,x) funcEuler2segODE_m(t, x, u),temp_tspan,x0);
     % Update 
     temp_x = temp_y(:,1:2:end);
     temp_roll = gp_input_vec(1,1:8);
     gp_input_vec = [mean(temp_x,1),temp_roll];
     x0 = mean(temp_y,1);
+    ti
     end
-    close all
+
+close all
 
 figure(1)
 subplot(4,1,1)
 plot(result_mat(:,1))
 hold on
-plot(output_struct.state_array(1:10,1))
+% plot(output_struct.state_array(1:10,1))
+ylabel("$\theta_1$",Interpreter="latex",FontWeight="bold",FontSize=12)
+title("Exp Ini condition with 0 input values")
 subplot(4,1,2)
 plot(result_mat(:,3))
+ylabel("$\L_1$",Interpreter="latex",FontWeight="bold",FontSize=12)
 hold on
-plot(output_struct.state_array(1:10,3))
+% plot(output_struct.state_array(1:10,3))
 subplot(4,1,3)
 plot(result_mat(:,5))
+ylabel("$\theta_2$",Interpreter="latex",FontWeight="bold",FontSize=12)
 hold on
-plot(output_struct.state_array(1:10,5))
+% plot(output_struct.state_array(1:10,5))
 subplot(4,1,4)
 plot(result_mat(:,7))
+ylabel("$\L_2$",Interpreter="latex",FontWeight="bold",FontSize=12)
 hold on
-plot(output_struct.state_array(1:10,7))
+% plot(output_struct.state_array(1:10,7))
+xlabel("Samples at 30Hz")
+%% Initial state with initial exp input
+dt = 0.001; %sec
+testData =par_set.trial1;
+output_struct = funcKnownTerm_v5(testData,par_set);
+st_pt = 1; ed_pt = int64(par_set.train_ratio * length(testData.pm_psi));
+Y_id_array = [];
+Y_id_array= [output_struct.u_pm_pa(st_pt:ed_pt,1)*par_set.fz_a0*par_set.tau_l0,...
+    output_struct.u_pm_pa(st_pt:ed_pt,2)*par_set.fz_a0,...
+    output_struct.u_pm_pa(st_pt:ed_pt,3)*par_set.fz_a0*par_set.tau_l0,...
+    output_struct.u_pm_pa(st_pt:ed_pt,4)*par_set.fz_a0] - output_struct.mcg_array(st_pt:ed_pt)';
+y_temp = [];X_temp = [];
+windowSize = 5; 
+b = (1/windowSize)*ones(1,windowSize);
+a = 1;
+y_temp =filter(b,a,Y_id_array(:,1)) ;
+X_temp = output_struct.state_array(st_pt:ed_pt,1:2:end);
+X_temp(:,5:8) = [0, 0, 0, 0;output_struct.state_array(st_pt:ed_pt-1,1:2:end)];
+X_temp(:,9:12) = [0, 0, 0, 0; 0, 0, 0, 0; output_struct.state_array(st_pt:ed_pt-2,1:2:end)];
+gp_input_vec = X_temp(1,:);
+x0 = output_struct.state_array(1,:);
+% x0 = zeros(8,1);
+u_array= [output_struct.u_pm_pa(st_pt:ed_pt,1)*par_set.fz_a0*par_set.tau_l0,...
+    output_struct.u_pm_pa(st_pt:ed_pt,2)*par_set.fz_a0,...
+    output_struct.u_pm_pa(st_pt:ed_pt,3)*par_set.fz_a0*par_set.tau_l0,...
+    output_struct.u_pm_pa(st_pt:ed_pt,4)*par_set.fz_a0];
+result_mat =[];
+% for ti = 1:length(testData.time_stamp)-1
+    for ti = 1:100
+    result_mat(ti,:) = x0;
+%     temp_tspan = testData.time_stamp(ti):dt:testData.time_stamp(ti+1);
+        temp_tspan = 0:dt:testData.time_stamp(ti+1)-testData.time_stamp(ti);
+    temp_gp = [];
+    temp_gp= [predict(gpy1_1,gp_input_vec);...
+            predict(gpy2_1,gp_input_vec);...
+            predict(gpy3_1,gp_input_vec);
+            predict(gpy4_1,gp_input_vec)];
+    u = u_array(ti,:);
+    u =  u_array(1,:);
+    [temp_t,temp_y] = ode45(@(t,x) funcGP2segODE_m(t, x, u,temp_gp),temp_tspan,x0);
+%     [temp_t,temp_y] = ode45(@(t,x) funcEuler2segODE_m(t, x, u),temp_tspan,x0);
+    % Update 
+    temp_x = temp_y(:,1:2:end);
+    temp_roll = gp_input_vec(1,1:8);
+    gp_input_vec = [mean(temp_x,1),temp_roll];
+    x0 = mean(temp_y,1);
+    ti
+    end
+
+close all
+
+figure(1)
+subplot(4,1,1)
+plot(result_mat(:,1))
+hold on
+% plot(output_struct.state_array(1:10,1))
+ylabel("$\theta_1$",Interpreter="latex",FontWeight="bold",FontSize=12)
+title("Exp Ini state with exp ini input values")
+subplot(4,1,2)
+plot(result_mat(:,3))
+ylabel("$\L_1$",Interpreter="latex",FontWeight="bold",FontSize=12)
+hold on
+% plot(output_struct.state_array(1:10,3))
+subplot(4,1,3)
+plot(result_mat(:,5))
+ylabel("$\theta_2$",Interpreter="latex",FontWeight="bold",FontSize=12)
+hold on
+% plot(output_struct.state_array(1:10,5))
+subplot(4,1,4)
+plot(result_mat(:,7))
+ylabel("$\L_2$",Interpreter="latex",FontWeight="bold",FontSize=12)
+hold on
+% plot(output_struct.state_array(1:10,7))
+xlabel("Samples at 30Hz")
+%% Initial state with full exp input
+dt = 0.001; %sec
+testData =par_set.trial1;
+output_struct = funcKnownTerm_v5(testData,par_set);
+st_pt = 1; ed_pt = int64(par_set.train_ratio * length(testData.pm_psi));
+Y_id_array = [];
+Y_id_array= [output_struct.u_pm_pa(st_pt:ed_pt,1)*par_set.fz_a0*par_set.tau_l0,...
+    output_struct.u_pm_pa(st_pt:ed_pt,2)*par_set.fz_a0,...
+    output_struct.u_pm_pa(st_pt:ed_pt,3)*par_set.fz_a0*par_set.tau_l0,...
+    output_struct.u_pm_pa(st_pt:ed_pt,4)*par_set.fz_a0] - output_struct.mcg_array(st_pt:ed_pt)';
+y_temp = [];X_temp = [];
+windowSize = 5; 
+b = (1/windowSize)*ones(1,windowSize);
+a = 1;
+y_temp =filter(b,a,Y_id_array(:,1)) ;
+X_temp = output_struct.state_array(st_pt:ed_pt,1:2:end);
+X_temp(:,5:8) = [0, 0, 0, 0;output_struct.state_array(st_pt:ed_pt-1,1:2:end)];
+X_temp(:,9:12) = [0, 0, 0, 0; 0, 0, 0, 0; output_struct.state_array(st_pt:ed_pt-2,1:2:end)];
+gp_input_vec = X_temp(1,:);
+x0 = output_struct.state_array(1,:);
+% x0 = zeros(8,1);
+u_array= [output_struct.u_pm_pa(st_pt:ed_pt,1)*par_set.fz_a0*par_set.tau_l0,...
+    output_struct.u_pm_pa(st_pt:ed_pt,2)*par_set.fz_a0,...
+    output_struct.u_pm_pa(st_pt:ed_pt,3)*par_set.fz_a0*par_set.tau_l0,...
+    output_struct.u_pm_pa(st_pt:ed_pt,4)*par_set.fz_a0];
+result_mat =[];
+
+% for ti = 1:length(testData.time_stamp)-1000
+    for ti = 1:500
+    result_mat(ti,:) = x0;
+%     temp_tspan = testData.time_stamp(ti):dt:testData.time_stamp(ti+1);
+    temp_tspan = 0:dt:testData.time_stamp(ti+1)-testData.time_stamp(ti);
+    temp_gp = [];
+    temp_gp= [predict(gpy1_1,gp_input_vec);...
+            predict(gpy2_1,gp_input_vec);...
+            predict(gpy3_1,gp_input_vec);
+            predict(gpy4_1,gp_input_vec)];
+    u = u_array(ti,:);
+%     u =  u_array(1,:);
+options = odeset('RelTol',1e-4,'AbsTol',1e-6);
+    [temp_t,temp_y] = ode15s(@(t,x) funcGP2segODE_m(t, x, u,temp_gp),temp_tspan,x0,options);
+    dx =funcGP2segODE_dx(x0, u,temp_gp);
+    temp_result(:,ti) = dx;
+%     [temp_t,temp_y] = ode45(@(t,x) funcEuler2segODE_m(t, x, u),temp_tspan,x0);
+    % Update 
+    temp_x = temp_y(:,1:2:end);
+    temp_roll = gp_input_vec(1,1:8);
+    gp_input_vec = [mean(temp_x,1),temp_roll];
+    x0 = mean(temp_y,1);
+    ti
+    end
+
+close all
+
+figure(1)
+subplot(4,1,1)
+plot(result_mat(:,1))
+hold on
+plot(output_struct.state_array(1:length(testData.time_stamp)-1,1))
+ylabel("$\theta_1$",Interpreter="latex",FontWeight="bold",FontSize=12)
+title("Exp Ini state with exp ini input values")
+subplot(4,1,2)
+plot(result_mat(:,3))
+ylabel("$\L_1$",Interpreter="latex",FontWeight="bold",FontSize=12)
+hold on
+plot(output_struct.state_array(1:length(testData.time_stamp)-1,3))
+subplot(4,1,3)
+plot(result_mat(:,5))
+ylabel("$\theta_2$",Interpreter="latex",FontWeight="bold",FontSize=12)
+hold on
+plot(output_struct.state_array(1:length(testData.time_stamp)-1,5))
+subplot(4,1,4)
+plot(result_mat(:,7))
+ylabel("$\L_2$",Interpreter="latex",FontWeight="bold",FontSize=12)
+hold on
+plot(output_struct.state_array(1:length(testData.time_stamp)-1,7))
+xlabel("Samples at 30Hz")
+
+figure(2)
+subplot(4,1,1)
+plot(u_array(:,1))
+hold on
+
+ylabel("$\tau_1$",Interpreter="latex",FontWeight="bold",FontSize=12)
+title("Exp profile")
+subplot(4,1,2)
+plot(u_array(:,2))
+ylabel("$F_1$",Interpreter="latex",FontWeight="bold",FontSize=12)
+hold on
+
+subplot(4,1,3)
+plot(u_array(:,3))
+ylabel("$\tau_2$",Interpreter="latex",FontWeight="bold",FontSize=12)
+hold on
+
+subplot(4,1,4)
+plot(u_array(:,4))
+ylabel("$F_2$",Interpreter="latex",FontWeight="bold",FontSize=12)
+hold on
+
+xlabel("Samples at 30Hz")
