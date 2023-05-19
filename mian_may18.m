@@ -21,6 +21,9 @@ par_set.R1_stand_off = 0.05;% m
 par_set.train_ratio = 1.0;
 % par_set.R1_stand_off = 0.03;% m
 fprintf('System initialization done \n')
+%%
+par_set.EOM=1;
+par_set = funcEOMbaseFrame2seg_v3(par_set);
 %% Read txt file or mat file
 if par_set.flag_read_exp==1
     for i = 1:11
@@ -37,7 +40,7 @@ else
     fprintf( 'Data loaded \n' );
 end
 %% Rounge-Kuka 4th order
-h = 0.0001; %prediction size
+h = 0.01; %prediction size
 testData =par_set.trial1;
 output_struct = funcKnownTerm_v5(testData,par_set);
 st_pt = 1; ed_pt = int64(par_set.train_ratio * length(testData.pm_psi));
@@ -61,7 +64,8 @@ u_array= [output_struct.u_pm_pa(st_pt:ed_pt,1)*par_set.fz_a0*par_set.tau_l0,...
     output_struct.u_pm_pa(st_pt:ed_pt,3)*par_set.fz_a0*par_set.tau_l0,...
     output_struct.u_pm_pa(st_pt:ed_pt,4)*par_set.fz_a0];
 result_mat = [];
-for ti = 1:10*3
+for ti = 1:10
+    ti
     result_mat(ti,:) = x0;
 %     temp_tspan = testData.time_stamp(ti):dt:testData.time_stamp(ti+1);
     temp_gp = zeros(4,1);
