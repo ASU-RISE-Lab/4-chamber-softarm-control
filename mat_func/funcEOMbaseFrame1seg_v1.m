@@ -9,7 +9,13 @@ Iyyi = sym('Iyy',[n 1],'real');
 syms a1 g m1 m2 real
 
 T0i = cell(n,1);
-
+% mocap xm pointing left hand, zm pointing up, z_offset = 0.55m
+% x0 pointing right hand, z0 pointing down
+% x1 same, z1 pointing out
+%T x0 to xm = [-1 0 0 0 
+%               0 1 0 0
+%               0 0 -1 0.55 
+%               0 0 0 1]
 DH = [0 -pi/2 q(1)  0;
       0  pi/2   0   q(2); 
       0     0 q(3)  0;
@@ -135,6 +141,7 @@ C_q=J_f.'*subs(D,q,m_q)*dJ_fdt+J_f.'*subs(C,[q;qd],[temp_xi;temp_dxi])*J_f;
 fprintf( 'g_q... \n' )
 G_q=J_f.'*subs(G,q,m_q);
 % %%
+
 % par.J_xyz2q=subs(par.J_xyz2xi*par.J_xi2q,[xi],[m_q]);
 
 % f_q=J_f.'*subs(par.f_xi,xi,f);
@@ -144,7 +151,7 @@ G_q=J_f.'*subs(G,q,m_q);
 par.B_q=B_q;
 par.C_q=C_q;
 par.G_q=G_q;
-
+% par.Ti = T0i;
 %% Actuation mapping
 fprintf('EOM Done\n')
 end

@@ -41,3 +41,51 @@ else
     load('raw_id_data.mat');
     fprintf( 'Data loaded \n' );
 end
+%% Forward Kinematics
+testData = par_set.trial1;
+mocapResult = funcComputeStateVar_v1(testData,par_set);
+fkResult = funcCompuFK_v1(mocapResult.state_array,par_set.Ti);
+close all
+figure(1)
+subplot(2,1,1)
+plot(fkResult.camFrameE1(:,1),'r')
+hold on
+plot(fkResult.camFrameE1(:,2),'b')
+hold on
+plot(fkResult.camFrameE1(:,3),'k')
+hold on
+
+plot(testData.rigid_2_pose(:,1),'g--')
+hold on
+plot(testData.rigid_2_pose(:,2),'y--')
+hold on
+plot(testData.rigid_2_pose(:,3),'c--')
+hold on
+title('FK result for Endeffector 1 in Cam frame')
+legend('xfk','yfk','zfk','xmo','ymo','zmo')
+subplot(2,1,2)
+plot(mocapResult.state_array(:,1))
+hold on
+legend('theta1')
+
+figure(2)
+subplot(2,1,1)
+plot(fkResult.camFrameE2(:,1),'r')
+hold on
+plot(fkResult.camFrameE2(:,2),'b')
+hold on
+plot(fkResult.camFrameE2(:,3),'k')
+hold on
+
+plot(testData.rigid_3_pose(:,1),'g--')
+hold on
+plot(testData.rigid_3_pose(:,2),'y--')
+hold on
+plot(testData.rigid_3_pose(:,3),'c--')
+hold on
+title('FK result for Endeffector 2 in Cam frame')
+legend('xfk','yfk','zfk','xmo','ymo','zmo')
+subplot(2,1,2)
+plot(mocapResult.state_array(:,5))
+hold on
+legend('theta2')
