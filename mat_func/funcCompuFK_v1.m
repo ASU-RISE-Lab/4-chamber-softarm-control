@@ -18,7 +18,7 @@ Tbase2mocap = [1 0 0 0.0068;
               0 1 0 -0.2111;
               0 0 -1 0.5086; 
               0 0 0 1];
-a1 = 0.0;
+a1 = 0.02;
 for i  =  1:length(stateVarArr)
 theta1 = stateVarArr(i,1);
 dtheta1 = stateVarArr(i,2);
@@ -37,24 +37,29 @@ m_q=[b_theta1 theta1 b_theta1 b_theta2 theta2 b_theta2 ].';% 6x1
 % endEffector1y(i) = double(subs(TiSymb{3}(2,4),q,m_q));
 % endEffector1z(i) = double(subs(TiSymb{3}(3,4),q,m_q));
 %
-endEffector1x(i) = b_theta1*sin(theta1);
+endEffector1x(i) = (a1 + b_theta1)*sin(theta1);
 endEffector1y(i) = 0;
-endEffector1z(i) = b_theta1 + b_theta1*cos(theta1);
+endEffector1z(i) = b_theta1 + (a1 + b_theta1)*cos(theta1);
 
 % endEffector2x(i) = double(subs(TiSymb{3}(1,4),q,m_q));
 % endEffector2y(i) = double(subs(TiSymb{3}(2,4),q,m_q));
 % endEffector2z(i) = double(subs(TiSymb{3}(3,4),q,m_q));
-endEffector2x(i) = sin(theta1)*(a1 + b_theta2)...
-                    + b_theta2*cos(theta1 + theta2) + b_theta1*sin(theta1);
+% endEffector2x(i) = sin(theta1)*(a1 + b_theta2)...
+%                     + b_theta2*cos(theta1 + theta2) + b_theta1*sin(theta1);
+% endEffector2y(i) = 0;
+% endEffector2z(i) = b_theta1 + cos(theta1)*(a1 + b_theta2) ...
+%                    + b_theta2*cos(theta1 + theta2) + b_theta1*cos(theta1);
+
+endEffector2x(i) = sin(theta1+theta2)*(a1 + b_theta2) + ...
+                   sin(theta1)*(2*a1 + b_theta1 + b_theta2);
 endEffector2y(i) = 0;
-endEffector2z(i) = b_theta1 + cos(theta1)*(a1 + b_theta2) ...
-                   + b_theta2*cos(theta1 + theta2) + b_theta1*cos(theta1);
+endEffector2z(i) = b_theta1 + cos(theta1)*(2*a1 + b_theta2 + b_theta1) ...
+                   + (a1 + b_theta2)*cos(theta1 + theta2);
 
 xyz1 = [endEffector1x(i);endEffector1y(i);endEffector1z(i);1];
 xyz2 = [endEffector2x(i);endEffector2y(i);endEffector2z(i);1];
 fkxyz1(:,i) = Tbase2mocap*xyz1;
 fkxyz2(:,i) = Tbase2mocap*xyz2;
-i
 end
 output.baseFrameE1 = [endEffector1x,endEffector1y,endEffector1z];
 output.baseFrameE2 = [endEffector2x,endEffector2y,endEffector2z];

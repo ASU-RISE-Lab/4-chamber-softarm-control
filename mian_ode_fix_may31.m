@@ -24,8 +24,7 @@ fprintf('System initialization done \n')
 %% ode fix 1 seg 3 link
 par_set.EOM=1;
 par_set = funcEOMbaseFrame1seg_v1(par_set);
-%%
-par_set = funcGitTest(par_set);
+
 %% Read txt file or mat file
 if par_set.flag_read_exp==1
     for i = 1:11
@@ -42,7 +41,7 @@ else
     fprintf( 'Data loaded \n' );
 end
 %% Forward Kinematics
-testData = par_set.trial1;
+testData = par_set.trial2;
 mocapResult = funcComputeStateVar_v1(testData,par_set);
 fkResult = funcCompuFK_v1(mocapResult.state_array,par_set.Ti);
 close all
@@ -89,3 +88,16 @@ subplot(2,1,2)
 plot(mocapResult.state_array(:,5))
 hold on
 legend('theta2')
+%% Euler-lag simulation
+MCG_result = funcCompuMCG_v1(mocapResult.state_array);
+close all
+figure(1)
+subplot(2,1,1)
+plot(MCG_result.detM)
+hold on
+subplot(2,1,2)
+plot(MCG_result.detC)
+%%
+t0 = 0; tfinal =10;
+x0 = mocapResult.state_array(500,:);
+[t,x] = ode45(@funcMCGode_v1,[t0 tfinal],x0);

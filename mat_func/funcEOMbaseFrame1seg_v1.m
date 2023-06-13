@@ -18,10 +18,10 @@ T0i = cell(n,1);
 %               0 0 0 1]
 DH = [0 -pi/2 q(1)  0;
       0  pi/2   0   q(2); 
-      0     0 q(3)  0;
+      0     0 q(3)+a1  0;
       0 -pi/2 q(4)+a1  0;
       0  pi/2   0   q(5); 
-      0     0 q(6)  0;];
+      0     0 q(6)+a1  0;];
 
 T = eye(4);
 for i = 1:n
@@ -151,7 +151,7 @@ G_q=J_f.'*subs(G,q,m_q);
 par.B_q=B_q;
 par.C_q=C_q;
 par.G_q=G_q;
-% par.Ti = T0i;
+par.Ti = T0i;
 %% Actuation mapping
 fprintf('EOM Done\n')
 end
