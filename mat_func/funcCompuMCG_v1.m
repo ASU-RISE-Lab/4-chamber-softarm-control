@@ -32,7 +32,7 @@ G4x1{i} = [((lc1*(tan(theta1/2)^2/2 + 1/2))/theta1 - (lc1*tan(theta1/2))/theta1^
 (g*m2*tan(theta2/2)*cos(theta1))/theta2;];
 output.detM(i) = det(M4x4{i});
 output.detC(i) = det(C4x4{i});
-% output.detG(i) = det(G4x1{i});
+output.rankM(i) = rank(M4x4{i});
 end
 
 end

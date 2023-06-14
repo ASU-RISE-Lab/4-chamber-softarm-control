@@ -90,14 +90,21 @@ hold on
 legend('theta2')
 %% Euler-lag simulation
 MCG_result = funcCompuMCG_v1(mocapResult.state_array);
+rigidMCG_result = funcCompuRigidMCG_v1(mocapResult.state_array);
 close all
 figure(1)
 subplot(2,1,1)
 plot(MCG_result.detM)
 hold on
+
+plot(rigidMCG_result.detM)
+% hold on 
+% plot(rigidMCG_result.rankM)
 subplot(2,1,2)
-plot(MCG_result.detC)
+% plot(MCG_result.detC)
+hold on
+plot(rigidMCG_result.detC)
 %%
 t0 = 0; tfinal =10;
-x0 = mocapResult.state_array(500,:);
+x0 = mocapResult.state_array(500,:)
 [t,x] = ode45(@funcMCGode_v1,[t0 tfinal],x0);
