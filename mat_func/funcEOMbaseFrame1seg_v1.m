@@ -57,20 +57,23 @@ for i= 1:n
 end
 %% Protential energy and Kinetic 
 m = sym(zeros(n,1));
-m(2) = m1;
-m(5) = m2;
+m(1) = m1;
+m(3) = m1;
+m(4) = m2;
+m(6) = m2;
 PE = 0;
 D = 0;
 I=cell(n,1);
 for i =1:n
-    if m(i) == 0 % no mass
+    if DH(i,4) == 0 % prismatic
+
         I{i}=zeros(3,3);
     else
 %         I{link_i}=[Ixx Ixy Ixz;
 %            Ixy Iyy Iyz;
 %            Ixz Iyz Izz];
+        
         I{i}= Iyyi(i);
-
     end
 end
 
