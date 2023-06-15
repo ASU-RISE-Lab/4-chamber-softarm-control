@@ -64,22 +64,22 @@ m(6) = 0.5*m2;
 PE = 0;
 D = 0;
 I=cell(n,1);
-for i =1:n
-    if DH(i,4) == 0 % prismatic
-
-        I{i}=zeros(3,3);
-    else
-%         I{link_i}=[Ixx Ixy Ixz;
-%            Ixy Iyy Iyz;
-%            Ixz Iyz Izz];
-        I{i}= Iyyi(i);
-    end
-end
+% for i =1:n
+%     if DH(i,4) == 0 % prismatic
+% 
+%         I{i}=zeros(3,3);
+%     else
+% %         I{link_i}=[Ixx Ixy Ixz;
+% %            Ixy Iyy Iyz;
+% %            Ixz Iyz Izz];
+%         I{i}= Iyyi(i);
+%     end
+% end
 
 for i=1:n
     P = T0i{i};
     PE=PE+m(i)*g*P(3,4);
-    D = D + (m(i)*Jv{i}'*Jv{i} + Jw{i}'*I{i}*Jw{i});
+    D = D + (m(i)*Jv{i}'*Jv{i} + Jw{i}'*Iyyi(i)*Jw{i});
 end
 fprintf( 'J_v... \n' )
 par.Ep = PE;
