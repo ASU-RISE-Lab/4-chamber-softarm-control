@@ -38,6 +38,8 @@ def main():
         p_client.th2.start()
         sleep(0.5)
         p_client.th1.start()
+        sleep(0.5)
+        p_client.th3.start()
         while 1:
             pass
     except KeyboardInterrupt:

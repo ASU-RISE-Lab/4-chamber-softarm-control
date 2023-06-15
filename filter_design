@@ -1,0 +1,12 @@
+clear all
+close all
+clc
+fprintf( 'Loading... \n' );
+load('raw_filter_design.mat');
+fprintf( 'Data loaded \n' );
+
+figure(1)
+for i =2:5
+plot(data3(:,i))
+hold on
+end
