@@ -23,7 +23,7 @@ par_set.train_ratio = 1.0;
 fprintf('System initialization done \n')
 %% ode fix 1 seg 3 link
 par_set.EOM=1;
-par_set = funcEOMbaseFrame1seg_v1(par_set);
+par_set = funcEOMbaseFrame1seg_v2(par_set);
 
 %% Read txt file or mat file
 if par_set.flag_read_exp==1
@@ -46,7 +46,7 @@ mocapResult = funcComputeStateVar_v1(testData,par_set);
 fkResult = funcCompuFK_v1(mocapResult.state_array,par_set.Ti);
 close all
 figure(1)
-subplot(2,1,1)
+subplot(3,1,1)
 plot(fkResult.camFrameE1(:,1),'r')
 hold on
 plot(fkResult.camFrameE1(:,2),'b')
@@ -62,11 +62,18 @@ plot(testData.rigid_2_pose(:,3),'c--')
 hold on
 title('FK result for Endeffector 1 in Cam frame')
 legend('xfk','yfk','zfk','xmo','ymo','zmo')
-subplot(2,1,2)
+subplot(3,1,2)
 plot(mocapResult.state_array(:,1))
 hold on
 legend('theta1')
-
+subplot(3,1,3)
+plot(testData.pd_psi(:,1))
+hold on
+plot(testData.pd_psi(:,2))
+hold on
+plot(testData.pd_psi(:,3))
+hold on
+legend('1','2','3')
 figure(2)
 subplot(2,1,1)
 plot(fkResult.camFrameE2(:,1),'r')

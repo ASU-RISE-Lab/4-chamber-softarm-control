@@ -1,4 +1,4 @@
-function par =funcEOMbaseFrame1seg_v1(par)
+function par =funcEOMbaseFrame1seg_v2(par)
 fprintf( 'EOM... \n' )
 n = 6; % DOF
 
@@ -57,10 +57,10 @@ for i= 1:n
 end
 %% Protential energy and Kinetic 
 m = sym(zeros(n,1));
-m(1) = m1;
-% m(3) = m1;
-m(4) = m2;
-% m(6) = m2;
+% m(1) = ;
+m(3) = 0.5*m1;
+m(4) = 0.5*m2;
+m(6) = 0.5*m2;
 PE = 0;
 D = 0;
 I=cell(n,1);
