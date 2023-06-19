@@ -7,7 +7,9 @@ q = sym('q', [n 1], 'real'); % generalized coordinates (joint angles)
 qd = sym('qd', [n 1], 'real');
 Iyyi = sym('Iyy',[n 1],'real');
 syms a1 g m1 m2 real
-
+m = sym(zeros(n,1));
+m(1) = m1;
+m(4) = m2;
 T0i = cell(n,1);
 % mocap xm pointing left hand, zm pointing up, z_offset = 0.55m
 % x0 pointing right hand, z0 pointing down
@@ -16,13 +18,14 @@ T0i = cell(n,1);
 %               0 1 0 0
 %               0 0 -1 0.55 
 %               0 0 0 1]
-DH = [0 -pi/2 q(1)  0;
-      0  pi/2   0   q(2); 
-      0     0 q(3)+a1  0;
-      0 -pi/2 q(4)+a1  0;
-      0  pi/2   0   q(5); 
-      0     0 q(6)+a1  0;];
-
+DH = [0 -pi/2 q(1)  0;%
+      0  pi/2   0   q(2);% m1
+      0     0 q(3)+a1  0;%
+      0 -pi/2 q(4)+a1  0;%
+      0  pi/2   0   q(5);% m2
+      0     0 q(6)+a1  0;];%
+Iyyi(1) = 0; Iyyi(2) = 0; Iyyi(3) = 0;
+Iyyi(4) = m2*(q(3)+q(4)+2*a1).^2; Iyyi(5) = 0; Iyyi(6) = 0;
 T = eye(4);
 for i = 1:n
     temp = compute_dh_matrix(DH(i,1),DH(i,2),DH(i,3),DH(i,4));
@@ -56,30 +59,15 @@ for i= 1:n
     Jw{i}=jw;
 end
 %% Protential energy and Kinetic 
-m = sym(zeros(n,1));
-m(1) = m1;
-% m(3) = m1;
-m(4) = m2;
-% m(6) = m2;
+
 PE = 0;
 D = 0;
-I=cell(n,1);
-for i =1:n
-    if DH(i,4) == 0 % prismatic
 
-        I{i}=zeros(3,3);
-    else
-%         I{link_i}=[Ixx Ixy Ixz;
-%            Ixy Iyy Iyz;
-%            Ixz Iyz Izz];
-        I{i}= Iyyi(i);
-    end
-end
 
 for i=1:n
     P = T0i{i};
     PE=PE+m(i)*g*P(3,4);
-    D = D + (m(i)*Jv{i}'*Jv{i} + Jw{i}'*I{i}*Jw{i});
+    D = D + (m(i)*Jv{i}'*Jv{i} + Jw{i}'*Iyyi(i)*Jw{i});
 end
 fprintf( 'J_v... \n' )
 par.Ep = PE;

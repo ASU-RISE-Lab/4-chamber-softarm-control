@@ -97,21 +97,38 @@ hold on
 legend('theta2')
 %% Euler-lag simulation
 MCG_result = funcCompuMCG_v1(mocapResult.state_array);
-rigidMCG_result = funcCompuRigidMCG_v1(mocapResult.state_array);
+rigidMCG_result = funcCompuRigidMCG_v2(mocapResult.state_array);
 close all
 figure(1)
 subplot(2,1,1)
 plot(MCG_result.detM)
 hold on
-
 plot(rigidMCG_result.detM)
 % hold on 
 % plot(rigidMCG_result.rankM)
 subplot(2,1,2)
 % plot(MCG_result.detC)
 hold on
-plot(rigidMCG_result.detC)
+% plot(rigidMCG_result.detC)
 %%
+x=[];
 t0 = 0; tfinal =10;
-x0 = mocapResult.state_array(500,:)
+x0 = mocapResult.state_array(500,:);
+x0(2:2:8) = 0;
+% x0(1) =0;x0(5)=0;
+x0
 [t,x] = ode45(@funcMCGode_v1,[t0 tfinal],x0);
+close all
+figure(2)
+subplot(2,1,1)
+plot(t,rad2deg(x(:,1)))
+hold on
+plot(t,rad2deg(x(:,5)))
+title('bending angle(deg)')
+legend('1','2')
+subplot(2,1,2)
+hold on
+plot(t,x(:,3))
+hold on
+plot(t,x(:,7))
+title('lc(m)')
