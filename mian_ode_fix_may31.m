@@ -1,4 +1,4 @@
-%% Greybox main
+%% mpc main
 clc;close all;clear all;
 %% Initialize the system
 par_set=[];
@@ -95,6 +95,16 @@ subplot(2,1,2)
 plot(mocapResult.state_array(:,5))
 hold on
 legend('theta2')
+%% RNN model
+testData = par_set.trial1;
+mocapResult = funcComputeStateVar_v1(testData,par_set);
+nn_pred = [mocapResult.state_array,mocapResult.u_pm_psi,testData.pd_psi];
+nn_resp = [mocapResult.state_array];
+
+testData = par_set.trial2;
+mocapResult = funcComputeStateVar_v1(testData,par_set);
+nn_val_pred = [mocapResult.state_array,mocapResult.u_pm_psi,testData.pd_psi];
+nn_val_resp = [mocapResult.state_array];
 %% Euler-lag simulation
 MCG_result = funcCompuMCG_v1(mocapResult.state_array);
 rigidMCG_result = funcCompuRigidMCG_v2(mocapResult.state_array);
