@@ -133,5 +133,19 @@ options.MaxEpochs = 1000;
 
 
 %%
+A =   [];b =   [];Aeq = [];beq = [];
+lb =  [];ub =  [];xMin = [];xMax = [];
+uMin = [];uMax = [];
 
-obj = nlssest(U,M,obj,options,'UseLastExperimentForValidation',true);
+Ts = 1/100;%
+N = 10;% prediction horizon
+uMin = 0*ones(1,6);
+uMax = 40*ones(1,6);
+xMin = [-1.5708, 0,-1.5708, 0, zeros(1,6)];%
+xMax = [1.5708, 0,1.5708, 0, zeros(1,6)];%
+
+lb = [xMin,uMin];
+ub = [xMax,uMax];
+for i  = 1:N % prediction on sample k to k+N
+u = fmincon(@(u)func_costFunc1(net,x0u),x0,A,b,Aeq,beq,lb,ub);
+end
