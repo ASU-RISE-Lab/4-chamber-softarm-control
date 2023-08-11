@@ -1,6 +1,6 @@
 function [output] = funcCompuRigidMCG_v2(stateVarArr)
     m2 = (100 + 34*2 + 25*5)/1000; %kg
-    m1 = m2;
+%     m1 = m2;
     h0 = 0.01; %m
     g = 9.8
     Iyy2 = 0;

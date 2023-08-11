@@ -1,4 +1,7 @@
 function [output] = funcComputeStateVar_v1(testData,par_set)
+%Fix log:
+%Aug 11th: change theta_mocap_rad calculation make it match with the
+%pressure input setup.
     % Use mocap for angle but encoder for arclength
 % State equations.
     m0 = (100 + 34*2 + 25*5)/1000; %kg
@@ -28,12 +31,12 @@ function [output] = funcComputeStateVar_v1(testData,par_set)
     d_x = testData.rigid_2_pose(:,1) - testData.rigid_1_pose(:,1);
     d_y = testData.rigid_2_pose(:,2) - testData.rigid_1_pose(:,2);
     d_z = testData.rigid_2_pose(:,3) - testData.rigid_1_pose(:,3) + par_set.R1_stand_off;
-    s1.theta_mocap_rad = 2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2));
+    s1.theta_mocap_rad = -(2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2)));
 
     d_x = testData.rigid_3_pose(:,1) - testData.rigid_1_pose(:,1);
     d_y = testData.rigid_3_pose(:,2) - testData.rigid_1_pose(:,2);
     d_z = testData.rigid_3_pose(:,3) - testData.rigid_1_pose(:,3)  + 0.004;
-    s2.theta_mocap_rad = 2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2)) - s1.theta_mocap_rad;
+    s2.theta_mocap_rad = -(2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2))) - s1.theta_mocap_rad;
 %     s2.theta_mocap_rad = 2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2));
     s2.theta_wire_rad = (s2.r_t - s2.l_t)/r0;
     s2.l_wire_mm = (s2.r_t + s2.l_t)/2;
@@ -69,15 +72,7 @@ s2.l_wire_mm = (alpha_r2*s2.r_t + alpha_l2*s2.l_t)/2;
     filt_lc2_array = filter((1/windowSize)*ones(1,windowSize),1,lc2_array);
     filt_theta1_array = filter((1/windowSize)*ones(1,windowSize),1,theta1_array);
     filt_theta2_array = filter((1/windowSize)*ones(1,windowSize),1,theta2_array);
-    figure(1)
-    subplot(4,1,1)
-    plot(filt_theta1_array)
-    subplot(4,1,2)
-    plot(filt_lc1_array)
-    subplot(4,1,3)
-    plot(filt_theta2_array)
-    subplot(4,1,4)
-    plot(filt_lc2_array)
+
 %     return
     fprintf( 'Filtering vel... \n' );
     for i = 1:length(s1.theta_wire_rad)
@@ -106,17 +101,7 @@ s2.l_wire_mm = (alpha_r2*s2.r_t + alpha_l2*s2.l_t)/2;
     filt_dlc2_array = sgolayfilt(dlc2_array,1,fit_length);
     filt_dtheta1_array = sgolayfilt(dtheta1_array,1,fit_length);
     filt_dtheta2_array = sgolayfilt(dtheta2_array,1,fit_length);
-    figure(2)
-    subplot(4,1,1)
-    plot(filt_dtheta1_array)
-    subplot(4,1,2)
-    plot(filt_dlc1_array)
-    hold on
-    plot(sgolayfilt(dlc1_array,1,17))
-    subplot(4,1,3)
-    plot(filt_dtheta2_array)
-    subplot(4,1,4)
-    plot(filt_dlc2_array)
+
 %     return
 
     for i = 1:length(s1.theta_wire_rad)
@@ -164,5 +149,53 @@ output.u_pm_psi(:,2) = testData.pm_psi(:,1) + testData.pm_psi(:,2) + 2*testData.
 output.u_pm_psi(:,3) = testData.pm_psi(:,4) - testData.pm_psi(:,5);
 output.u_pm_psi(:,4) = testData.pm_psi(:,4) + testData.pm_psi(:,5) + 2*testData.pm_psi(:,6);
 output.u_pm_pa = output.u_pm_psi * 6894.76;
+output.u_pm_tf(:,1) = output.u_pm_psi(:,1) * par_set.fz_a0 * par_set.tau_l0;
+output.u_pm_tf(:,2) = output.u_pm_psi(:,2) * par_set.fz_a0;
+output.u_pm_tf(:,3) = output.u_pm_psi(:,3) * par_set.fz_a0 * par_set.tau_l0;
+output.u_pm_tf(:,4) = output.u_pm_psi(:,4) * par_set.fz_a0;
 output.acc_array = [filt_ddtheta1_array,filt_ddlc1_array,filt_ddtheta2_array,filt_ddlc2_array];
+
+    figure(1)
+    subplot(4,1,1)
+    plot(filt_theta1_array)
+    ylabel('$\theta_1$',Interpreter='latex')
+    subplot(4,1,2)
+    plot(filt_lc1_array)
+    ylabel('$lc_1$',Interpreter='latex')
+    subplot(4,1,3)
+    plot(filt_theta2_array)
+    ylabel('$\theta_2$',Interpreter='latex')
+    subplot(4,1,4)
+    plot(filt_lc2_array)
+    ylabel('$lc_2$',Interpreter='latex')
+
+    figure(2)
+    subplot(4,1,1)
+    plot(filt_dtheta1_array)
+    ylabel('$\dot{\theta}_1$',Interpreter='latex')
+    subplot(4,1,2)
+    plot(filt_dlc1_array)
+    hold on
+    plot(sgolayfilt(dlc1_array,1,17))
+    ylabel('$\dot{lc}_1$',Interpreter='latex')
+    subplot(4,1,3)
+    plot(filt_dtheta2_array)
+    ylabel('$\dot{\theta}_2$',Interpreter='latex')
+    subplot(4,1,4)
+    plot(filt_dlc2_array)
+    ylabel('$\dot{lc}_2$',Interpreter='latex')
+
+    figure(3)
+    subplot(4,1,1)
+    plot(output.u_pm_psi(:,1))
+    ylabel('$\tau_1$',Interpreter='latex')
+    subplot(4,1,2)
+    plot(output.u_pm_psi(:,2))
+    ylabel('$f_1$',Interpreter='latex')
+    subplot(4,1,3)
+    plot(output.u_pm_psi(:,3))
+    ylabel('$\tau_2$',Interpreter='latex')
+    subplot(4,1,4)
+    plot(output.u_pm_psi(:,4))
+    ylabel('$f_2$',Interpreter='latex')
 end 
