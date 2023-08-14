@@ -31,12 +31,12 @@ function [output] = funcComputeStateVar_v1(testData,par_set)
     d_x = testData.rigid_2_pose(:,1) - testData.rigid_1_pose(:,1);
     d_y = testData.rigid_2_pose(:,2) - testData.rigid_1_pose(:,2);
     d_z = testData.rigid_2_pose(:,3) - testData.rigid_1_pose(:,3) + par_set.R1_stand_off;
-    s1.theta_mocap_rad = -(2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2)));
+    s1.theta_mocap_rad = (2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2)));
 
     d_x = testData.rigid_3_pose(:,1) - testData.rigid_1_pose(:,1);
     d_y = testData.rigid_3_pose(:,2) - testData.rigid_1_pose(:,2);
     d_z = testData.rigid_3_pose(:,3) - testData.rigid_1_pose(:,3)  + 0.004;
-    s2.theta_mocap_rad = -(2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2))) - s1.theta_mocap_rad;
+    s2.theta_mocap_rad = (2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2))) - s1.theta_mocap_rad;
 %     s2.theta_mocap_rad = 2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2));
     s2.theta_wire_rad = (s2.r_t - s2.l_t)/r0;
     s2.l_wire_mm = (s2.r_t + s2.l_t)/2;
@@ -187,15 +187,15 @@ output.acc_array = [filt_ddtheta1_array,filt_ddlc1_array,filt_ddtheta2_array,fil
 
     figure(3)
     subplot(4,1,1)
-    plot(output.u_pm_psi(:,1))
+    plot(output.u_pm_tf(:,1))
     ylabel('$\tau_1$',Interpreter='latex')
     subplot(4,1,2)
-    plot(output.u_pm_psi(:,2))
+    plot(output.u_pm_tf(:,2))
     ylabel('$f_1$',Interpreter='latex')
     subplot(4,1,3)
-    plot(output.u_pm_psi(:,3))
+    plot(output.u_pm_tf(:,3))
     ylabel('$\tau_2$',Interpreter='latex')
     subplot(4,1,4)
-    plot(output.u_pm_psi(:,4))
+    plot(output.u_pm_tf(:,4))
     ylabel('$f_2$',Interpreter='latex')
 end 

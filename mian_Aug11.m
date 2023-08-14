@@ -98,16 +98,46 @@ subplot(2,1,2)
 plot(mocapResult.state_array(:,5))
 hold on
 legend('theta2')
-%% RNN model
+%% least-square for k d term
+close all
 testData = par_set.trial1;
-mocapResult = funcComputeStateVar_v1(testData,par_set);
-nn_pred = [mocapResult.state_array,mocapResult.u_pm_psi,testData.pd_psi];
-nn_resp = [mocapResult.state_array];
+ls_data_prep = [];
+ls_data_prep = funcKnownTerm_v7(testData,par_set);
 
-testData = par_set.trial2;
-mocapResult = funcComputeStateVar_v1(testData,par_set);
-nn_val_pred = [mocapResult.state_array,mocapResult.u_pm_psi,testData.pd_psi];
-nn_val_resp = [mocapResult.state_array];
+figure
+subplot(2,1,1)
+plot(ls_data_prep.sum_mcgTauf2xn(1,:))
+hold on
+plot(ls_data_prep.state_array4xn(1,:))
+hold on
+plot(ls_data_prep.state_array4xn(2,:))
+hold on
+plot(ls_data_prep.sum_mcg2xn(1,:))
+legend('y','x','dx')
+subplot(2,1,2)
+plot(ls_data_prep.sum_mcgTauf2xn(2,:))
+hold on
+plot(ls_data_prep.state_array4xn(3,:))
+hold on
+plot(ls_data_prep.state_array4xn(4,:))
+hold on
+plot(ls_data_prep.sum_mcg2xn(2,:))
+legend('y','x','dx')
+ytau = ls_data_prep.sum_mcgTauf2xn(1,:);
+xtau = ls_data_prep.state_array4xn(1,:);
+dxtau = ls_data_prep.state_array4xn(2,:);
+yf = ls_data_prep.sum_mcgTauf2xn(2,:);
+xf = ls_data_prep.state_array4xn(3,:);
+dxf = ls_data_prep.state_array4xn(4,:);
+
+% Result summary
+% ytau = 0.03795 * theta (R^2 = 0.9989)
+% yf = 6.414 * lc1 + 2.41* dc1 + -1.92
+figure
+plot(ls_data_prep.sum_mcgTauf2xn(2,:))
+hold on
+plot(6.414*xf)
+legend('1','2')
 %% Euler-lag simulation
 MCG_result = funcCompuMCG_v1(mocapResult.state_array);
 % rigidMCG_result = funcCompuRigidMCG_v2(mocapResult.state_array);
