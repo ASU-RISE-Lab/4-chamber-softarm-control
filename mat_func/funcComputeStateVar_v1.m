@@ -138,10 +138,10 @@ fprintf( 'Finishing calculation... \n' );
     dtheta2 = filt_dtheta2_array(i);dlc2 = filt_dlc2_array(i);
     ddtheta2 = filt_ddtheta2_array(i);ddlc2 = filt_ddlc2_array(i);
 
-% state_array = [filt_theta1_array,filt_dtheta1_array,filt_lc1_array,filt_dlc1_array,...
-%                filt_theta2_array,filt_dtheta2_array,filt_lc2_array,filt_dlc2_array];
-state_array = [filt_theta2_array,filt_dtheta2_array,filt_lc2_array,filt_dlc2_array,...
-               filt_theta1_array,filt_dtheta1_array,filt_lc1_array,filt_dlc1_array];
+state_array = [filt_theta1_array,filt_dtheta1_array,filt_lc1_array,filt_dlc1_array,...
+               filt_theta2_array,filt_dtheta2_array,filt_lc2_array,filt_dlc2_array];
+% state_array = [filt_theta2_array,filt_dtheta2_array,filt_lc2_array,filt_dlc2_array,...
+%                filt_theta1_array,filt_dtheta1_array,filt_lc1_array,filt_dlc1_array];
 output.state_array = state_array;
 output.wire_angle_rad = [s1.theta_wire_rad,s2.theta_wire_rad];
 output.u_pm_psi(:,1) = testData.pm_psi(:,1) - testData.pm_psi(:,2);

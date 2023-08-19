@@ -1,11 +1,11 @@
-function par =funcEOMbaseFrame1seg_v3(par)
+function par =funcEOMbaseFrame1seg_v4(par)
 fprintf( 'EOM... \n' )
 % par=[];
 %% Transformations
 par.n= 4;%DOF
 %q1=phi_i, q2=theta_i/2 - zeta_theta_i, q3 = zeta_theta_i,q4=bi
 % pi =sym('pi');
-syms m0 g h0 lc1
+syms m0 g a1 lc1
 xi = sym('xi', [par.n 1]);
 %q1=phi_i, q2=theta_i/2 - zeta_theta_i, q3 = zeta_theta_i,q4=bi
 dxi = sym('dxi', [par.n 1]);
@@ -18,7 +18,7 @@ rigid_alpha=sym(zeros(1,par.n));%alpha
 rigid_d=sym(zeros(1,par.n));    
 rigid_theta=sym(zeros(1,par.n));
 rigid_m = sym(zeros(1,par.n));
-%%% DH talbe %%% z0+ points inward, x0+ points right
+%%% DH talbe %%% z0+ points inward, x0+ points left
 %%% Link    theta   d     alpha   a   
 %%% 1       xi(1)   0     -pi/2   0   
 %%% 2       0      xi(2)   0   
@@ -28,12 +28,13 @@ rigid_m = sym(zeros(1,par.n));
 rigid_theta(1)= xi(1);
 rigid_theta(4)= xi(4);
 
-rigid_alpha(1)= -pi/2;
-rigid_alpha(3)= pi/2;
+rigid_alpha(1)= pi/2;
+rigid_alpha(3)= -pi/2;
 
 rigid_d(2)= xi(2);
 rigid_d(3)= xi(3);
 rigid_d(4)= 0;
+
 
 
 

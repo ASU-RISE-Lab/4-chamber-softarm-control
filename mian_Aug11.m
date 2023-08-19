@@ -23,8 +23,8 @@ par_set.train_ratio = 1.0;
 fprintf('System initialization done \n')
 %% ode fix 1 seg 3 link
 par_set.EOM=1;
-par_set = funcEOMbaseFrame1seg_v3(par_set);
-
+par_set = funcEOMbaseFrame1seg_v4(par_set);
+simplify(par_set.Ti{end})
 %% Read txt file or mat file
 if par_set.flag_read_exp==1
     for i = 1:11

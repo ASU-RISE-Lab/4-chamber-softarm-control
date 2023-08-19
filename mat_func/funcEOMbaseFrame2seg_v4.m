@@ -1,15 +1,15 @@
-function par =funcEOMbaseFrame2seg_v2(par)
+function par =funcEOMbaseFrame2seg_v4(par)
 fprintf( 'EOM... \n' )
 % par=[];
 %% Transformations
-par.n= 6;%DOF
+par.n= 8;%DOF
 %q1=phi_i, q2=theta_i/2 - zeta_theta_i, q3 = zeta_theta_i,q4=bi
 % pi =sym('pi');
-syms m0 g h0 lc1 lc2
+syms m0 g a1 lc1
 xi = sym('xi', [par.n 1]);
 %q1=phi_i, q2=theta_i/2 - zeta_theta_i, q3 = zeta_theta_i,q4=bi
 dxi = sym('dxi', [par.n 1]);
-Iyyi = sym('Iyy',[par.n 1]);
+Izzi = sym('Izz',[par.n 1]);
 
 
 
@@ -18,34 +18,43 @@ rigid_alpha=sym(zeros(1,par.n));%alpha
 rigid_d=sym(zeros(1,par.n));    
 rigid_theta=sym(zeros(1,par.n));
 rigid_m = sym(zeros(1,par.n));
-%%% DH talbe %%%
+%%% DH talbe %%% z0+ points inward, x0+ points left
 %%% Link    theta   d     alpha   a   
-%%% 1       0       xi(1)  -pi/2   0   
-%%% 2       xi(2)   xi(3)  pi/2   
-%%% 3       0       0.02199 0   0
-%%% 4       0       xi(4)  -pi/2   0   
-%%% 5       xi(5)   xi(6)  pi/2
-rigid_alpha(1)= -pi/2;
-rigid_alpha(2)= pi/2;
-rigid_alpha(4)= -pi/2;
-rigid_alpha(5)= pi/2;
+%%% 1       xi(1)   0     -pi/2   0   
+%%% 2       0      xi(2)   0   
+%%% 3       0      xi(3)   pi/2   0
+%%% 4       xi(4)   0     0      0
+%%% 5       xi(5)   0     -pi/2   0   
+%%% 6       0      xi(6)   0   
+%%% 7       0      xi(7)   pi/2   0
+%%% 8       xi(8)   0     0      0
 
-
-
-rigid_d(1)= xi(1)+h0;
-rigid_d(3)= xi(3)+h0;
-rigid_d(4)= xi(4)+h0;
-rigid_d(6)= xi(6)+h0;
-
-
-rigid_theta(2)= xi(2);
+rigid_theta(1)= xi(1);
+rigid_theta(4)= xi(4);
 rigid_theta(5)= xi(5);
+rigid_theta(8)= xi(8);
+
+rigid_alpha(1)= pi/2;
+rigid_alpha(3)= -pi/2;
+rigid_alpha(5)= pi/2;
+rigid_alpha(7)= -pi/2;
+
+rigid_d(2)= xi(2);
+rigid_d(3)= xi(3);
+rigid_d(6)= xi(6);
+rigid_d(7)= xi(7);
 
 
-rigid_m(1)= m0/2;
-rigid_m(3)= m0;
-rigid_m(4)= 0;
-rigid_m(6)= m0/2;
+
+
+
+
+
+
+rigid_m(2)= m0;
+rigid_m(6)= m0;
+Izzi(2) = rigid_m(2)*xi(2)*xi(2);
+Izzi(6) = rigid_m(6)*xi(6)*xi(6);
 % n=length(q);% DOF
 % cell array of your homogeneous transformations; each Ti{i} is a 4x4 symbolic transform matrix
 T_old_to_i = cell(par.n,1);% z0 z_end_effector
@@ -69,7 +78,7 @@ for i = 2:length(rigid_m)+1
 end
 par.Ti=Ti;
 fprintf( 'Ep.. \n' )
-par.rigid_2_htm = Ti{3};
+par.rigid_2_htm = Ti{par.n/2};
 par.rigid_3_htm = Ti{end};
 % return
 %% Protential energy
@@ -77,7 +86,7 @@ E_p=0;
 for link_i=2:length(rigid_r)
 %     Epi = rigid_m(link_i)*[0;0;g].'*p_i{link_i+1}
 % p_i{link_i+1}
-    E_p=E_p+rigid_m(link_i)*[0;0;g].'*p_i{link_i+1};
+    E_p=E_p+rigid_m(link_i)*[0;-g;0].'*p_i{link_i+1};
 end
 fprintf( 'J_v... \n' )
 par.Ep = E_p;
@@ -168,7 +177,7 @@ for link_i =1:par.n
 %         I{link_i}=[Ixx Ixy Ixz;
 %            Ixy Iyy Iyz;
 %            Ixz Iyz Izz];
-        I{link_i}= Iyyi(link_i);
+        I{link_i}= Izzi(link_i);
 
     end
 end
@@ -224,10 +233,6 @@ par.B_rigid=D;
 par.C_rigid=cor;
 par.G_rigid=Phi;
 
-par.xi_0_G_rigid=subs(Phi,[xi(2),xi(5)],[0,0]);
-par.xi2_0_G_rigid=subs(Phi,[xi(2)],[0]);
-par.xi5_0_G_rigid=subs(Phi,[xi(5)],[0]);
-
 % for i =1:3
 %     T_p{i}=Ti{end}*[eye(3),par.r_p{i};0 0 0 1];
 %     r_p_base{i}=T_p{i}(1:3,4);
@@ -244,19 +249,22 @@ par.xi5_0_G_rigid=subs(Phi,[xi(5)],[0]);
 
 syms theta1 dtheta1 ddtheta1 theta1_t(t) lc1 dlc1 ddlc1 lc1_t(t)
 syms theta2 dtheta2 ddtheta2 theta2_t(t) lc2 dlc2 ddlc2 lc2_t(t)
-b_theta1 = lc1/(theta1)*tan(theta1/2);
-b_theta2 = lc2/(theta2)*tan(theta2/2);
 
-m_q=[b_theta1 theta1 b_theta1 b_theta2 theta2 b_theta2 ].';% 6x1
-J_f=[diff(m_q,theta1),diff(m_q,lc1),diff(m_q,theta2),diff(m_q,lc2)];%6x4
+b_theta1 = lc1/(theta1)*sin(theta1/2);
+b_theta2 = lc2/(theta2)*sin(theta2/2);
 
-temp.dJ_f=diff(subs(J_f,[theta1,lc1,theta2,lc2],[theta1_t(t),lc1_t(t),theta2_t(t),lc2_t(t)]),t);%6x4
-dJ_fdt=subs(temp.dJ_f,[theta1_t(t),diff(theta1_t(t),t),lc1_t(t),diff(lc1_t(t),t),theta2_t(t),diff(theta2_t(t),t),lc2_t(t),diff(lc2_t(t), t)]...
-    ,[theta1,dtheta1,lc1,dlc1,theta2,dtheta2,lc2,dlc2]);% 6x4
-par.J_xi2q=J_f;%6x4
-temp.xi=m_q;%6x1
-temp.dxi=J_f*[dtheta1 dlc1 dtheta2 dlc2].'; %6x4 * 4x1
-temp.ddxi=dJ_fdt*[dtheta1 dlc1 dtheta2 dlc2].'+J_f*[ddtheta1 ddlc1 ddtheta2 ddlc2].';% 6x4 * 4x1 + 6x4 * 4x1
+m_q=[0.5*theta1 b_theta1 b_theta1 0.5*theta1 0.5*theta2 b_theta2 b_theta2 0.5*theta2].';% 8x1
+
+J_f=[diff(m_q,theta1),diff(m_q,lc1),diff(m_q,theta2),diff(m_q,lc2)];%8x4
+
+temp.dJ_f=diff(subs(J_f,[theta1,lc1,theta2,lc2],[theta1_t(t),lc1_t(t),theta2_t(t),lc2_t(t)]),t);%8x4
+dJ_fdt=subs(temp.dJ_f,[theta1_t(t),diff(theta1_t(t),t),lc1_t(t),diff(lc1_t(t),t),...
+    theta2_t(t),diff(theta2_t(t),t),lc2_t(t),diff(lc2_t(t),t)]...
+    ,[theta1,dtheta1,lc1,dlc1,theta2,dtheta2,lc2,dlc2]);% 8x4
+par.J_xi2q=J_f;%8x4
+temp.xi=m_q;%8x1
+temp.dxi=J_f*[dtheta1 dlc1 dtheta2 dlc2].'; %8x4 * 4x1
+temp.ddxi=dJ_fdt*[dtheta1 dlc1 dtheta2 dlc2].'+J_f*[ddtheta1 ddlc1 dtheta2 dlc2].';% 8x4 * 4x1 + 8x4 * 4x1
 % %%
 B_xi_q=subs(D,xi,m_q);
 par.sym_J_xi2q=subs(par.J_xyz{end},xi,m_q);
@@ -284,60 +292,7 @@ G_q=J_f.'*subs(Phi,xi,m_q);
 par.B_q=B_q;
 par.C_q=C_q;
 par.G_q=G_q;
-%% theta = 0
 
-b_theta1 = lc1/2;
-b_theta2 = lc2/2;
-
-m_q=[b_theta1 theta1 b_theta1 b_theta2 theta2 b_theta2 ].';% 6x1
-J_f=[diff(m_q,theta1),diff(m_q,lc1),diff(m_q,theta2),diff(m_q,lc2)];%6x4
-
-temp.dJ_f=diff(subs(J_f,[theta1,lc1,theta2,lc2],[theta1_t(t),lc1_t(t),theta2_t(t),lc2_t(t)]),t);%6x4
-dJ_fdt=subs(temp.dJ_f,[theta1_t(t),diff(theta1_t(t),t),lc1_t(t),diff(lc1_t(t),t),theta2_t(t),diff(theta2_t(t),t),lc2_t(t),diff(lc2_t(t), t)]...
-    ,[theta1,dtheta1,lc1,dlc1,theta2,dtheta2,lc2,dlc2]);% 6x4
-par.J_xi2q=J_f;%6x4
-temp.xi=m_q;%6x1
-temp.dxi=J_f*[dtheta1 dlc1 dtheta2 dlc2].'; %6x4 * 4x1
-temp.ddxi=dJ_fdt*[dtheta1 dlc1 dtheta2 dlc2].'+J_f*[ddtheta1 ddlc1 ddtheta2 ddlc2].';% 6x4 * 4x1 + 6x4 * 4x1
-% %%
-B_xi_q=subs(D,xi,m_q);
-par.theta0_sym_J_xi2q=subs(par.J_xyz{end},xi,m_q);
-B_q=J_f.'*B_xi_q*J_f;
-%%%
-% M_xi_q=subs(M,xi,m_q);
-% par.B_q_simplify=J_f.'*M_xi_q*J_f;
-% %%
-% temp_1=subs(cor,xi,f);
-% temp_2=subs(temp_1,dxi,df);
-% %%
-% C_q=J_f.'*subs(D,xi,f)*J_ff+J_f.'*temp_2*J_f;
-fprintf( 'cq... \n' )
-C_q=J_f.'*subs(D,xi,m_q)*dJ_fdt+J_f.'*subs(cor,[xi;dxi],[temp.xi;temp.dxi])*J_f;
-% %%
-fprintf( 'g_q... \n' )
-G_q=J_f.'*subs(Phi,xi,m_q);
-% subs(G_q.[theta1,theta2],[0,0])
-% %%
-% par.J_xyz2q=subs(par.J_xyz2xi*par.J_xi2q,[xi],[m_q]);
-
-% f_q=J_f.'*subs(par.f_xi,xi,f);
-% 
-% %%
-% % par={};
-par.theta_0_B_q=subs(B_q,[theta1,theta2],[0,0]);
-par.theta_0_C_q=subs(C_q,[theta1,theta2],[0,0]);
-par.theta_0_G_q=subs(G_q,[theta1,theta2],[0,0]);
-
-par.theta1_0_B_q=subs(B_q,[theta1],[0]);
-par.theta1_0_C_q=subs(C_q,[theta1],[0]);
-par.theta1_0_G_q=subs(G_q,[theta1],[0]);
-
-
-par.theta2_0_B_q=subs(B_q,[theta2],[0]);
-par.theta2_0_C_q=subs(C_q,[theta2],[0]);
-par.theta2_0_G_q=subs(G_q,[theta2],[0]);
-% % par.C_q_simplify=simplify(C_q);
-% % par.G_q_simplify=simplify(G_q);
 %% Actuation mapping
 fprintf('EOM Done\n')
 end
