@@ -29,7 +29,8 @@ simplify(par_set.Ti{end})
 par_set.EOM=1;
 par_set = funcEOMbaseFrame2seg_v4(par_set);
 simplify(par_set.Ti{end})
-
+par_set.Jxythetaz = par_set.J_xyz2q;
+par_set.Jxythetaz(3,:) = [1 0 1 0 ];
 %% Read txt file or mat file
 if par_set.flag_read_exp==1
     for i = 1:11
@@ -91,7 +92,7 @@ plot(fkResult.camFrameE1(:,3)-testData.rigid_2_pose(:,3))
 hold on
 legend('x','y','z')
 %% FK RESULT 2 seg
-testData = par_set.trial1;
+testData = par_set.trial2;
 mocapResult=[];
 mocapResult = funcComputeStateVar_v1(testData,par_set);
 fkResult = funcCompuFK2seg_v1(mocapResult.state_array);
@@ -178,15 +179,27 @@ testData = par_set.trial1;
 outputKnown = funcKnownTerm2seg_v1(testData,par_set);
 % Kx + Ddx = -u +mddq +cqdq +gq = y
 % (K+Ds)X(s) = Y(s) ----- G(s) = X(s)/Y(s) =  1/(K + Ds)
-spt = 10; ept = length(outputKnown.state_array);
-var1 = iddata(outputKnown.state_array(spt:ept,1),-(outputKnown.u_pm_tf(spt:ept,1) - outputKnown.mcg_array(1,spt:ept)'),par_set.Ts);
-var2 = iddata(outputKnown.state_array(spt:ept,3),-(outputKnown.u_pm_tf(spt:ept,2) - outputKnown.mcg_array(2,spt:ept)'),par_set.Ts);
-var3 = iddata(outputKnown.state_array(spt:ept,5),-(outputKnown.u_pm_tf(spt:ept,3) - outputKnown.mcg_array(3,spt:ept)'),par_set.Ts);
-var4 = iddata(outputKnown.state_array(spt:ept,7),-(outputKnown.u_pm_tf(spt:ept,4) - outputKnown.mcg_array(4,spt:ept)'),par_set.Ts);
+spt = 100; ept = length(outputKnown.state_array);
+var1 = iddata(outputKnown.state_array(spt:ept,1),(outputKnown.u_pm_tf(spt:ept,1) - outputKnown.mcg_array(1,spt:ept)'),par_set.Ts);
+var2 = iddata(outputKnown.state_array(spt:ept,3),(outputKnown.u_pm_tf(spt:ept,2) - outputKnown.mcg_array(2,spt:ept)'),par_set.Ts);
+var3 = iddata(outputKnown.state_array(spt:ept,5),(outputKnown.u_pm_tf(spt:ept,3) - outputKnown.mcg_array(3,spt:ept)'),par_set.Ts);
+var4 = iddata(outputKnown.state_array(spt:ept,7),(outputKnown.u_pm_tf(spt:ept,4) - outputKnown.mcg_array(4,spt:ept)'),par_set.Ts);
+
+var1x = outputKnown.state_array(spt:ept,1);
+var1y = outputKnown.state_array(spt:ept,2);
+var1z = (outputKnown.u_pm_tf(spt:ept,1) - outputKnown.mcg_array(1,spt:ept)');
 
 var2x = outputKnown.state_array(spt:ept,3);
 var2y = outputKnown.state_array(spt:ept,4);
-var2z = -(outputKnown.u_pm_tf(spt:ept,2) - outputKnown.mcg_array(2,spt:ept)');
+var2z = (outputKnown.u_pm_tf(spt:ept,2) - outputKnown.mcg_array(2,spt:ept)');
+
+var3x = outputKnown.state_array(spt:ept,5);
+var3y = outputKnown.state_array(spt:ept,6);
+var3z = (outputKnown.u_pm_tf(spt:ept,3) - outputKnown.mcg_array(3,spt:ept)');
+
+var4x = outputKnown.state_array(spt:ept,7);
+var4y = outputKnown.state_array(spt:ept,8);
+var4z = (outputKnown.u_pm_tf(spt:ept,4) - outputKnown.mcg_array(4,spt:ept)');
 %% RNN model
 testData = par_set.trial1;
 mocapResult = funcComputeStateVar_v1(testData,par_set);

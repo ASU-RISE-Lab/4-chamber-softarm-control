@@ -252,7 +252,10 @@ syms theta2 dtheta2 ddtheta2 theta2_t(t) lc2 dlc2 ddlc2 lc2_t(t)
 
 b_theta1 = lc1/(theta1)*sin(theta1/2);
 b_theta2 = lc2/(theta2)*sin(theta2/2);
-
+xyz3x1 = Ti{end}(1:3,4);
+for i =1:par.n
+par.J_xyz2xi(:,i) = [diff(xyz3x1,xi(i))]
+end
 m_q=[0.5*theta1 b_theta1 b_theta1 0.5*theta1 0.5*theta2 b_theta2 b_theta2 0.5*theta2].';% 8x1
 
 J_f=[diff(m_q,theta1),diff(m_q,lc1),diff(m_q,theta2),diff(m_q,lc2)];%8x4
@@ -283,7 +286,7 @@ C_q=J_f.'*subs(D,xi,m_q)*dJ_fdt+J_f.'*subs(cor,[xi;dxi],[temp.xi;temp.dxi])*J_f;
 fprintf( 'g_q... \n' )
 G_q=J_f.'*subs(Phi,xi,m_q);
 % %%
-% par.J_xyz2q=subs(par.J_xyz2xi*par.J_xi2q,[xi],[m_q]);
+par.J_xyz2q=subs(par.J_xyz2xi*par.J_xi2q,[xi],[m_q]);
 
 % f_q=J_f.'*subs(par.f_xi,xi,f);
 % 
