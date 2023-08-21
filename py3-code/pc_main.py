@@ -6,7 +6,9 @@ recorvery to compliant
 
 """
 import arm_main # mode 0high -- low1-pressure + low1-sensor + low2-pressure
-import vt_main
+import cali_main
+import elong_main
+import arm2_main
 # import sensor_test # mode 1
 # import ramp_test # mode 2
 # import step_test # mode 3
@@ -16,15 +18,15 @@ from time import sleep
 def main():
     try:
         #### Select control method ####
-        flag_ctrl_mode=0
+        flag_ctrl_mode=3
         if flag_ctrl_mode==0:
             p_client=arm_main.pc_client()
         elif flag_ctrl_mode==1:
-            p_client=vt_main.pc_client()
-        # elif flag_ctrl_mode==2:
-        #     p_client=ramp_test.pc_client()
-        # elif flag_ctrl_mode==3:
-        #     p_client=step_test.pc_client()
+            p_client=cali_main.pc_client()
+        elif flag_ctrl_mode==2:
+            p_client=elong_main.pc_client()
+        elif flag_ctrl_mode==3:
+            p_client=arm2_main.pc_client()
 
         p_client.positionProfile_flag=3 
         p_client.flag_use_mocap=1

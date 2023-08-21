@@ -1,6 +1,6 @@
 function [output] = funcCompuFK2seg_v1(stateVarArr)
 % use funcEOMBaseFrame1seg_v4
-
+a1 = 0.05;
 Tbase2mocap = [-1 0 0 0.0068; 
                 0 0 -1 -0.2111;
                 0 1 0  0.5086; 
@@ -21,8 +21,8 @@ endEffector1x(i) = (2*b_theta1)*sin(theta1/2);
 endEffector1y(i) = -(2*b_theta1)*cos(theta1/2); 
 endEffector1z(i) = 0;
 
-endEffector2x(i) = (2*b_theta1)*sin(theta1/2) + 2*b_theta2*sin(theta1 + theta2/2);
-endEffector2y(i) = -(2*b_theta1)*cos(theta1/2) - (2*b_theta2)*cos(theta1 + theta2/2);
+endEffector2x(i) = (2*b_theta1)*sin(theta1/2) + (2*b_theta2 + a1)*sin(theta1 + theta2/2);
+endEffector2y(i) = -(2*b_theta1)*cos(theta1/2) - (2*b_theta2 + a1)*cos(theta1 + theta2/2);
 endEffector2z(i) = 0;
 
 

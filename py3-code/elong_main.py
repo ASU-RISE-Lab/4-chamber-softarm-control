@@ -152,6 +152,31 @@ class pc_client(object):
             self.t0_on_glob = time()
             try:
                 while(self.flag_end_test):
+                    seg1_r= 5.0
+                    seg1_l = 5.0
+                    seg1_m = 5.0
+
+                    seg2_r = 5.0
+                    seg2_l = 5.0
+                    seg2_m = 5.0
+
+                    td = 10
+                    pd_array=np.array([seg1_r,seg1_l,seg1_m,seg2_r,seg2_l,seg2_m])
+                    self.pres_single_step_response_v2(pd_array,td,time())
+
+                    seg1_r= 10.0
+                    seg1_l = 10.0
+                    seg1_m = 10.0
+
+                    seg2_r = 10.0
+                    seg2_l = 10.0
+                    seg2_m = 10.0
+
+                    td = 10
+                    pd_array=np.array([seg1_r,seg1_l,seg1_m,seg2_r,seg2_l,seg2_m])
+                    self.pres_single_step_response_v2(pd_array,td,time())
+
+
                     seg1_r= 15.0
                     seg1_l = 15.0
                     seg1_m = 15.0
@@ -164,56 +189,19 @@ class pc_client(object):
                     pd_array=np.array([seg1_r,seg1_l,seg1_m,seg2_r,seg2_l,seg2_m])
                     self.pres_single_step_response_v2(pd_array,td,time())
 
-                    seg1_r= 15.0
-                    seg1_l = 1.0
-                    seg1_m = 1.0
 
-                    seg2_r = 15.0
-                    seg2_l = 1.0
-                    seg2_m = 1.0
+                    seg1_r= 20.0
+                    seg1_l = 20.0
+                    seg1_m = 20.0
 
-                    td = 10
-                    pd_array=np.array([seg1_r,seg1_l,seg1_m,seg2_r,seg2_l,seg2_m])
-                    self.pres_single_step_response_v2(pd_array,td,time())
-
-
-                    seg1_r= 1.0
-                    seg1_l = 15.0
-                    seg1_m = 1.0
-
-                    seg2_r = 1.0
-                    seg2_l = 15.0
-                    seg2_m = 1.0
+                    seg2_r = 20.0
+                    seg2_l = 20.0
+                    seg2_m = 20.0
 
                     td = 10
                     pd_array=np.array([seg1_r,seg1_l,seg1_m,seg2_r,seg2_l,seg2_m])
                     self.pres_single_step_response_v2(pd_array,td,time())
 
-
-                    seg1_r= 15.0
-                    seg1_l = 1.0
-                    seg1_m = 1.0
-
-                    seg2_r = 1.0
-                    seg2_l = 15.0
-                    seg2_m = 1.0
-
-                    td = 10
-                    pd_array=np.array([seg1_r,seg1_l,seg1_m,seg2_r,seg2_l,seg2_m])
-                    self.pres_single_step_response_v2(pd_array,td,time())
-
-
-                    seg1_r= 1.0
-                    seg1_l = 15.0
-                    seg1_m = 1.0
-
-                    seg2_r = 15.0
-                    seg2_l = 1.0
-                    seg2_m = 1.0
-
-                    td = 10
-                    pd_array=np.array([seg1_r,seg1_l,seg1_m,seg2_r,seg2_l,seg2_m])
-                    self.pres_single_step_response_v2(pd_array,td,time())
 
                     seg1_r= 15.0
                     seg1_l = 15.0
@@ -222,6 +210,30 @@ class pc_client(object):
                     seg2_r = 15.0
                     seg2_l = 15.0
                     seg2_m = 15.0
+
+                    td = 10
+                    pd_array=np.array([seg1_r,seg1_l,seg1_m,seg2_r,seg2_l,seg2_m])
+                    self.pres_single_step_response_v2(pd_array,td,time())
+
+                    seg1_r= 10.0
+                    seg1_l = 10.0
+                    seg1_m = 10.0
+
+                    seg2_r = 10.0
+                    seg2_l = 10.0
+                    seg2_m = 10.0
+
+                    td = 10
+                    pd_array=np.array([seg1_r,seg1_l,seg1_m,seg2_r,seg2_l,seg2_m])
+                    self.pres_single_step_response_v2(pd_array,td,time())
+
+                    seg1_r= 5.0
+                    seg1_l = 5.0
+                    seg1_m = 5.0
+
+                    seg2_r = 5.0
+                    seg2_l = 5.0
+                    seg2_m = 5.0
 
                     td = 10
                     pd_array=np.array([seg1_r,seg1_l,seg1_m,seg2_r,seg2_l,seg2_m])
@@ -234,6 +246,7 @@ class pc_client(object):
                 self.th2_flag=False
             if self.flag_reset==0:
                 self.t0_on_trial = time()
+                # self.pres_single_step_response(np.array([15.0]*6),10)
                 self.pres_single_step_response(np.array([2.0]*6),10)
                 self.flag_reset=1
             self.th1_flag=False

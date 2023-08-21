@@ -27,7 +27,7 @@ rigid_m = sym(zeros(1,par.n));
 %%% 5       xi(5)   0     -pi/2   0   
 %%% 6       0      xi(6)   0   
 %%% 7       0      xi(7)   pi/2   0
-%%% 8       xi(8)   0     0      0
+%%% 8       xi(8)        0      0
 
 rigid_theta(1)= xi(1);
 rigid_theta(4)= xi(4);
@@ -42,7 +42,8 @@ rigid_alpha(7)= -pi/2;
 rigid_d(2)= xi(2);
 rigid_d(3)= xi(3);
 rigid_d(6)= xi(6);
-rigid_d(7)= xi(7);
+rigid_d(7)= xi(7)+a1;
+
 
 
 

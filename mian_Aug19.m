@@ -175,8 +175,8 @@ hold on
 title('fk errors in cam frame')
 legend('x','y','z')
 %% least square for K and D
-testData = par_set.trial1;
-outputKnown = funcKnownTerm2seg_v1(testData,par_set);
+testData = par_set.trial4;
+outputKnown = funcKnownTerm2seg_v2(testData,par_set);
 % Kx + Ddx = -u +mddq +cqdq +gq = y
 % (K+Ds)X(s) = Y(s) ----- G(s) = X(s)/Y(s) =  1/(K + Ds)
 spt = 100; ept = length(outputKnown.state_array);
@@ -191,7 +191,7 @@ var1z = (outputKnown.u_pm_tf(spt:ept,1) - outputKnown.mcg_array(1,spt:ept)');
 
 var2x = outputKnown.state_array(spt:ept,3);
 var2y = outputKnown.state_array(spt:ept,4);
-var2z = (outputKnown.u_pm_tf(spt:ept,2) - outputKnown.mcg_array(2,spt:ept)');
+var2z = (-outputKnown.u_pm_tf(spt:ept,2) - outputKnown.mcg_array(2,spt:ept)');
 
 var3x = outputKnown.state_array(spt:ept,5);
 var3y = outputKnown.state_array(spt:ept,6);
@@ -199,7 +199,191 @@ var3z = (outputKnown.u_pm_tf(spt:ept,3) - outputKnown.mcg_array(3,spt:ept)');
 
 var4x = outputKnown.state_array(spt:ept,7);
 var4y = outputKnown.state_array(spt:ept,8);
-var4z = (outputKnown.u_pm_tf(spt:ept,4) - outputKnown.mcg_array(4,spt:ept)');
+var4z = (-outputKnown.u_pm_tf(spt:ept,4) - outputKnown.mcg_array(4,spt:ept)');
+%% GP use data set 1
+
+xob1 = [var1x,var1y];
+yob1 = var1z;
+gprMdl1 = fitrgp(xob1,yob1);
+[ypred1,~,yint1] = predict(gprMdl1,xob1);
+close all
+fig = figure;
+fig.Position(3) = fig.Position(3)*4;
+tiledlayout(2,2,'TileSpacing','compact')
+nexttile
+hold on
+scatter3(xob1(:,1),xob1(:,2),yob1,'r');
+plot3(xob1(:,1),xob1(:,2),ypred1,'g')                  % GPR predictions
+% patch([xob;flipud(xob)],[yint1(:,1);flipud(yint1(:,2))],'k','FaceAlpha',0.1); % Prediction intervals
+hold off
+view(-37.5,30)
+title('theta1')
+xlabel('x (rad)')
+ylabel('dx (rad/s)')
+zlabel('f(x) = u-mcg')
+legend({'Noise-free observations','GPR predictions'},'Location','best')
+
+xob2 = [var2x,var2y];
+yob2 = var2z;
+gprMdl2 = fitrgp(xob2,yob2);
+[ypred2,~,yint2] = predict(gprMdl2,xob2);
+
+nexttile
+hold on
+scatter3(xob2(:,1),xob2(:,2),yob2,'r');
+plot3(xob2(:,1),xob2(:,2),ypred2,'g')                  % GPR predictions
+% patch([xob;flipud(xob)],[yint1(:,1);flipud(yint1(:,2))],'k','FaceAlpha',0.1); % Prediction intervals
+hold off
+view(-37.5,30)
+title('lc1')
+xlabel('x (m)')
+ylabel('dx (m/s)')
+zlabel('f(x) = u-mcg')
+legend({'Noise-free observations','GPR predictions'},'Location','best')
+
+xob3 = [var3x,var3y];
+yob3 = var3z;
+gprMdl3 = fitrgp(xob3,yob3);
+[ypred3,~,yint3] = predict(gprMdl3,xob3);
+
+nexttile
+hold on
+scatter3(xob3(:,1),xob3(:,2),yob3,'r');
+plot3(xob3(:,1),xob3(:,2),ypred3,'g')                  % GPR predictions
+% patch([xob;flipud(xob)],[yint1(:,1);flipud(yint1(:,2))],'k','FaceAlpha',0.1); % Prediction intervals
+hold off
+view(-37.5,30)
+title('theta2')
+xlabel('x (rad)')
+ylabel('dx (rad/s)')
+zlabel('f(x) = u-mcg')
+legend({'Noise-free observations','GPR predictions'},'Location','best')
+
+xob4 = [var4x,var4y];
+yob4 = var4z;
+gprMdl4 = fitrgp(xob4,yob4);
+[ypred4,~,yint4] = predict(gprMdl4,xob4);
+
+nexttile
+hold on
+scatter3(xob4(:,1),xob4(:,2),yob4,'r');
+plot3(xob4(:,1),xob4(:,2),ypred4,'g')                  % GPR predictions
+% patch([xob;flipud(xob)],[yint1(:,1);flipud(yint1(:,2))],'k','FaceAlpha',0.1); % Prediction intervals
+hold off
+view(-37.5,30)
+title('lc2')
+xlabel('x (m)')
+ylabel('dx (m/s)')
+zlabel('f(x) = u-mcg')
+legend({'Noise-free observations','GPR predictions'},'Location','best')
+
+%% sysid for pneumatic controller
+spt =1;
+pctrl1 = iddata(testData.pm_psi(spt:ept,1),testData.pd_psi(spt:ept,1));
+pctrl2 = iddata(testData.pm_psi(spt:ept,2),testData.pd_psi(spt:ept,2));
+pctrl3 = iddata(testData.pm_psi(spt:ept,3),testData.pd_psi(spt:ept,3));
+pctrl4 = iddata(testData.pm_psi(spt:ept,4),testData.pd_psi(spt:ept,4));
+pctrl5 = iddata(testData.pm_psi(spt:ept,5),testData.pd_psi(spt:ept,5));
+pctrl6 = iddata(testData.pm_psi(spt:ept,6),testData.pd_psi(spt:ept,6));
+
+pctrlMerge = merge(pctrl1,pctrl4);
+% dpm = -0.0353*pm + 0.03768*pd
+%% RNN training
+testData = par_set.trial2;
+outputvalid = funcKnownTerm2seg_v1(testData,par_set);
+spt = 100; ept = length(outputvalid.state_array);
+var1x = outputvalid.state_array(spt:ept,1);
+var1y = outputvalid.state_array(spt:ept,2);
+var1z = (outputvalid.u_pm_tf(spt:ept,1) - outputvalid.mcg_array(1,spt:ept)');
+
+var2x = outputvalid.state_array(spt:ept,3);
+var2y = outputvalid.state_array(spt:ept,4);
+var2z = (-outputvalid.u_pm_tf(spt:ept,2) - outputvalid.mcg_array(2,spt:ept)');
+
+var3x = outputvalid.state_array(spt:ept,5);
+var3y = outputvalid.state_array(spt:ept,6);
+var3z = (outputvalid.u_pm_tf(spt:ept,3) - outputvalid.mcg_array(3,spt:ept)');
+
+var4x = outputvalid.state_array(spt:ept,7);
+var4y = outputvalid.state_array(spt:ept,8);
+var4z = (-outputvalid.u_pm_tf(spt:ept,4) - outputvalid.mcg_array(4,spt:ept)');
+
+xob1 = [var1x,var1y];
+yob1 = var1z;
+%%
+% gprMdl1 = fitrgp(xob1,yob1);
+[ypred1,~,yint1] = predict(gprMdl1,xob1);
+close all
+fig = figure;
+fig.Position(3) = fig.Position(3)*4;
+tiledlayout(2,2,'TileSpacing','compact')
+nexttile
+hold on
+scatter3(xob1(:,1),xob1(:,2),yob1,'r');
+plot3(xob1(:,1),xob1(:,2),ypred1,'g')                  % GPR predictions
+% patch([xob;flipud(xob)],[yint1(:,1);flipud(yint1(:,2))],'k','FaceAlpha',0.1); % Prediction intervals
+hold off
+view(-37.5,30)
+title('theta1')
+xlabel('x (rad)')
+ylabel('dx (rad/s)')
+zlabel('f(x) = u-mcg')
+legend({'Noise-free observations','GPR predictions'},'Location','best')
+
+xob2 = [var2x,var2y];
+yob2 = var2z;
+% gprMdl2 = fitrgp(xob2,yob2);
+[ypred2,~,yint2] = predict(gprMdl2,xob2);
+
+nexttile
+hold on
+scatter3(xob2(:,1),xob2(:,2),yob2,'r');
+plot3(xob2(:,1),xob2(:,2),ypred2,'g')                  % GPR predictions
+% patch([xob;flipud(xob)],[yint1(:,1);flipud(yint1(:,2))],'k','FaceAlpha',0.1); % Prediction intervals
+hold off
+view(-37.5,30)
+title('lc1')
+xlabel('x (m)')
+ylabel('dx (m/s)')
+zlabel('f(x) = u-mcg')
+legend({'Noise-free observations','GPR predictions'},'Location','best')
+
+xob3 = [var3x,var3y];
+yob3 = var3z;
+% gprMdl3 = fitrgp(xob3,yob3);
+[ypred3,~,yint3] = predict(gprMdl3,xob3);
+
+nexttile
+hold on
+scatter3(xob3(:,1),xob3(:,2),yob3,'r');
+plot3(xob3(:,1),xob3(:,2),ypred3,'g')                  % GPR predictions
+% patch([xob;flipud(xob)],[yint1(:,1);flipud(yint1(:,2))],'k','FaceAlpha',0.1); % Prediction intervals
+hold off
+view(-37.5,30)
+title('theta2')
+xlabel('x (rad)')
+ylabel('dx (rad/s)')
+zlabel('f(x) = u-mcg')
+legend({'Noise-free observations','GPR predictions'},'Location','best')
+
+xob4 = [var4x,var4y];
+yob4 = var4z;
+% gprMdl4 = fitrgp(xob4,yob4);
+[ypred4,~,yint4] = predict(gprMdl4,xob4);
+
+nexttile
+hold on
+scatter3(xob4(:,1),xob4(:,2),yob4,'r');
+plot3(xob4(:,1),xob4(:,2),ypred4,'g')                  % GPR predictions
+% patch([xob;flipud(xob)],[yint1(:,1);flipud(yint1(:,2))],'k','FaceAlpha',0.1); % Prediction intervals
+hold off
+view(-37.5,30)
+title('lc2')
+xlabel('x (m)')
+ylabel('dx (m/s)')
+zlabel('f(x) = u-mcg')
+legend({'Noise-free observations','GPR predictions'},'Location','best')
+
 %% RNN model
 testData = par_set.trial1;
 mocapResult = funcComputeStateVar_v1(testData,par_set);
