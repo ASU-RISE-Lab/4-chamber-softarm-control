@@ -92,7 +92,7 @@ plot(fkResult.camFrameE1(:,3)-testData.rigid_2_pose(:,3))
 hold on
 legend('x','y','z')
 %% FK RESULT 2 seg
-testData = par_set.trial2;
+testData = par_set.trial3;
 mocapResult=[];
 mocapResult = funcComputeStateVar_v1(testData,par_set);
 fkResult = funcCompuFK2seg_v1(mocapResult.state_array);
@@ -175,15 +175,15 @@ hold on
 title('fk errors in cam frame')
 legend('x','y','z')
 %% least square for K and D
-testData = par_set.trial4;
+testData = par_set.trial2;
 outputKnown = funcKnownTerm2seg_v2(testData,par_set);
 % Kx + Ddx = -u +mddq +cqdq +gq = y
 % (K+Ds)X(s) = Y(s) ----- G(s) = X(s)/Y(s) =  1/(K + Ds)
 spt = 100; ept = length(outputKnown.state_array);
 var1 = iddata(outputKnown.state_array(spt:ept,1),(outputKnown.u_pm_tf(spt:ept,1) - outputKnown.mcg_array(1,spt:ept)'),par_set.Ts);
-var2 = iddata(outputKnown.state_array(spt:ept,3),(outputKnown.u_pm_tf(spt:ept,2) - outputKnown.mcg_array(2,spt:ept)'),par_set.Ts);
+var2 = iddata(outputKnown.state_array(spt:ept,3),(-outputKnown.u_pm_tf(spt:ept,2) - outputKnown.mcg_array(2,spt:ept)'),par_set.Ts);
 var3 = iddata(outputKnown.state_array(spt:ept,5),(outputKnown.u_pm_tf(spt:ept,3) - outputKnown.mcg_array(3,spt:ept)'),par_set.Ts);
-var4 = iddata(outputKnown.state_array(spt:ept,7),(outputKnown.u_pm_tf(spt:ept,4) - outputKnown.mcg_array(4,spt:ept)'),par_set.Ts);
+var4 = iddata(outputKnown.state_array(spt:ept,7),(-outputKnown.u_pm_tf(spt:ept,4) - outputKnown.mcg_array(4,spt:ept)'),par_set.Ts);
 
 var1x = outputKnown.state_array(spt:ept,1);
 var1y = outputKnown.state_array(spt:ept,2);
@@ -191,7 +191,7 @@ var1z = (outputKnown.u_pm_tf(spt:ept,1) - outputKnown.mcg_array(1,spt:ept)');
 
 var2x = outputKnown.state_array(spt:ept,3);
 var2y = outputKnown.state_array(spt:ept,4);
-var2z = (-outputKnown.u_pm_tf(spt:ept,2) - outputKnown.mcg_array(2,spt:ept)');
+var2z = (outputKnown.u_pm_tf(spt:ept,2) + outputKnown.mcg_array(2,spt:ept)');
 
 var3x = outputKnown.state_array(spt:ept,5);
 var3y = outputKnown.state_array(spt:ept,6);
@@ -199,7 +199,94 @@ var3z = (outputKnown.u_pm_tf(spt:ept,3) - outputKnown.mcg_array(3,spt:ept)');
 
 var4x = outputKnown.state_array(spt:ept,7);
 var4y = outputKnown.state_array(spt:ept,8);
-var4z = (-outputKnown.u_pm_tf(spt:ept,4) - outputKnown.mcg_array(4,spt:ept)');
+var4z = (outputKnown.u_pm_tf(spt:ept,4) + outputKnown.mcg_array(4,spt:ept)');
+
+%%
+outputKnown = funcKnownTerm2seg_v2(testData,par_set);
+% Kx + Ddx = -u +mddq +cqdq +gq = y
+% (K+Ds)X(s) = Y(s) ----- G(s) = X(s)/Y(s) =  1/(K + Ds)
+spt = 100; ept = length(outputKnown.state_array);
+var2 = iddata(outputKnown.mean_u_pm_psi(spt:ept),(outputKnown.u_pm_tf(spt:ept,2) + outputKnown.mcg_array(2,spt:ept)'./outputKnown.state_array(spt:ept,3)),par_set.Ts);
+pmvar1x = outputKnown.mean_u_pm_psi(spt:ept);
+pmvar1y = (outputKnown.u_pm_tf(spt:ept,1) - outputKnown.mcg_array(1,spt:ept)'./outputKnown.state_array(spt:ept,1));
+
+pmvar2x = outputKnown.mean_u_pm_psi(spt:ept);
+pmvar2y = outputKnown.state_array(spt:ept,3);
+pmvar2z = (outputKnown.u_pm_tf(spt:ept,2) + outputKnown.mcg_array(2,spt:ept));
+
+pmvar4x = outputKnown.mean_u_pm_psi(spt:ept);
+pmvar4y = (outputKnown.u_pm_tf(spt:ept,4) + outputKnown.mcg_array(4,spt:ept)'./outputKnown.state_array(spt:ept,7));
+
+% k2_pm = 41.08 * mean(pm_psi)+46.5 0.99R^2
+% k4_pm = 41.42 * mean(pm_psi)+3.933 0.99R^2
+
+%% validation
+testData = par_set.trial2;
+outputKnown = funcKnownTerm2seg_v2(testData,par_set);
+yright = outputKnown.u_pm_tf - ...
+    [26.64*outputKnown.state_array(:,1),... 
+    (41.08 * outputKnown.mean_u_pm_psi + 46.5).*outputKnown.state_array(:,3),... 
+    52.4075*outputKnown.state_array(:,5),... 
+    (41.42 * outputKnown.mean_u_pm_psi + 3.933).*outputKnown.state_array(:,7)]...
+    -    [23.0894*outputKnown.state_array(:,2),... 
+    0*outputKnown.state_array(:,4),... 
+    50.6842*outputKnown.state_array(:,6),... 
+    0*outputKnown.state_array(:,8)];
+
+yupm = outputKnown.u_pm_tf;
+ykpm=    [26.64*outputKnown.state_array(:,1),... 
+    (41.08 * outputKnown.mean_u_pm_psi + 46.5).*outputKnown.state_array(:,3),... 
+    52.4075*outputKnown.state_array(:,5),... 
+    (41.42 * outputKnown.mean_u_pm_psi + 3.933).*outputKnown.state_array(:,7)];
+
+yleft = outputKnown.mcg_array';
+close all
+figure(1)
+titlelist = {'theta1','lc1','theta2','lc2'};
+for i  =1 :4
+subplot(4,1,i)
+plot(yleft(:,i))
+hold on 
+plot(yright(:,i))
+hold on
+title(titlelist{i})
+legend('mcg','u-kq')
+end 
+return
+for i  =1 :4
+subplot(4,1,i)
+yyaxis left
+plot(yupm(i,:))
+ylabel(unitlistleft{i})
+ylim(ylimleft(i,:))
+hold on
+yyaxis right
+ylabel(unitlistright{i})
+ylim(ylimright(i,:))
+plot(output.state_array(:,2*i-1))
+title(titlelist{i})
+end
+%% least square for K and alpha
+testData = par_set.trial3;
+outputKnown = funcKnownTerm2seg_v2(testData,par_set);
+spt = 100; ept = length(outputKnown.state_array);
+var1x = outputKnown.state_array(spt:ept,1);
+var1y = outputKnown.u_pm_tf(spt:ept,1);
+var1z = outputKnown.mcg_array(1,spt:ept);
+
+var2x = outputKnown.state_array(spt:ept,3);
+var2y = outputKnown.u_pm_tf(spt:ept,2);
+var2z = outputKnown.mcg_array(2,spt:ept);
+
+var3x = outputKnown.state_array(spt:ept,5);
+var3y = outputKnown.u_pm_tf(spt:ept,3);
+var3z = outputKnown.mcg_array(3,spt:ept);
+
+var4x = outputKnown.state_array(spt:ept,7);
+var4y = outputKnown.u_pm_tf(spt:ept,4);
+var4z = outputKnown.mcg_array(4,spt:ept);
+
+
 %% GP use data set 1
 
 xob1 = [var1x,var1y];

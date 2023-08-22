@@ -144,15 +144,16 @@ state_array = [filt_theta1_array,filt_dtheta1_array,filt_lc1_array,filt_dlc1_arr
 %                filt_theta1_array,filt_dtheta1_array,filt_lc1_array,filt_dlc1_array];
 output.state_array = state_array;
 output.wire_angle_rad = [s1.theta_wire_rad,s2.theta_wire_rad];
-output.u_pm_psi(:,1) = testData.pm_psi(:,1) - testData.pm_psi(:,2);
+output.mean_u_pm_psi = mean(testData.pm_psi,2);
+output.u_pm_psi(:,1) = -(testData.pm_psi(:,1) - testData.pm_psi(:,2));
 output.u_pm_psi(:,2) = testData.pm_psi(:,1) + testData.pm_psi(:,2) + 2*testData.pm_psi(:,3);
-output.u_pm_psi(:,3) = testData.pm_psi(:,4) - testData.pm_psi(:,5);
+output.u_pm_psi(:,3) = -(testData.pm_psi(:,4) - testData.pm_psi(:,5));
 output.u_pm_psi(:,4) = testData.pm_psi(:,4) + testData.pm_psi(:,5) + 2*testData.pm_psi(:,6);
 output.u_pm_pa = output.u_pm_psi * 6894.76;
-output.u_pm_tf(:,1) = output.u_pm_psi(:,1) * par_set.fz_a0 * par_set.tau_l0;
-output.u_pm_tf(:,2) = output.u_pm_psi(:,2) * par_set.fz_a0;
-output.u_pm_tf(:,3) = output.u_pm_psi(:,3) * par_set.fz_a0 * par_set.tau_l0;
-output.u_pm_tf(:,4) = output.u_pm_psi(:,4) * par_set.fz_a0;
+output.u_pm_tf(:,1) = output.u_pm_pa(:,1) * par_set.fz_a0 * par_set.tau_l0;
+output.u_pm_tf(:,2) = output.u_pm_pa(:,2) * par_set.fz_a0;
+output.u_pm_tf(:,3) = output.u_pm_pa(:,3) * par_set.fz_a0 * par_set.tau_l0;
+output.u_pm_tf(:,4) = output.u_pm_pa(:,4) * par_set.fz_a0;
 output.acc_array = [filt_ddtheta1_array,filt_ddlc1_array,filt_ddtheta2_array,filt_ddlc2_array];
 
     figure(1)

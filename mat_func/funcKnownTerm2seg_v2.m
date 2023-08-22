@@ -51,12 +51,14 @@ output.state_array = stateVarArr;
 output.Mddq = Mi;
 output.Gq = Gi;
 output.Cqdq = Ci;
+output.mean_u_pm_psi = mocapResult.mean_u_pm_psi;
 output.u_pm_tf = mocapResult.u_pm_tf;
+output.u_pm_psi = mocapResult.u_pm_psi;
 output.acc_array = mocapResult.acc_array;
 close all
 figure(1)
 titlelist = {'theta1','lc1','theta2','lc2'};
-legnedlist = {'M','C','G','U'};
+legnedlist = {'M','C','G'};
 for i  =1 :4
 subplot(4,1,i)
 plot(output.Mddq(i,:))
@@ -65,17 +67,25 @@ plot(output.Cqdq(i,:))
 hold on 
 plot(output.Gq(i,:))
 hold on 
-plot(output.u_pm_tf(:,i))
+% plot(output.u_pm_tf(:,i))
 title(titlelist{i})
 end 
-legend('M','C','G','U');
+legend('M','C','G');
+unitlistleft = {'Nm','N','Nm','N'};
+unitlistright = {'rad','m','rad','m'};
+ylimleft = [-100 100; 0 1000; -100 100; 0 1000];
+ylimright = [deg2rad(-45) deg2rad(45); 0.13 0.16; deg2rad(-45) deg2rad(45); 0.09 0.12];
 figure(2)
 for i  =1 :4
 subplot(4,1,i)
 yyaxis left
 plot(output.u_pm_tf(:,i)' - output.Mddq(i,:) - output.Cqdq(i,:) - output.Gq(i,:))
+ylabel(unitlistleft{i})
+ylim(ylimleft(i,:))
 hold on
 yyaxis right
+ylabel(unitlistright{i})
+ylim(ylimright(i,:))
 plot(output.state_array(:,2*i-1))
 title(titlelist{i})
 end 
