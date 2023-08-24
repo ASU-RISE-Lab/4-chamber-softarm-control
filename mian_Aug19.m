@@ -47,7 +47,7 @@ else
     fprintf( 'Data loaded \n' );
 end
 %%
-testData = par_set.trial2;
+testData = par_set.trial3;
 mocapResult = funcComputeStateVar_v1(testData,par_set);
 %% Forward Kinematics 1 seg
 testData = par_set.trial2;
@@ -175,11 +175,11 @@ hold on
 title('fk errors in cam frame')
 legend('x','y','z')
 %% least square for K and D
-testData = par_set.trial2;
+testData = par_set.trial3;
 outputKnown = funcKnownTerm2seg_v2(testData,par_set);
 % Kx + Ddx = -u +mddq +cqdq +gq = y
 % (K+Ds)X(s) = Y(s) ----- G(s) = X(s)/Y(s) =  1/(K + Ds)
-spt = 100; ept = length(outputKnown.state_array);
+spt = 1; ept = length(outputKnown.state_array);
 var1 = iddata(outputKnown.state_array(spt:ept,1),(outputKnown.u_pm_tf(spt:ept,1) - outputKnown.mcg_array(1,spt:ept)'),par_set.Ts);
 var2 = iddata(outputKnown.state_array(spt:ept,3),(-outputKnown.u_pm_tf(spt:ept,2) - outputKnown.mcg_array(2,spt:ept)'),par_set.Ts);
 var3 = iddata(outputKnown.state_array(spt:ept,5),(outputKnown.u_pm_tf(spt:ept,3) - outputKnown.mcg_array(3,spt:ept)'),par_set.Ts);
@@ -201,6 +201,22 @@ var4x = outputKnown.state_array(spt:ept,7);
 var4y = outputKnown.state_array(spt:ept,8);
 var4z = (outputKnown.u_pm_tf(spt:ept,4) + outputKnown.mcg_array(4,spt:ept)');
 
+%%
+testData = par_set.trial3;
+trainningdata.wireEncoderReadings_unit_mV = testData.enco_volts;
+    d_x = testData.rigid_3_pose(:,1) - testData.rigid_1_pose(:,1);
+    d_y = testData.rigid_3_pose(:,2) - testData.rigid_1_pose(:,2);
+    d_z = testData.rigid_3_pose(:,3) - testData.rigid_1_pose(:,3)  + 0.004;
+    theta_mocap_rad = -(2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2)));
+trainningdata.xzphiy_unit_m_m_rad = [d_x,d_z,theta_mocap_rad];
+
+testData = par_set.trial4;
+validationdata.wireEncoderReadings_unit_mV = testData.enco_volts;
+    d_x = testData.rigid_3_pose(:,1) - testData.rigid_1_pose(:,1);
+    d_y = testData.rigid_3_pose(:,2) - testData.rigid_1_pose(:,2);
+    d_z = testData.rigid_3_pose(:,3) - testData.rigid_1_pose(:,3)  + 0.004;
+    theta_mocap_rad = -(2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2)));
+validationdata.xzphiy_unit_m_m_rad = [d_x,d_z,theta_mocap_rad];
 %%
 outputKnown = funcKnownTerm2seg_v2(testData,par_set);
 % Kx + Ddx = -u +mddq +cqdq +gq = y
