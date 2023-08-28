@@ -12,19 +12,7 @@ tauy2 = u(3);
 fz2 = u(4);
 theta1 = x(1); dtheta1 = x(2); lc1 = x(3); dlc1 = x(4);
 theta2 = x(5); dtheta2 = x(6); lc2 = x(7); dlc2 = x(8);
-if theta1 <= 0.005
-    r3 = 0.5 * lc1;
-else
-    r3 = lc1/(theta1)*sin(theta1/2);
-end
 
-if theta2 <= 0.005
-    r6 = 0.5*lc2;
-else
-    r6 = lc2/(theta2)*sin(theta2/2);
-end
-Iyy3 = m0 * r3^2;
-Iyy6 = 0.5 * m0 * r6^2;
 
 if theta1 <= 0.005
 

@@ -95,6 +95,7 @@ output =[];
     Mi(1:4,i)  = simpM4x4 * [ddtheta1;ddlc1;ddtheta2;ddlc2];
     Ci(1:4,i) = simpC4x4 * [dtheta1;dlc1;dtheta2;dlc2];
     Gi(1:4,i) = simpG4x1;
+    invM = inv(simpM4x4);
     end
 
     

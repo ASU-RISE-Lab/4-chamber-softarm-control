@@ -222,6 +222,7 @@ var4z = -(outputKnown.u_pm_tf(spt:ept,4) + outputKnown.mcg_array(4,spt:ept)');
 % k1 = 26.04,d1 = 20.60
 % k2 = -2.729e+04 d2 = -2.823e+04, a2 =3680
 % k3 =42.66 d3 =33.87
+% k4 = -3.285e+04 d2 =-3.256e+04 a4 = 3144
 %%
 testData = par_set.trial3;
 trainningdata.wireEncoderReadings_unit_mV = testData.enco_volts;
