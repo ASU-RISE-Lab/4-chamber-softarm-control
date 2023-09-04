@@ -11,7 +11,7 @@ load('greybox_test.mat');
 % testData = par_set.trial1;
 % temp_struct = funcKnownTerm_v3(testData);
 temp_struct = outputKnown;
-z = iddata(outputKnown.state_array(:,:),outputKnown.u_pm_tf,par_set.Ts,'Name','2-segArm');
+z = iddata(outputKnown.state_array_wire(:,:),outputKnown.u_pm_tf,par_set.Ts,'Name','2-segArm');
 
 
 FileName      = 'func2segODE_m';       % File describing the model structure.
@@ -19,7 +19,7 @@ Order         = [8 4 8];           % Model orders [ny nu nx].
 Parameters    = [0, 3680, 0, 3144,... % u offset
                 26.04, -2.729e+04,42.66,-3.285e+04,... % k4x1
                 20.60, -2.823e+04, 33.87, -3.285e+04]; % d4x1        % Initial parameters. Np = 3*4
-InitialStates = zeros(8,1);            % Initial initial states.
+InitialStates = outputKnown.state_array_wire(1,:)';            % Initial initial states.
 Ts            = 0;                 % Time-continuous system.
 nlgr = idnlgrey(FileName, Order, Parameters, InitialStates, Ts, ...
     'Name', 'Arm');
@@ -43,6 +43,7 @@ nlgr = setpar(nlgr, 'Unit', {'None';'N';'None';'N';...
 %                                eps(0)*1;eps(0)*1;eps(0)*1;eps(0)*1;...
 %                                eps(0)*1;eps(0)*1;eps(0)*1;eps(0)*1;});   % All parameters > 0!
 present(nlgr);
-
+compare(z,nlgr)
+%%
 opt = nlgreyestOptions('Display', 'on');
 nlgr = nlgreyest(z, nlgr, opt);

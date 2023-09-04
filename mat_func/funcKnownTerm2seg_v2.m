@@ -9,7 +9,7 @@ output =[];
     timestamp=testData.time_stamp;%sec
     Ts=timestamp(2)-timestamp(1);
     mocapResult = funcComputeStateVar_v1(testData,par_set);
-    stateVarArr = mocapResult.state_array;
+    stateVarArr = mocapResult.state_array_wire;
     for i = 1: length(stateVarArr)
     theta1 = stateVarArr(i,1);
     lc1 = stateVarArr(i,3);
@@ -100,7 +100,7 @@ output =[];
 
     
 output.mcg_array = mcg_array;
-output.state_array = stateVarArr;
+output.state_array_wire = stateVarArr;
 output.Mddq = Mi;
 output.Gq = Gi;
 output.Cqdq = Ci;
@@ -139,7 +139,7 @@ hold on
 yyaxis right
 ylabel(unitlistright{i})
 ylim(ylimright(i,:))
-plot(output.state_array(:,2*i-1))
+plot(output.state_array_wire(:,2*i-1))
 title(titlelist{i})
 end 
 end
