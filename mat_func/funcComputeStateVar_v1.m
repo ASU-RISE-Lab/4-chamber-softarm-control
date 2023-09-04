@@ -32,12 +32,21 @@ function [output] = funcComputeStateVar_v1(testData,par_set)
     d_y = testData.rigid_2_pose(:,2) - testData.rigid_1_pose(:,2);
     d_z = testData.rigid_2_pose(:,3) - testData.rigid_1_pose(:,3) + par_set.R1_stand_off;
     s1.theta_mocap_rad = -(2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2)));
+    quat_array(:,1) = testData.rigid_2_rot(:,4);
+    quat_array(:,2:4) = testData.rigid_2_rot(:,1:3);
+    rpy = quat2eul(quat_array,'XYZ');
+    s1.theta_mocap_rad = rpy(:,2);
 
     d_x = testData.rigid_3_pose(:,1) - testData.rigid_1_pose(:,1);
     d_y = testData.rigid_3_pose(:,2) - testData.rigid_1_pose(:,2);
     d_z = testData.rigid_3_pose(:,3) - testData.rigid_1_pose(:,3)  + 0.004;
-    s2.theta_mocap_rad = -(2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2))) - s1.theta_mocap_rad;
+%     s2.theta_mocap_rad = -(2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2))) - s1.theta_mocap_rad;
 %     s2.theta_mocap_rad = 2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2));
+
+    quat_array(:,1) = testData.rigid_3_rot(:,4);
+    quat_array(:,2:4) = testData.rigid_3_rot(:,1:3);
+    rpy = quat2eul(quat_array,'XYZ');
+    s2.theta_mocap_rad = rpy(:,2);
     s2.theta_wire_rad = (s2.r_t - s2.l_t)/r0;
     s2.l_wire_mm = (s2.r_t + s2.l_t)/2;
 alpha_r2 = 0.7825;
@@ -142,7 +151,9 @@ state_array = [filt_theta1_array,filt_dtheta1_array,filt_lc1_array,filt_dlc1_arr
                filt_theta2_array,filt_dtheta2_array,filt_lc2_array,filt_dlc2_array];
 % state_array = [filt_theta2_array,filt_dtheta2_array,filt_lc2_array,filt_dlc2_array,...
 %                filt_theta1_array,filt_dtheta1_array,filt_lc1_array,filt_dlc1_array];
+
 output.state_array = state_array;
+
 output.wire_angle_rad = [s1.theta_wire_rad,s2.theta_wire_rad];
 output.mean_u_pm_psi = mean(testData.pm_psi,2);
 output.u_pm_psi(:,1) = -(testData.pm_psi(:,1) - testData.pm_psi(:,2));

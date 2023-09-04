@@ -68,6 +68,9 @@ end
 %%
 testData = par_set.trial3;
 mocapResult = funcComputeStateVar_v1(testData,par_set);
+%%
+testData = par_set.trial4;
+output = funcComputeNNInputOutputPair_v1(testData,par_set);
 %% Forward Kinematics 1 seg
 testData = par_set.trial2;
 mocapResult=[];

@@ -38,16 +38,38 @@ function [output] = funcComputeNNInputOutputPair_v1(testData,par_set)
                 0 1 0  0.5086; 
                 0 0 0 1];
    xyzCam = testData.rigid_3_pose;
-   d_x = testData.rigid_3_pose(:,1) - testData.rigid_1_pose(:,1);
-    d_y = testData.rigid_3_pose(:,2) - testData.rigid_1_pose(:,2);
-    d_z = testData.rigid_3_pose(:,3) - testData.rigid_1_pose(:,3)  + 0.004;
-   theta_mocap_rad = -(2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2)));
+    quat_array(:,1) = testData.rigid_3_rot(:,4);
+    quat_array(:,2:4) = testData.rigid_3_rot(:,1:3);
+    rpy = quat2eul(quat_array,'XYZ');
+    theta_mocap_rad = rpy(:,2);
+    theta_prev = rpy(1,2);
+    theta_aug_flag =0;
+    for i = 2:length(theta_mocap_rad)-1
+        theta_cur = theta_mocap_rad(i);
+        if theta_aug_flag ==0 && rad2deg(abs(theta_cur-theta_prev))>40
+                theta_aug_flag = 1;
+                theta_offset = theta_cur-theta_prev;
+                theta_mocap_rad(i) = theta_prev;
+        elseif theta_aug_flag == 1 && rad2deg(abs(theta_cur-theta_prev))<=40 % jump occcur
+            theta_mocap_rad(i) = -theta_mocap_rad(i)+theta_offset;
+        elseif theta_aug_flag ==0 && rad2deg(abs(theta_cur-theta_prev))<=40
+            theta_mocap_rad(i) = theta_mocap_rad(i);
+        elseif theta_aug_flag ==1 && rad2deg(abs(theta_cur-theta_prev))>40
+            theta_aug_flag = 0;
+            theta_offset = 0;
+            theta_mocap_rad(i) = -theta_mocap_rad(i)+theta_offset;
+        end
+            theta_prev = theta_cur;
+    end
+    windowSize = 1;
+    filt_theta_mocap_rad = filter((1/windowSize)*ones(1,windowSize),1,theta_mocap_rad);
+    
    for i =1:length(xyzCam)
    xyzArm(:,i) = inv(Tbase2mocap)*[xyzCam(i,:),1]';
    end
    output.x_measured = xyzArm(1,:)';
    output.y_measured = xyzArm(2,:)';
-   output.phiz_measured = theta_mocap_rad;
+   output.phiz_measured = filt_theta_mocap_rad;
    output.x_est = endEffector2x;
    output.y_est = endEffector2y;
    output.phiz_est = -endEffectorPhiz;
