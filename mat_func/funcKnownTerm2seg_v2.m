@@ -3,7 +3,7 @@ output =[];
     % Use mocap for angle but encoder for arclength
 % State equations.
     m0 = (100 + 34*2 + 25*5)/1000; %kg
-    a1 = 0.05; %m
+    a1 = 0.025; %m
     g = -9.8; %N/kg
     angle_th = deg2rad(5);
     timestamp=testData.time_stamp;%sec
@@ -95,7 +95,7 @@ output =[];
     Mi(1:4,i)  = simpM4x4 * [ddtheta1;ddlc1;ddtheta2;ddlc2];
     Ci(1:4,i) = simpC4x4 * [dtheta1;dlc1;dtheta2;dlc2];
     Gi(1:4,i) = simpG4x1;
-    invM = inv(simpM4x4);
+    invM{i} = inv(simpM4x4);
     end
 
     

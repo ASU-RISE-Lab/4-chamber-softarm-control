@@ -21,13 +21,13 @@ par_set.R1_stand_off = 0.05;% m
 par_set.train_ratio = 1.0;
 % par_set.R1_stand_off = 0.03;% m
 fprintf('System initialization done \n')
-%% ode fix 1 seg 4 link
-par_set.EOM=1;
-par_set = funcEOMbaseFrame1seg_v4(par_set);
-simplify(par_set.Ti{end})
+% %% ode fix 1 seg 4 link
+% par_set.EOM=1;
+% par_set = funcEOMbaseFrame1seg_v4(par_set);
+% simplify(par_set.Ti{end})
 %% ode fix 2 seg 8 link
 par_set.EOM=1;
-par_set = funcEOMbaseFrame2seg_v4(par_set);
+par_set = funcEOMbaseFrame2seg_v5(par_set);
 simplify(par_set.Ti{end})
 par_set.Jxythetaz = par_set.J_xyz2q;
 par_set.Jxythetaz(3,:) = [1 0 1 0 ];
@@ -67,7 +67,7 @@ else
 end
 %%
 testData = par_set.trial3;
-mocapResult = funcComputeStateVar_v1(testData,par_set);
+mocapResult = funcComputeStateVar_v2(testData,par_set);
 %%
 testData = par_set.trial4;
 output = funcComputeNNInputOutputPair_v1(testData,par_set);
@@ -116,7 +116,7 @@ legend('x','y','z')
 %% FK RESULT 2 seg
 testData = par_set.trial3;
 mocapResult=[];
-mocapResult = funcComputeStateVar_v1(testData,par_set);
+mocapResult = funcComputeStateVar_v2(testData,par_set);
 fkResult = funcCompuFK2seg_v1(mocapResult.state_array_wire);
 close all
 figure(1)
@@ -197,7 +197,7 @@ hold on
 title('fk errors in cam frame')
 legend('x','y','z')
 %% least square for K and D aug28
-testData = par_set.trial2;
+testData = par_set.trial3;
 outputKnown = funcKnownTerm2seg_v2(testData,par_set);
 % Kx + Ddx = u -(mddq +cqdq +gq) = y
 % (K+Ds)X(s) = Y(s) ----- G(s) = X(s)/Y(s) =  1/(K + Ds)
@@ -226,6 +226,29 @@ var4z = (outputKnown.u_pm_tf(spt:ept,4) - outputKnown.mcg_array(4,spt:ept)');
 % k2 = -2.729e+04 d2 = -2.823e+04, a2 =3680
 % k3 =42.66 d3 =33.87
 % k4 = -4.786e+04 d2 =-1.863e+04 a4 = 4623
+%% RK4 SIMULULATION
+testData = par_set.trial3;
+outputKnown = funcKnownTerm2seg_v2(testData,par_set);
+x_state = outputKnown.state_array_wire(1:500,1:1:end);
+u_pm_tf=outputKnown.u_pm_tf(1:500,:);
+alpha4x1 = [0, -3680, 0, -3144]';... % u offset
+k4x1 = [26.04, 2.729e+04,42.66,3.285e+04]; % k4x1
+d4x1 = [20.60, 2.823e+04, 33.87, 3.285e+04]; % d4x1 
+h =1;
+for i  =1: length(x_state)
+    x_state_i = x_state(i,:)';
+    u_i = u_pm_tf(i,:);
+x_new_i = funcRK42segODE_m(x_state_i,alpha4x1,k4x1,d4x1,u_i,h);
+x_new(i,:) =x_new_i;
+end
+close all
+figure(1)
+for i  =1:2:8
+plot(x_new(:,i))
+hold on
+plot(x_state(:,i))
+end
+legend
 %% least square for K and D aug28 z = a*y - b*x
 testData = par_set.trial3;
 outputKnown = funcKnownTerm2seg_v2(testData,par_set);
@@ -286,9 +309,9 @@ pmvar4y = (outputKnown.u_pm_tf(spt:ept,4) + outputKnown.mcg_array(4,spt:ept)'./o
 % k2 = -2.729e+04 d2 = -2.823e+04, a2 =3680
 % k3 =42.66 d3 =33.87
 % k4 = -4.786e+04 d2 =-1.863e+04 a4 = 4623
-k_mat = [25.3,1.446e+04,42.66,2.4e+04];
-d_mat = [20.22,7346,33.87,8677];
-a_mat = [0,-1952,0,-2322]';
+k_mat = [25.3,1.53e+04,42.66,2.4e+04];
+d_mat = [20.22,1.76e+04,33.87,8677];
+a_mat = [0,-2091,0,-2322]';
 testData = par_set.trial3;
 outputKnown = funcKnownTerm2seg_v2(testData,par_set);
 kterm = diag(k_mat)*outputKnown.state_array_wire(:,1:2:end)'+a_mat;
