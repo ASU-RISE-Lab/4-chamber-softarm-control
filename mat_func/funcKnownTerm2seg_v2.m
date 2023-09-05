@@ -4,7 +4,7 @@ output =[];
 % State equations.
     m0 = (100 + 34*2 + 25*5)/1000; %kg
     a1 = 0.05; %m
-    g = 9.8; %N/kg
+    g = -9.8; %N/kg
     angle_th = deg2rad(5);
     timestamp=testData.time_stamp;%sec
     Ts=timestamp(2)-timestamp(1);

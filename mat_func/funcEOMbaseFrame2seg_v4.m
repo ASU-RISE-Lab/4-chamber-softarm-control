@@ -87,7 +87,7 @@ E_p=0;
 for link_i=2:length(rigid_r)
 %     Epi = rigid_m(link_i)*[0;0;g].'*p_i{link_i+1}
 % p_i{link_i+1}
-    E_p=E_p+rigid_m(link_i)*[0;-g;0].'*p_i{link_i+1};
+    E_p=E_p+rigid_m(link_i)*[0;g;0].'*p_i{link_i+1};
 end
 fprintf( 'J_v... \n' )
 par.Ep = E_p;

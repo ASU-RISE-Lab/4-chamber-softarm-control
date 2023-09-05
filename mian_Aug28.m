@@ -201,7 +201,7 @@ testData = par_set.trial2;
 outputKnown = funcKnownTerm2seg_v2(testData,par_set);
 % Kx + Ddx = u -(mddq +cqdq +gq) = y
 % (K+Ds)X(s) = Y(s) ----- G(s) = X(s)/Y(s) =  1/(K + Ds)
-spt = 1; ept = 750;
+spt = 1; ept = length(outputKnown.state_array_wire);
 var1 = iddata(outputKnown.state_array_wire(spt:ept,1),(outputKnown.u_pm_tf(spt:ept,1) - outputKnown.mcg_array(1,spt:ept)'),par_set.Ts);
 var2 = iddata(outputKnown.state_array_wire(spt:ept,3),(outputKnown.u_pm_tf(spt:ept,2) - outputKnown.mcg_array(2,spt:ept)'),par_set.Ts);
 var3 = iddata(outputKnown.state_array_wire(spt:ept,5),(outputKnown.u_pm_tf(spt:ept,3) - outputKnown.mcg_array(3,spt:ept)'),par_set.Ts);
@@ -226,6 +226,26 @@ var4z = (outputKnown.u_pm_tf(spt:ept,4) - outputKnown.mcg_array(4,spt:ept)');
 % k2 = -2.729e+04 d2 = -2.823e+04, a2 =3680
 % k3 =42.66 d3 =33.87
 % k4 = -4.786e+04 d2 =-1.863e+04 a4 = 4623
+%% least square for K and D aug28 z = a*y - b*x
+testData = par_set.trial3;
+outputKnown = funcKnownTerm2seg_v2(testData,par_set);
+spt = 1; ept = length(outputKnown.state_array_wire);
+
+var1x = outputKnown.state_array_wire(spt:ept,1);
+var1y = outputKnown.u_pm_psi(spt:ept,1);
+var1z = outputKnown.mcg_array(1,spt:ept)';
+
+var2x = outputKnown.state_array_wire(spt:ept,3);
+var2y = outputKnown.u_pm_psi(spt:ept,2);
+var2z = outputKnown.mcg_array(2,spt:ept)';
+
+var3x = outputKnown.state_array_wire(spt:ept,5);
+var3y = outputKnown.u_pm_psi(spt:ept,3);
+var3z = outputKnown.mcg_array(3,spt:ept)';
+
+var4x = outputKnown.state_array_wire(spt:ept,7);
+var4y = outputKnown.u_pm_psi(spt:ept,4);
+var4z = outputKnown.mcg_array(4,spt:ept);
 %%
 testData = par_set.trial3;
 trainningdata.wireEncoderReadings_unit_mV = testData.enco_volts;

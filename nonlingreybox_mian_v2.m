@@ -10,9 +10,10 @@ load('greybox_test.mat');
 %% Calculate wire length
 % testData = par_set.trial1;
 % temp_struct = funcKnownTerm_v3(testData);
+outputKnown = funcKnownTerm2seg_v2(testData,par_set);
+close all
 temp_struct = outputKnown;
-z = iddata(outputKnown.state_array_wire(:,:),outputKnown.u_pm_tf,par_set.Ts,'Name','2-segArm');
-
+z = iddata([outputKnown.state_array_wire(:,1:2:end),outputKnown.u_pm_psi] ,testData.pd_psi,par_set.Ts,'Name','2-segArm');
 
 FileName      = 'func2segODE_m';       % File describing the model structure.
 Order         = [8 4 8];           % Model orders [ny nu nx].

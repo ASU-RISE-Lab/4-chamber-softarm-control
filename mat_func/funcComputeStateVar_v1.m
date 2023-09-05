@@ -254,6 +254,7 @@ output.u_pm_tf(:,3) = output.u_pm_pa(:,3) * par_set.fz_a0 * par_set.tau_l0;
 output.u_pm_tf(:,4) = output.u_pm_pa(:,4) * par_set.fz_a0;
 output.acc_array = [filt_ddtheta1_array,filt_ddlc1_array,filt_ddtheta2_array,filt_ddlc2_array];
 
+
     figure(1)
     subplot(4,1,1)
     plot(filt_theta1_array)
