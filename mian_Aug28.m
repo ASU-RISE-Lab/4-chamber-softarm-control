@@ -372,20 +372,20 @@ testData = par_set.trial4;
 
 outputKnown = funcKnownTerm2seg_v2(testData,par_set);
 spt = 1; ept = length(outputKnown.state_array_wire);
-var1x = outputKnown.state_array_wire(spt:ept,1);
-var1y = outputKnown.state_array_wire(spt:ept,2);
+var1x = outputKnown.state_array_wire(spt:ept,1:4);
+var1y = outputKnown.state_array_wire(spt:ept,1:4);
 var1z = (outputKnown.u_pm_tf(spt:ept,1) - outputKnown.mcg_array(1,spt:ept)');
 
-var2x = outputKnown.state_array_wire(spt:ept,3);
-var2y = outputKnown.state_array_wire(spt:ept,4);
+var2x = outputKnown.state_array_wire(spt:ept,1:4);
+var2y = outputKnown.state_array_wire(spt:ept,1:4);
 var2z = (outputKnown.u_pm_tf(spt:ept,2) - outputKnown.mcg_array(2,spt:ept)');
 
-var3x = outputKnown.state_array_wire(spt:ept,5);
-var3y = outputKnown.state_array_wire(spt:ept,6);
+var3x = outputKnown.state_array_wire(spt:ept,5:8);
+var3y = outputKnown.state_array_wire(spt:ept,5:8);
 var3z = (outputKnown.u_pm_tf(spt:ept,3) - outputKnown.mcg_array(3,spt:ept)');
 
-var4x = outputKnown.state_array_wire(spt:ept,7);
-var4y = outputKnown.state_array_wire(spt:ept,8);
+var4x = outputKnown.state_array_wire(spt:ept,5:8);
+var4y = outputKnown.state_array_wire(spt:ept,5:8);
 var4z = outputKnown.u_pm_tf(spt:ept,4) - outputKnown.mcg_array(4,spt:ept)';
 
 xob1 = [var1x,var1y];
@@ -458,20 +458,20 @@ testData = par_set.trial3;
 spt = 1; ept = length(outputKnown.state_array_wire);
 outputKnown = funcKnownTerm2seg_v2(testData,par_set);
 
-var1x = outputKnown.state_array_wire(spt:ept,1);
-var1y = outputKnown.state_array_wire(spt:ept,2);
+var1x = outputKnown.state_array_wire(spt:ept,1:4);
+var1y = outputKnown.state_array_wire(spt:ept,1:4);
 var1z = (outputKnown.u_pm_tf(spt:ept,1) - outputKnown.mcg_array(1,spt:ept)');
 
-var2x = outputKnown.state_array_wire(spt:ept,3);
-var2y = outputKnown.state_array_wire(spt:ept,4);
+var2x = outputKnown.state_array_wire(spt:ept,1:4);
+var2y = outputKnown.state_array_wire(spt:ept,1:4);
 var2z = outputKnown.u_pm_tf(spt:ept,2) - outputKnown.mcg_array(2,spt:ept)';
 
-var3x = outputKnown.state_array_wire(spt:ept,5);
-var3y = outputKnown.state_array_wire(spt:ept,6);
+var3x = outputKnown.state_array_wire(spt:ept,5:8);
+var3y = outputKnown.state_array_wire(spt:ept,5:8);
 var3z = (outputKnown.u_pm_tf(spt:ept,3) - outputKnown.mcg_array(3,spt:ept)');
 
-var4x = outputKnown.state_array_wire(spt:ept,7);
-var4y = outputKnown.state_array_wire(spt:ept,8);
+var4x = outputKnown.state_array_wire(spt:ept,5:8);
+var4y = outputKnown.state_array_wire(spt:ept,5:8);
 var4z = outputKnown.u_pm_tf(spt:ept,4) - outputKnown.mcg_array(4,spt:ept)';
 
 
