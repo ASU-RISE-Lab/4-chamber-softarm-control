@@ -380,12 +380,12 @@ var2x = outputKnown.state_array_wire(spt:ept,1:4);
 var2y = outputKnown.state_array_wire(spt:ept,1:4);
 var2z = (outputKnown.u_pm_tf(spt:ept,2) - outputKnown.mcg_array(2,spt:ept)');
 
-var3x = outputKnown.state_array_wire(spt:ept,5:8);
-var3y = outputKnown.state_array_wire(spt:ept,5:8);
+var3x = outputKnown.state_array_wire(spt:ept,1:8);
+var3y = outputKnown.state_array_wire(spt:ept,1:8);
 var3z = (outputKnown.u_pm_tf(spt:ept,3) - outputKnown.mcg_array(3,spt:ept)');
 
-var4x = outputKnown.state_array_wire(spt:ept,5:8);
-var4y = outputKnown.state_array_wire(spt:ept,5:8);
+var4x = outputKnown.state_array_wire(spt:ept,1:8);
+var4y = outputKnown.state_array_wire(spt:ept,1:8);
 var4z = outputKnown.u_pm_tf(spt:ept,4) - outputKnown.mcg_array(4,spt:ept)';
 
 xob1 = [var1x,var1y];
@@ -454,10 +454,10 @@ plot(ypred4 - var4z)
 hold on
 title('e = pred - actul')
 %% validation GP
-testData = par_set.trial3;
-spt = 1; ept = length(outputKnown.state_array_wire);
-outputKnown = funcKnownTerm2seg_v2(testData,par_set);
+testData = par_set.trial7;
 
+outputKnown = funcKnownTerm2seg_v2(testData,par_set);
+spt = 1; ept = length(outputKnown.state_array_wire);
 var1x = outputKnown.state_array_wire(spt:ept,1:4);
 var1y = outputKnown.state_array_wire(spt:ept,1:4);
 var1z = (outputKnown.u_pm_tf(spt:ept,1) - outputKnown.mcg_array(1,spt:ept)');
@@ -466,12 +466,12 @@ var2x = outputKnown.state_array_wire(spt:ept,1:4);
 var2y = outputKnown.state_array_wire(spt:ept,1:4);
 var2z = outputKnown.u_pm_tf(spt:ept,2) - outputKnown.mcg_array(2,spt:ept)';
 
-var3x = outputKnown.state_array_wire(spt:ept,5:8);
-var3y = outputKnown.state_array_wire(spt:ept,5:8);
+var3x = outputKnown.state_array_wire(spt:ept,1:8);
+var3y = outputKnown.state_array_wire(spt:ept,1:8);
 var3z = (outputKnown.u_pm_tf(spt:ept,3) - outputKnown.mcg_array(3,spt:ept)');
 
-var4x = outputKnown.state_array_wire(spt:ept,5:8);
-var4y = outputKnown.state_array_wire(spt:ept,5:8);
+var4x = outputKnown.state_array_wire(spt:ept,1:8);
+var4y = outputKnown.state_array_wire(spt:ept,1:8);
 var4z = outputKnown.u_pm_tf(spt:ept,4) - outputKnown.mcg_array(4,spt:ept)';
 
 
@@ -535,6 +535,180 @@ subplot(4,2,8)
 plot(ypred4 - var4z)
 hold on
 title('e = pred - actul')
+
+
+%% GP use data set 1 with pm
+testData = par_set.trial4;
+
+outputKnown = funcKnownTerm2seg_v2(testData,par_set);
+spt = 1; ept = length(outputKnown.state_array_wire);
+var1x = [outputKnown.state_array_wire(spt:ept,1:4)];
+var1y = testData.pm_psi(:,1:3)/20;
+var1z = (outputKnown.u_pm_tf(spt:ept,1) - outputKnown.mcg_array(1,spt:ept)');
+
+var2x = [outputKnown.state_array_wire(spt:ept,1:4)];
+var2y = testData.pm_psi(:,1:3)/20;
+var2z = (outputKnown.u_pm_tf(spt:ept,2) - outputKnown.mcg_array(2,spt:ept)');
+
+var3x = [outputKnown.state_array_wire(spt:ept,5:8)];
+var3y = testData.pm_psi(:,4:6)/20;
+var3z = (outputKnown.u_pm_tf(spt:ept,3) - outputKnown.mcg_array(3,spt:ept)');
+
+var4x = [outputKnown.state_array_wire(spt:ept,5:8)];
+var4y = testData.pm_psi(:,4:6)/20;
+var4z = outputKnown.u_pm_tf(spt:ept,4) - outputKnown.mcg_array(4,spt:ept)';
+
+xob1 = [var1x,var1y];
+yob1 = var1z;
+gprMdl1 = fitrgp(xob1,yob1);
+[ypred1,~,yint1] = predict(gprMdl1,xob1);
+close all
+
+xob2 = [var2x,var2y];
+yob2 = var2z;
+gprMdl2 = fitrgp(xob2,yob2);
+[ypred2,~,yint2] = predict(gprMdl2,xob2);
+
+xob3 = [var3x,var3y];
+yob3 = var3z;
+gprMdl3 = fitrgp(xob3,yob3);
+[ypred3,~,yint3] = predict(gprMdl3,xob3);
+
+
+
+xob4 = [var4x,var4y];
+yob4 = var4z;
+gprMdl4 = fitrgp(xob4,yob4);
+[ypred4,~,yint4] = predict(gprMdl4,xob4);
+
+close all
+figure(1)
+subplot(4,2,1)
+plot(ypred1)
+hold on
+plot(var1z)
+legend('pred','actul')
+subplot(4,2,2)
+plot(ypred1 - var1z)
+hold on
+title('e = pred - actul')
+
+subplot(4,2,3)
+plot(ypred2)
+hold on
+plot(var2z)
+legend('pred','actul')
+subplot(4,2,4)
+plot(ypred2 - var2z)
+hold on
+title('e = pred - actul')
+
+
+subplot(4,2,5)
+plot(ypred3)
+hold on
+plot(var3z)
+legend('pred','actul')
+subplot(4,2,6)
+plot(ypred3 - var3z)
+hold on
+title('e = pred - actul')
+
+subplot(4,2,7)
+plot(ypred4)
+hold on
+plot(var4z)
+legend('pred','actul')
+subplot(4,2,8)
+plot(ypred4 - var4z)
+hold on
+title('e = pred - actul')
+%% validation GP with pm
+testData = par_set.trial7;
+
+outputKnown = funcKnownTerm2seg_v2(testData,par_set);
+spt = 1; ept = length(outputKnown.state_array_wire);
+var1x = [outputKnown.state_array_wire(spt:ept,1:4)];
+var1y = testData.pm_psi(:,1:3)/20;
+var1z = (outputKnown.u_pm_tf(spt:ept,1) - outputKnown.mcg_array(1,spt:ept)');
+
+var2x = [outputKnown.state_array_wire(spt:ept,1:4)];
+var2y = testData.pm_psi(:,1:3)/20;
+var2z = (outputKnown.u_pm_tf(spt:ept,2) - outputKnown.mcg_array(2,spt:ept)');
+
+var3x = [outputKnown.state_array_wire(spt:ept,5:8)];
+var3y = testData.pm_psi(:,4:6)/20;
+var3z = (outputKnown.u_pm_tf(spt:ept,3) - outputKnown.mcg_array(3,spt:ept)');
+
+var4x = [outputKnown.state_array_wire(spt:ept,5:8)];
+var4y = testData.pm_psi(:,4:6)/20;
+var4z = outputKnown.u_pm_tf(spt:ept,4) - outputKnown.mcg_array(4,spt:ept)';
+
+
+xob1 = [var1x,var1y];
+yob1 = var1z;
+[ypred1,~,yint1] = predict(gprMdl1,xob1);
+
+xob2 = [var2x,var2y];
+yob2 = var2z;
+[ypred2,~,yint2] = predict(gprMdl2,xob2);
+
+xob3 = [var3x,var3y];
+yob3 = var3z;
+[ypred3,~,yint3] = predict(gprMdl3,xob3);
+
+
+
+xob4 = [var4x,var4y];
+yob4 = var4z;
+[ypred4,~,yint4] = predict(gprMdl4,xob4);
+
+close all
+figure(1)
+subplot(4,2,1)
+plot(ypred1)
+hold on
+plot(var1z)
+legend('pred','actul')
+subplot(4,2,2)
+plot(ypred1 - var1z)
+hold on
+title('e = pred - actul')
+
+subplot(4,2,3)
+plot(ypred2)
+hold on
+plot(var2z)
+legend('pred','actul')
+subplot(4,2,4)
+plot(ypred2 - var2z)
+hold on
+title('e = pred - actul')
+
+
+subplot(4,2,5)
+plot(ypred3)
+hold on
+plot(var3z)
+legend('pred','actul')
+subplot(4,2,6)
+plot(ypred3 - var3z)
+hold on
+title('e = pred - actul')
+
+subplot(4,2,7)
+plot(ypred4)
+hold on
+plot(var4z)
+legend('pred','actul')
+subplot(4,2,8)
+plot(ypred4 - var4z)
+hold on
+title('e = pred - actul')
+
+
+
+
 %% sysid for pneumatic controller
 spt =1;
 pctrl1 = iddata(testData.pm_psi(spt:ept,1),testData.pd_psi(spt:ept,1));
