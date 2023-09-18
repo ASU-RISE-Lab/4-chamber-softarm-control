@@ -368,7 +368,7 @@ var4z = outputKnown.mcg_array(4,spt:ept);
 
 
 %% GP use data set 1
-testData = par_set.trial4;
+testData = par_set.trial1;
 
 outputKnown = funcKnownTerm2seg_v2(testData,par_set);
 spt = 1; ept = length(outputKnown.state_array_wire);
@@ -720,7 +720,7 @@ pctrl6 = iddata(testData.pm_psi(spt:ept,6),testData.pd_psi(spt:ept,6));
 
 pctrlMerge = merge(pctrl1,pctrl4);
 % dpm = -0.0353*pm + 0.03768*pd
-%% RK4 simulation
+%% RK4 simulation for pm regulator
 testData = par_set.trial2;
 alpha = -0.04; beta = 0.03768
 h=1.0
@@ -741,6 +741,213 @@ hold on
 plot(x_pred(:,i),'r--')
 hold on
 ylim([0 20])
+if i ==1
+    legend('est','exp')
+end
+end
+
+%% GP for a*pm-kx-ddotx - other
+testData = par_set.trial7;
+
+outputKnown = funcKnownTerm2seg_v3(testData,par_set);
+spt = 1; ept = length(outputKnown.state_array_wire);
+var1x = [outputKnown.state_array_wire(spt:ept,1:2)];
+var1y = testData.pm_psi(:,1:3);
+var1z = outputKnown.mcg_array(1,spt:ept)';
+
+var2x = [outputKnown.state_array_wire(spt:ept,3:4)];
+var2y = testData.pm_psi(:,1:3);
+var2z = outputKnown.mcg_array(2,spt:ept)';
+
+var3x = [outputKnown.state_array_wire(spt:ept,5:6)];
+var3y = testData.pm_psi(:,4:6);
+var3z = outputKnown.mcg_array(3,spt:ept)';
+
+var4x = [outputKnown.state_array_wire(spt:ept,7:8)];
+var4y = testData.pm_psi(:,4:6);
+var4z = outputKnown.mcg_array(4,spt:ept)';
+
+xob1 = [var1x,var1y];
+yob1 = var1z;
+gprMdl1 = fitrgp(xob1,yob1);
+[ypred1,~,yint1] = predict(gprMdl1,xob1);
+
+xob2 = [var2x,var2y];
+yob2 = var2z;
+gprMdl2 = fitrgp(xob2,yob2);
+[ypred2,~,yint2] = predict(gprMdl2,xob2);
+
+xob3 = [var3x,var3y];
+yob3 = var3z;
+gprMdl3 = fitrgp(xob3,yob3);
+[ypred3,~,yint3] = predict(gprMdl3,xob3);
+
+xob4 = [var4x,var4y];
+yob4 = var4z;
+gprMdl4 = fitrgp(xob4,yob4);
+[ypred4,~,yint4] = predict(gprMdl4,xob4);
+
+close all
+figure(1)
+subplot(4,2,1)
+plot(ypred1)
+hold on
+plot(var1z)
+legend('pred','actul')
+subplot(4,2,2)
+plot(ypred1 - var1z)
+hold on
+title('e = pred - actul')
+
+subplot(4,2,3)
+plot(ypred2)
+hold on
+plot(var2z)
+legend('pred','actul')
+subplot(4,2,4)
+plot(ypred2 - var2z)
+hold on
+title('e = pred - actul')
+
+
+subplot(4,2,5)
+plot(ypred3)
+hold on
+plot(var3z)
+legend('pred','actul')
+subplot(4,2,6)
+plot(ypred3 - var3z)
+hold on
+title('e = pred - actul')
+
+subplot(4,2,7)
+plot(ypred4)
+hold on
+plot(var4z)
+legend('pred','actul')
+subplot(4,2,8)
+plot(ypred4 - var4z)
+hold on
+title('e = pred - actul')
+%% validation GP with pm
+testData = par_set.trial2;
+
+outputKnown = funcKnownTerm2seg_v3(testData,par_set);
+spt = 1; ept = length(outputKnown.state_array_wire);
+var1x = [outputKnown.state_array_wire(spt:ept,1:2)];
+var1y = testData.pm_psi(:,1:3);
+var1z = outputKnown.mcg_array(1,spt:ept)';
+
+var2x = [outputKnown.state_array_wire(spt:ept,3:4)];
+var2y = testData.pm_psi(:,1:3);
+var2z = outputKnown.mcg_array(2,spt:ept)';
+
+var3x = [outputKnown.state_array_wire(spt:ept,5:6)];
+var3y = testData.pm_psi(:,4:6);
+var3z = outputKnown.mcg_array(3,spt:ept)';
+
+var4x = [outputKnown.state_array_wire(spt:ept,7:8)];
+var4y = testData.pm_psi(:,4:6);
+var4z = outputKnown.mcg_array(4,spt:ept)';
+
+
+xob1 = [var1x,var1y];
+yob1 = var1z;
+[ypred1,~,yint1] = predict(gprMdl1,xob1);
+
+xob2 = [var2x,var2y];
+yob2 = var2z;
+[ypred2,~,yint2] = predict(gprMdl2,xob2);
+
+xob3 = [var3x,var3y];
+yob3 = var3z;
+[ypred3,~,yint3] = predict(gprMdl3,xob3);
+
+
+
+xob4 = [var4x,var4y];
+yob4 = var4z;
+[ypred4,~,yint4] = predict(gprMdl4,xob4);
+
+close all
+figure(1)
+subplot(4,2,1)
+plot(ypred1)
+hold on
+plot(var1z)
+legend('pred','actul')
+subplot(4,2,2)
+plot(ypred1 - var1z)
+hold on
+title('e = pred - actul')
+
+subplot(4,2,3)
+plot(ypred2)
+hold on
+plot(var2z)
+legend('pred','actul')
+subplot(4,2,4)
+plot(ypred2 - var2z)
+hold on
+title('e = pred - actul')
+
+
+subplot(4,2,5)
+plot(ypred3)
+hold on
+plot(var3z)
+legend('pred','actul')
+subplot(4,2,6)
+plot(ypred3 - var3z)
+hold on
+title('e = pred - actul')
+
+subplot(4,2,7)
+plot(ypred4)
+hold on
+plot(var4z)
+legend('pred','actul')
+subplot(4,2,8)
+plot(ypred4 - var4z)
+hold on
+title('e = pred - actul')
+
+%% RK4 simulation for full order ode regulator
+testData = par_set.trial2;
+alpha = -0.04; beta = 0.03768
+h=1
+x_pred = [];
+outputKnown = funcKnownTerm2seg_v3(testData,par_set);
+x14x1 = [outputKnown.state_array_wire(1,:)';testData.pm_psi(1,:)'];
+for i = 1:100  
+    u6x1 = testData.pd_psi(i,:)';
+    x_pred(i,:) = funcRK4fullODE_m(x14x1,alpha,beta,u6x1,h,gprMdl1,gprMdl2,gprMdl3,gprMdl4);
+    x14x1 = x_pred(i,:)';
+end
+close all
+figure(1)
+for i  = 1:6 
+subplot(3,2,i)
+
+plot(testData.pm_psi(:,i),'k')
+hold on
+plot(x_pred(:,i),'r--')
+hold on
+ylim([0 20])
+if i ==1
+    legend('est','exp')
+end
+end
+
+figure(2)
+for i  = 1:8 
+subplot(4,2,i)
+
+plot(outputKnown.state_array_wire(:,i),'k')
+hold on
+plot(x_pred(:,i+6),'r--')
+hold on
+% ylim([0 20])
 if i ==1
     legend('est','exp')
 end
