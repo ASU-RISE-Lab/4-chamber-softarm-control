@@ -3,7 +3,7 @@ theta1 = x(1); dtheta1 = x(2); lc1 = x(3); dlc1 = x(4);
 theta2 = x(5); dtheta2 = x(6); lc2 = x(7); dlc2 = x(8);
 angle_th = deg2rad(5);
 m0 = (100 + 34*2 + 25*5)/1000; %kg
-g = 9.8; %N/kg
+g = -9.8; %N/kg
 if abs(theta1)<= angle_th && abs(theta2) <= angle_th
     M = [(lc2^2*m0)/4 + (m0*(3*lc1^2 + 4*lc1*lc2 + 2*lc2^2))/8,0, (lc2^2*m0)/8 + (lc2*m0*(lc1/2 + lc2/2))/4,0;
         0, (5*m0)/4, 0, m0/2;
@@ -71,4 +71,7 @@ else
         (g*lc2*m0*(sin(theta1) - sin(theta1 + theta2) + theta2*cos(theta1 + theta2)))/(2*theta2^2);
         (g*m0*(sin(theta1 + theta2)/2 - sin(theta1)/2))/theta2;];
     condition =3;
+end
+% condition    
+% det(M)
 end
