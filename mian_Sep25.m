@@ -751,7 +751,51 @@ subplot(4,2,8)
 plot(ypred4 - var4z)
 hold on
 title('e = pred - actul')
+%%
+testData = par_set.trial2;
+outputKnown = funcKnownTerm2seg_v3(testData,par_set);
+qarray = [testData.pm_psi,outputKnown.state_array_wire];
+upd = testData.pd_psi;
 
+for t = 1:length(qarray)
+dqdt = funcCaldqdt(qarray(t,:),upd(t,:),alpha,beta,gprMdl1,gprMdl2,gprMdl3,gprMdl4,par_set);
+dqdtout(t,:) = dqdt;
+end
+est_acc_array =dqdtout(:,8:2:14);
+close all
+figure(1)
+for i  =1:4
+subplot(4,1,i)
+plot(est_acc_array(:,i))
+hold on
+plot(outputKnown.acc_array(:,i))
+end
+legend('GP','EXP')
+%% ode1 for full order
+testData = par_set.trial2;
+outputKnown = funcKnownTerm2seg_v3(testData,par_set);
+q0 = [testData.pm_psi(1,:),outputKnown.state_array_wire(1,:)];
+qarray = [testData.pm_psi,outputKnown.state_array_wire];
+upd = testData.pd_psi;
+q= q0;
+qout=q;
+t0 = testData.time_stamp(1)
+tfinal = testData.time_stamp(end)
+h = 1/1000
+tspan = t0:h:tfinal;
+qt=[];updt =[];
+for i =1:length(q0)
+    qt(:,i) = interp1(testData.time_stamp,qarray(:,i),tspan);
+end
+for i =1:6
+    updt(:,i) = interp1(testData.time_stamp,upd(:,i),tspan);
+end
+
+for t = 1:length(tspan)-1
+    dqdt = funcCaldqdt(q,updt(t,:),alpha,beta,gprMdl1,gprMdl2,gprMdl3,gprMdl4,par_set);
+    q =q +h*dqdt';
+    qout=[qout;q];
+end
 %% RK4 simulation for full order ode regulator
 testData = par_set.trial2;
 alpha = -0.04; beta = 0.03768;
