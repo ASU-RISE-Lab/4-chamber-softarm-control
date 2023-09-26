@@ -2,6 +2,8 @@ function [output] = funcComputeStateVar_v2(testData,par_set)
 %Fix log:
 %Aug 11th: change theta_mocap_rad calculation make it match with the
 %pressure input setup.
+%Step 28: change pm force calculation to match the direction of angle and
+%arclength changes,such that both K,D para. are positive.
     % Use mocap for angle but encoder for arclength
 % State equations.
     m0 = (100 + 34*2 + 25*5)/1000; %kg
@@ -244,9 +246,9 @@ output.state_array_wire = state_array;
 output.wire_angle_rad = [s1.theta_wire_rad,s2.theta_wire_rad];
 output.mean_u_pm_psi = mean(testData.pm_psi,2);
 output.u_pm_psi(:,1) = -(testData.pm_psi(:,1) - testData.pm_psi(:,2));
-output.u_pm_psi(:,2) = -testData.pm_psi(:,1) + testData.pm_psi(:,2) + 2*testData.pm_psi(:,3);
+output.u_pm_psi(:,2) = testData.pm_psi(:,1) + testData.pm_psi(:,2) + 2*testData.pm_psi(:,3);
 output.u_pm_psi(:,3) = -(testData.pm_psi(:,4) - testData.pm_psi(:,5));
-output.u_pm_psi(:,4) = -testData.pm_psi(:,4) + testData.pm_psi(:,5) + 2*testData.pm_psi(:,6);
+output.u_pm_psi(:,4) = testData.pm_psi(:,4) + testData.pm_psi(:,5) + 2*testData.pm_psi(:,6);
 output.u_pm_pa = output.u_pm_psi * 6894.76;
 output.u_pm_tf(:,1) = output.u_pm_pa(:,1) * par_set.fz_a0 * par_set.tau_l0;
 output.u_pm_tf(:,2) = output.u_pm_pa(:,2) * par_set.fz_a0;

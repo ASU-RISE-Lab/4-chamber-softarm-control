@@ -526,7 +526,7 @@ pctrlMerge = merge(pctrl1,pctrl4);
 testData = par_set.trial3;
 % alpha = -0.04; beta = 0.03768
 % h=1.0
-alpha = -0.9665; beta = 0.9698
+alpha = -0.9665; beta = 0.9698;
 h=1.0/40;
 x_pred = [];
 x6x1 = testData.pm_psi(1,:)';
@@ -753,6 +753,7 @@ hold on
 title('e = pred - actul')
 %%
 testData = par_set.trial2;
+alpha = -0.9665; beta = 0.9698;
 outputKnown = funcKnownTerm2seg_v3(testData,par_set);
 qarray = [testData.pm_psi,outputKnown.state_array_wire];
 upd = testData.pd_psi;
@@ -762,17 +763,88 @@ dqdt = funcCaldqdt(qarray(t,:),upd(t,:),alpha,beta,gprMdl1,gprMdl2,gprMdl3,gprMd
 dqdtout(t,:) = dqdt;
 end
 est_acc_array =dqdtout(:,8:2:14);
+
 close all
 figure(1)
 for i  =1:4
 subplot(4,1,i)
+yyaxis left
 plot(est_acc_array(:,i))
 hold on
+yyaxis right
 plot(outputKnown.acc_array(:,i))
 end
 legend('GP','EXP')
-%% ode1 for full order
+%% 
 testData = par_set.trial2;
+alpha = -0.9665; beta = 0.9698;
+outputKnown = funcKnownTerm2seg_v3(testData,par_set);
+close all
+figure(1)
+titlelist = {'theta1','lc1','theta2','lc2'};
+unitlistleft = {'Nm','N','Nm','N'};
+for i  =1:4
+subplot(4,1,i)
+yyaxis left
+plot(outputKnown.Mddq(i,:),'b--')
+hold on
+plot(outputKnown.Cqdq(i,:),'b')
+hold on
+plot(outputKnown.Gq(i,:),'b.')
+hold on
+ylabel(unitlistleft{i})
+hold on
+yyaxis right
+plot(outputKnown.u_pm_psi(:,i),'r')
+hold on
+title(titlelist{i})
+end
+legend('Mddq','Cdq','Gq','tf')
+%% greybox with 1st order
+testData = par_set.trial4;
+outputKnown = funcKnownTerm2seg_v3(testData,par_set);
+close all
+[~] = funcComputeStateVar_v2(testData,par_set)
+close all
+% k = [13.83; 5397; 5.603; 8645;]
+% d = [5.759; 4898; 5.678; 6310;]
+% offset = [0,-463,0,-904]
+alpha = -0.9665; beta = 0.9698;
+output_array = [testData.pm_psi, outputKnown.state_array_wire(:,1:2:end)];
+input_array = testData.pd_psi;
+z = iddata(output_array,input_array,par_set.Ts,'Name','train');
+FileName      = 'func1stWithPmDyn';       % File describing the model structure.
+Order         = [10 6 10];           % Model orders [ny nu nx].
+ParName = {'k1';'k2';'k3';'k4';'d1';'d2';'d3';'d4';'koff1';'koff2'};
+ParUnit ={'none';'none';'none';'none';'none';'none';'none';'none';'none';'none';};  
+ParVal    ={13.83; 5397; 5.603; 8645;5.759; 4898; 5.678; 6310;-463;-904};         % Initial parameters. Np = 3*4
+InitialStates = output_array(1,:)';           % Initial initial states.
+Ts            = 0;                 % Time-continuous system.
+
+ParMin   = {eps(0);eps(0);eps(0);eps(0);eps(0);eps(0);eps(0);eps(0);-Inf;-Inf};
+ParMax   = {Inf;Inf;Inf;Inf;Inf;Inf;Inf;Inf;-eps(0);-eps(0);};   % No maximum constraint.
+ParFix = {0; 0; 0; 0; 0; 0; 0; 0;0; 0;};
+Parameters = struct('Name', ParName, 'Unit', ParUnit,'Value',ParVal,'Minimum', ParMin, 'Maximum', ParMax, 'Fixed', ParFix);
+nlgr = idnlgrey(FileName, Order, Parameters,InitialStates, Ts, ...
+    'Name', 'og');
+present(nlgr)
+compare(nlgr,z)
+opt = nlgreyestOptions('Display', 'off');
+nlgr1 = nlgreyest(z, nlgr, opt);
+nlgr1.Name = 'refined';
+compare(nlgr1,z);
+% compare(nlgr1,nlgr,z);
+return
+%% cross validation
+testData = par_set.trial7;
+outputKnown = funcKnownTerm2seg_v3(testData,par_set);
+output_array = [testData.pm_psi, outputKnown.state_array_wire(:,1:2:end)];
+input_array = testData.pd_psi;
+z2 = iddata(output_array,input_array,par_set.Ts,'Name','valid');
+close all
+compare(nlgr1,nlgr,z2);
+%% ode1 for full order
+testData = par_set.trial3;
 outputKnown = funcKnownTerm2seg_v3(testData,par_set);
 q0 = [testData.pm_psi(1,:),outputKnown.state_array_wire(1,:)];
 qarray = [testData.pm_psi,outputKnown.state_array_wire];
@@ -796,46 +868,69 @@ for t = 1:length(tspan)-1
     q =q +h*dqdt';
     qout=[qout;q];
 end
-%% RK4 simulation for full order ode regulator
+%% %% least square for K and D sep25th tf = k*x + d*dx
 testData = par_set.trial2;
-alpha = -0.04; beta = 0.03768;
-h=1;
-x_pred = [];
-outputKnown = funcKnownTerm2seg_v3(testData,par_set);
-x14x1 = [testData.pm_psi(1,:)';outputKnown.state_array_wire(1,:)';];
-for i = 1:100  
-    u6x1 = testData.pd_psi(i,:)';
-    x_pred(i,:) = funcRK4fullODEv2_m(x14x1,alpha,beta,u6x1,h,gprMdl1,gprMdl2,gprMdl3,gprMdl4,par_set);
-    x14x1 = x_pred(i,:)';
-end
-close all
-figure(1)
-for i  = 1:6 
-subplot(3,2,i)
+outputKnown = funcComputeStateVar_v2(testData,par_set);
+spt = 1; ept = length(outputKnown.state_array_wire);
 
-plot(testData.pm_psi(:,i),'k')
-hold on
-plot(x_pred(:,i),'r--')
-hold on
-ylim([0 20])
-if i ==1
-    legend('est','exp')
-end
-end
+var1x = outputKnown.state_array_wire(spt:ept,1);
+var1y = outputKnown.state_array_wire(spt:ept,2);
+var1z = outputKnown.u_pm_tf(:,1);
 
-figure(2)
-for i  = 1:8 
-subplot(4,2,i)
+var2x = outputKnown.state_array_wire(spt:ept,3);
+var2y = outputKnown.state_array_wire(spt:ept,4);
+var2z = outputKnown.u_pm_tf(:,2);
 
-plot(outputKnown.state_array_wire(:,i),'k')
-hold on
-plot(x_pred(:,i+6),'r--')
-hold on
+var3x = outputKnown.state_array_wire(spt:ept,5);
+var3y = outputKnown.state_array_wire(spt:ept,6);
+var3z = outputKnown.u_pm_tf(:,3);
+
+var4x = outputKnown.state_array_wire(spt:ept,7);
+var4y = outputKnown.state_array_wire(spt:ept,8);
+var4z = outputKnown.u_pm_tf(:,4);
+% k = [13.83, 5397, 5.603, 8645]
+% d = [5.759, 4898, 5.678, 6310]
+% offset = [0,-463,0,-904]
+% %% RK4 simulation for full order ode regulator
+% testData = par_set.trial2;
+% alpha = -0.04; beta = 0.03768;
+% h=1;
+% x_pred = [];
+% outputKnown = funcKnownTerm2seg_v3(testData,par_set);
+% x14x1 = [testData.pm_psi(1,:)';outputKnown.state_array_wire(1,:)';];
+% for i = 1:100  
+%     u6x1 = testData.pd_psi(i,:)';
+%     x_pred(i,:) = funcRK4fullODEv2_m(x14x1,alpha,beta,u6x1,h,gprMdl1,gprMdl2,gprMdl3,gprMdl4,par_set);
+%     x14x1 = x_pred(i,:)';
+% end
+% close all
+% figure(1)
+% for i  = 1:6 
+% subplot(3,2,i)
+% 
+% plot(testData.pm_psi(:,i),'k')
+% hold on
+% plot(x_pred(:,i),'r--')
+% hold on
 % ylim([0 20])
-if i ==1
-    legend('est','exp')
-end
-end
+% if i ==1
+%     legend('est','exp')
+% end
+% end
+% 
+% figure(2)
+% for i  = 1:8 
+% subplot(4,2,i)
+% 
+% plot(outputKnown.state_array_wire(:,i),'k')
+% hold on
+% plot(x_pred(:,i+6),'r--')
+% hold on
+% % ylim([0 20])
+% if i ==1
+%     legend('est','exp')
+% end
+% end
 
 
 
