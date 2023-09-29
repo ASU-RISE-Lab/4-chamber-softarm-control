@@ -801,7 +801,7 @@ title(titlelist{i})
 end
 legend('Mddq','Cdq','Gq','tf')
 %% greybox with 1st order
-testData = par_set.trial4;
+testData = par_set.trial2;
 outputKnown = funcKnownTerm2seg_v3(testData,par_set);
 close all
 [~] = funcComputeStateVar_v2(testData,par_set)
@@ -810,8 +810,9 @@ close all
 % d = [5.759; 4898; 5.678; 6310;]
 % offset = [0,-463,0,-904]
 alpha = -0.9665; beta = 0.9698;
-output_array = [testData.pm_psi, outputKnown.state_array_wire(:,1:2:end)];
-input_array = testData.pd_psi;
+spt=1;ept=800;
+output_array = [testData.pm_psi(spt:ept,:), outputKnown.state_array_wire(spt:ept,1:2:end)];
+input_array = testData.pd_psi(spt:ept,:);
 z = iddata(output_array,input_array,par_set.Ts,'Name','train');
 FileName      = 'func1stWithPmDyn';       % File describing the model structure.
 Order         = [10 6 10];           % Model orders [ny nu nx].
@@ -832,8 +833,9 @@ compare(nlgr,z)
 opt = nlgreyestOptions('Display', 'off');
 nlgr1 = nlgreyest(z, nlgr, opt);
 nlgr1.Name = 'refined';
-compare(nlgr1,z);
-% compare(nlgr1,nlgr,z);
+% compare(nlgr1,z);
+close all
+compare(nlgr1,nlgr,z);
 return
 %% cross validation
 testData = par_set.trial7;

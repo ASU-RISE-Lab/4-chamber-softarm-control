@@ -14,19 +14,33 @@ function [output] = funcComputeStateVar_v2(testData,par_set)
 
     %%%%% calculate tau, fz, theta and lc %%%%%%
     s1.l_t0 = 205.7796;s1.r_t0 = 209.0839; 
-    s2.l_t0 = 223.6281;s2.r_t0 = 230.3360;%222.3360;
+    s2.l_t0 = 223.6281;s2.r_t0 = 223.3360;%222.3360;
     r0 = 43;
     green_t0 = 31.92;yellow_t0 = 46.33; purple_t0 =21.99;
     s1.red_l = s1.l_t0 - green_t0;
     s1.red_r = s1.r_t0 - green_t0;
+     s1.red_l = 169.7486;
+    s1.red_r = 173.1282;
     s2.red_l = s2.l_t0 - yellow_t0 - purple_t0 - green_t0;
     s2.red_r = s2.r_t0 - yellow_t0 - purple_t0 - green_t0;
-    
+%     offL2 = mean(testData.enco_volts(:,4)/5*1000 ...
+%         -1000*(abs(testData.rigid_2_pose(:,3) - testData.rigid_1_pose(:,3) + par_set.R1_stand_off))...
+%         -1000*(abs(testData.rigid_3_pose(:,3) - testData.rigid_2_pose(:,3) + 0.004)));
+%        offR2 = mean(testData.enco_volts(:,3)/5*1000 ...
+%         -1000*(abs(testData.rigid_2_pose(:,3) - testData.rigid_1_pose(:,3) + par_set.R1_stand_off))...
+%         -1000*(abs(testData.rigid_3_pose(:,3) - testData.rigid_2_pose(:,3) + 0.004)))
+
+s1.red_r = s1.r_t0 - green_t0;
+
+    s2.offset_l =(purple_t0 + s2.red_l)*1.0;
+    s2.offset_r =(purple_t0 + s2.red_r)*1.0;
+    s2.offset_l =126.3435;
+    s2.offset_r =124.7783;
     s1.l_t = testData.enco_volts(:,1)/5*1000 - s1.red_l;
     s1.r_t = testData.enco_volts(:,2)/5*1000 - s1.red_r;
     
-    s2.l_t = testData.enco_volts(:,4)/5*1000 - purple_t0 - s1.l_t - s2.red_l;
-    s2.r_t = testData.enco_volts(:,3)/5*1000 - purple_t0 - s1.r_t - s2.red_r;
+    s2.l_t = testData.enco_volts(:,4)/5*1000 -s1.l_t - s2.offset_l;
+    s2.r_t = testData.enco_volts(:,3)/5*1000 -s1.r_t - s2.offset_r;
     
     s1.theta_wire_rad = (s1.r_t - s1.l_t)/r0;
     s1.l_wire_mm = (s1.r_t + s1.l_t)/2;
@@ -49,7 +63,7 @@ function [output] = funcComputeStateVar_v2(testData,par_set)
     quat_array(:,2:4) = testData.rigid_3_rot(:,1:3);
     rpy = quat2eul(quat_array,'XYZ');
     s2.theta_mocap_rad = rpy(:,2);
-    s2.theta_wire_rad = (s2.r_t - s2.l_t)/r0;
+    s2.theta_wire_rad = (s2.r_t - s2.l_t)/(r0);
     s2.l_wire_mm = (s2.r_t + s2.l_t)/2;
 % alpha_r2 = 0.7825;
 % alpha_l2 = 0.716;
@@ -260,12 +274,17 @@ output.acc_array = [filt_ddtheta1_array,filt_ddlc1_array,filt_ddtheta2_array,fil
     figure(1)
     subplot(4,1,1)
     plot(filt_theta1_array)
+    hold on
+    plot(s1.theta_mocap_rad)
+    legend('wire','mocap')
     ylabel('$\theta_1$',Interpreter='latex')
     subplot(4,1,2)
     plot(filt_lc1_array)
     ylabel('$lc_1$',Interpreter='latex')
     subplot(4,1,3)
     plot(filt_theta2_array)
+    hold on
+    plot(s2.theta_mocap_rad-s1.theta_mocap_rad)
     ylabel('$\theta_2$',Interpreter='latex')
     subplot(4,1,4)
     plot(filt_lc2_array)
