@@ -19,6 +19,7 @@ par_set.tau_l0 =48/1000;%m
 
 par_set.R1_stand_off = 0.05;% m
 par_set.train_ratio = 1.0;
+par_set.enco_volt_p0 = [1.0191    1.0408    1.0858    1.0750];
 % par_set.R1_stand_off = 0.03;% m
 fprintf('System initialization done \n')
 % %% ode fix 1 seg 4 link
@@ -113,9 +114,175 @@ end
 % plot(fkResult.camFrameE1(:,3)-testData.rigid_2_pose(:,3))
 % hold on
 % legend('x','y','z')
+%% Get Li(p=0)
+testData = par_set.trial1;
+mean(testData.enco_volts,1)
 %% FK RESULT 2 seg
 testData = par_set.trial3;
 funcFullFK2seg(testData,par_set);
+%% Oct2 use delta L for id
+testData = par_set.trial2;
+outputKnown = funcComputeStateVar_v3(testData,par_set);
+% Kq + Ddot_q = u_pm_tf
+spt = 1; ept = 800;
+var1x = outputKnown.state_array_wire(spt:ept,1);
+var1y = outputKnown.state_array_wire(spt:ept,2);
+var1z = (outputKnown.u_pm_tf(spt:ept,1));
+
+var2x = outputKnown.state_array_wire(spt:ept,3);
+var2y = outputKnown.state_array_wire(spt:ept,4);
+var2z = (outputKnown.u_pm_tf(spt:ept,2));
+
+var3x = outputKnown.state_array_wire(spt:ept,5);
+var3y = outputKnown.state_array_wire(spt:ept,6);
+var3z = (outputKnown.u_pm_tf(spt:ept,3));
+
+var4x = outputKnown.state_array_wire(spt:ept,7);
+var4y = outputKnown.state_array_wire(spt:ept,8);
+var4z = (outputKnown.u_pm_tf(spt:ept,4));
+
+mat_k = [29.08;3.185e04;23.62;1.725e04];
+mat_d = [25.87;1.4e04;23.3;0.8699e04];
+mat_off = [0;-3004;0;-3238];
+
+%% greybox with 1st order
+testData = par_set.trial7;
+outputKnown = funcComputeStateVar_v3(testData,par_set);
+% close all
+% [~] = funcComputeStateVar_v2(testData,par_set)
+close all
+% k = [13.83; 5397; 5.603; 8645;]
+% d = [5.759; 4898; 5.678; 6310;]
+% offset = [0,-463,0,-904]
+alpha = -0.9665; beta = 0.9698;
+spt=1;ept=length(testData.pd_MPa);
+output_array = [testData.pm_psi(spt:ept,:), outputKnown.state_array_wire(spt:ept,1:2:end)];
+input_array = testData.pd_psi(spt:ept,:);
+z = iddata(output_array,input_array,par_set.Ts,'Name','train');
+FileName      = 'func1stWithPmDyn';       % File describing the model structure.
+Order         = [10 6 10];           % Model orders [ny nu nx].
+ParName = {'k1';'k2';'k3';'k4';'d1';'d2';'d3';'d4';'koff1';'koff2'};
+ParUnit ={'none';'none';'none';'none';'none';'none';'none';'none';'none';'none';};  
+% ParVal    ={13.83; 3.185e04; 5.603; 1.725e04;...
+%             5.759; 1.4e04; 5.678; 0.870e04;...
+%             -3004;-3238}; 
+ParVal    ={28.3353; 3.3031e04; 23.2665; 1.5814e04;...
+            28.2389; 3.9189e04; 28.041; 1.8099e04;...
+            -3140.72;-2901.08};  
+% Initial parameters. Np = 3*4
+InitialStates = output_array(1,:)';           % Initial initial states.
+Ts            = 0;                 % Time-continuous system.
+
+ParMin   = {eps(0);eps(0);eps(0);eps(0);eps(0);eps(0);eps(0);eps(0);-Inf;-Inf};
+ParMax   = {Inf;Inf;Inf;Inf;Inf;Inf;Inf;Inf;-eps(0);-eps(0);};   % No maximum constraint.
+ParFix = {0; 1; 0; 1;...
+          0; 1; 0; 1;...
+          1; 1;};
+Parameters = struct('Name', ParName, 'Unit', ParUnit,'Value',ParVal,'Minimum', ParMin, 'Maximum', ParMax, 'Fixed', ParFix);
+nlgr = idnlgrey(FileName, Order, Parameters,InitialStates, Ts, ...
+    'Name', 'og');
+present(nlgr)
+compare(nlgr,z)
+%%
+opt = nlgreyestOptions('Display', 'off');
+nlgr1 = nlgreyest(z, nlgr, opt);
+nlgr1.Name = 'refined';
+% compare(nlgr1,z);
+close all
+compare(nlgr1,nlgr,z);
+return
+%% greybox with 1st order no pm
+testData = par_set.trial6;
+outputKnown = funcComputeStateVar_v3(testData,par_set);
+% close all
+% [~] = funcComputeStateVar_v2(testData,par_set)
+close all
+% k = [13.83; 5397; 5.603; 8645;]
+% d = [5.759; 4898; 5.678; 6310;]
+% offset = [0,-463,0,-904]
+alpha = -0.9665; beta = 0.9698;
+spt=1;ept=length(testData.pd_MPa);
+output_array = [outputKnown.state_array_wire(spt:ept,1:2:end)];
+input_array = testData.pm_psi(spt:ept,:);
+z = iddata(output_array,input_array,par_set.Ts,'Name','train');
+FileName      = 'func1stNoPmDyn';       % File describing the model structure.
+Order         = [4 6 4];           % Model orders [ny nu nx].
+ParName = {'k1';'k2';'k3';'k4';'d1';'d2';'d3';'d4';'koff1';'koff2'};
+ParUnit ={'none';'none';'none';'none';'none';'none';'none';'none';'none';'none';};  
+% ParVal    ={13.83; 3.185e04; 5.603; 1.725e04;...
+%             5.759; 1.4e04; 5.678; 0.870e04;...
+%             -3004;-3238}; 
+ParVal    ={28.3353; 3.3031e04; 23.2665; 1.5814e04;...
+            28.2389; 3.9189e04; 28.041; 1.8099e04;...
+            -3140.72;-2901.08};  
+% Initial parameters. Np = 3*4
+InitialStates = output_array(1,:)';           % Initial initial states.
+Ts            = 0;                 % Time-continuous system.
+
+ParMin   = {eps(0);eps(0);eps(0);eps(0);eps(0);eps(0);eps(0);eps(0);-Inf;-Inf};
+ParMax   = {Inf;Inf;Inf;Inf;Inf;Inf;Inf;Inf;-eps(0);-eps(0);};   % No maximum constraint.
+ParFix = {0; 1; 0; 1;...
+          0; 1; 0; 1;...
+          1; 1;};
+Parameters = struct('Name', ParName, 'Unit', ParUnit,'Value',ParVal,'Minimum', ParMin, 'Maximum', ParMax, 'Fixed', ParFix);
+nlgr = idnlgrey(FileName, Order, Parameters,InitialStates, Ts, ...
+    'Name', 'og');
+present(nlgr)
+compare(nlgr,z)
+%%
+opt = nlgreyestOptions('Display', 'off');
+nlgr1 = nlgreyest(z, nlgr, opt);
+nlgr1.Name = 'refined';
+% compare(nlgr1,z);
+close all
+compare(nlgr1,nlgr,z);
+return
+
+%% off-diag term
+testData = par_set.trial3;
+outputKnown = funcComputeStateVar_v3(testData,par_set);
+% close all
+% [~] = funcComputeStateVar_v2(testData,par_set)
+close all
+% k = [13.83; 5397; 5.603; 8645;]
+% d = [5.759; 4898; 5.678; 6310;]
+% offset = [0,-463,0,-904]
+alpha = -0.9665; beta = 0.9698;
+spt=1;ept=800;
+output_array = [testData.pm_psi(spt:ept,1:3), outputKnown.state_array_wire(spt:ept,1:2:4)];
+input_array = testData.pd_psi(spt:ept,1:3);
+z = iddata(output_array,input_array,par_set.Ts,'Name','train');
+FileName      = 'func1stWithPmDynSeg1';       % File describing the model structure.
+Order         = [5 3 5];           % Model orders [ny nu nx].
+ParName = {'k11';'k12';'k21';'k22';'d11';'d12';'d21';'d22';'koff11';'koff21'};
+ParUnit ={'none';'none';'none';'none';'none';'none';'none';'none';'none';'none';};  
+% ParVal    ={13.83; 3.185e04; 5.603; 1.725e04;...
+%             5.759; 1.4e04; 5.678; 0.870e04;...
+%             -3004;-3238}; 
+ParVal    ={28.3353; 0.1; 28.3353; 0.1;...
+            5.759; 0.1; 28.3353; 0.1;...
+            -0.1;-2901.08};  
+% Initial parameters. Np = 3*4
+InitialStates = output_array(1,:)';           % Initial initial states.
+Ts            = 0;                 % Time-continuous system.
+
+ParMin   = {eps(0);eps(0);eps(0);eps(0);eps(0);eps(0);eps(0);eps(0);-Inf;-Inf};
+ParMax   = {Inf;Inf;Inf;Inf;Inf;Inf;Inf;Inf;-eps(0);-eps(0);};   % No maximum constraint.
+ParFix = {0; 0; 0; 0; 0; 0; 0; 0;0; 0;};
+Parameters = struct('Name', ParName, 'Unit', ParUnit,'Value',ParVal,'Minimum', ParMin, 'Maximum', ParMax, 'Fixed', ParFix);
+nlgr = idnlgrey(FileName, Order, Parameters,InitialStates, Ts, ...
+    'Name', 'og');
+present(nlgr)
+compare(nlgr,z)
+%%
+opt = nlgreyestOptions('Display', 'off');
+nlgr1 = nlgreyest(z, nlgr, opt);
+nlgr1.Name = 'refined';
+% compare(nlgr1,z);
+close all
+compare(nlgr1,nlgr,z);
+present(nlgr1)
+return
 %% least square for K and D aug28
 testData = par_set.trial3;
 outputKnown = funcKnownTerm2seg_v2(testData,par_set);
