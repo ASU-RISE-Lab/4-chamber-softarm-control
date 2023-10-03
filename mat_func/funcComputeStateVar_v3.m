@@ -271,6 +271,7 @@ output.u_pm_tf(:,2) = output.u_pm_pa(:,2) * par_set.fz_a0;
 output.u_pm_tf(:,3) = output.u_pm_pa(:,3) * par_set.fz_a0 * par_set.tau_l0;
 output.u_pm_tf(:,4) = output.u_pm_pa(:,4) * par_set.fz_a0;
 output.acc_array = [filt_ddtheta1_array,filt_ddlc1_array,filt_ddtheta2_array,filt_ddlc2_array];
+output.state_array_deg_mm = [rad2deg(state_array(:,1:2)),state_array(:,3:4)*1000,rad2deg(state_array(:,5:6)),state_array(:,7:8)*1000];
 
 
     figure(1)

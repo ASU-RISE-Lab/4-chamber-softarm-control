@@ -53,7 +53,7 @@ par_set.Jxythetaz = par_set.J_xyz2q;
 par_set.Jxythetaz(3,:) = [1 0 1 0 ];
 %% Read txt file or mat file
 if par_set.flag_read_exp==1
-    for i = 1:11
+    for i = 1:15
         par_set= funcLoadExp2Seg(par_set,i);
     end
     %     par_set= funcLoadExp2Seg(par_set,1);
@@ -120,30 +120,32 @@ mean(testData.enco_volts,1)
 %% FK RESULT 2 seg
 testData = par_set.trial3;
 funcFullFK2seg(testData,par_set);
+
 %% Oct2 use delta L for id
-testData = par_set.trial2;
-outputKnown = funcComputeStateVar_v3(testData,par_set);
-% Kq + Ddot_q = u_pm_tf
-spt = 1; ept = 800;
-var1x = outputKnown.state_array_wire(spt:ept,1);
-var1y = outputKnown.state_array_wire(spt:ept,2);
-var1z = (outputKnown.u_pm_tf(spt:ept,1));
-
-var2x = outputKnown.state_array_wire(spt:ept,3);
-var2y = outputKnown.state_array_wire(spt:ept,4);
-var2z = (outputKnown.u_pm_tf(spt:ept,2));
-
-var3x = outputKnown.state_array_wire(spt:ept,5);
-var3y = outputKnown.state_array_wire(spt:ept,6);
-var3z = (outputKnown.u_pm_tf(spt:ept,3));
-
-var4x = outputKnown.state_array_wire(spt:ept,7);
-var4y = outputKnown.state_array_wire(spt:ept,8);
-var4z = (outputKnown.u_pm_tf(spt:ept,4));
-
-mat_k = [29.08;3.185e04;23.62;1.725e04];
-mat_d = [25.87;1.4e04;23.3;0.8699e04];
-mat_off = [0;-3004;0;-3238];
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% testData = par_set.trial2;
+% outputKnown = funcComputeStateVar_v3(testData,par_set);
+% % Kq + Ddot_q = u_pm_tf
+% spt = 1; ept = 800;
+% var1x = outputKnown.state_array_wire(spt:ept,1);
+% var1y = outputKnown.state_array_wire(spt:ept,2);
+% var1z = (outputKnown.u_pm_tf(spt:ept,1));
+% 
+% var2x = outputKnown.state_array_wire(spt:ept,3);
+% var2y = outputKnown.state_array_wire(spt:ept,4);
+% var2z = (outputKnown.u_pm_tf(spt:ept,2));
+% 
+% var3x = outputKnown.state_array_wire(spt:ept,5);
+% var3y = outputKnown.state_array_wire(spt:ept,6);
+% var3z = (outputKnown.u_pm_tf(spt:ept,3));
+% 
+% var4x = outputKnown.state_array_wire(spt:ept,7);
+% var4y = outputKnown.state_array_wire(spt:ept,8);
+% var4z = (outputKnown.u_pm_tf(spt:ept,4));
+% 
+% mat_k = [29.08;3.185e04;23.62;1.725e04];
+% mat_d = [25.87;1.4e04;23.3;0.8699e04];
+% mat_off = [0;-3004;0;-3238];
 
 %% greybox with 1st order
 testData = par_set.trial7;
@@ -192,7 +194,7 @@ close all
 compare(nlgr1,nlgr,z);
 return
 %% greybox with 1st order no pm
-testData = par_set.trial6;
+testData = par_set.trial1;
 outputKnown = funcComputeStateVar_v3(testData,par_set);
 % close all
 % [~] = funcComputeStateVar_v2(testData,par_set)
@@ -237,6 +239,289 @@ nlgr1.Name = 'refined';
 close all
 compare(nlgr1,nlgr,z);
 return
+%% Change unit to deg mm
+testData = par_set.trial1;
+outputKnown = funcComputeStateVar_v3(testData,par_set);
+close all
+spt=1;ept=length(testData.pd_MPa);
+output_array = [outputKnown.state_array_wire(spt:ept,1:2:end)];
+input_array = testData.pm_psi(spt:ept,:);
+z1 = iddata(output_array,input_array,par_set.Ts,'Name','train');
+%%%
+FileName      = 'func1stNoPmDyn';       % File describing the model structure.
+Order         = [4 6 4];           % Model orders [ny nu nx].
+ParName = {'k1';'k2';'k3';'k4';'d1';'d2';'d3';'d4';'koff1';'koff2'};
+ParUnit ={'none';'none';'none';'none';'none';'none';'none';'none';'none';'none';};  
+% ParVal    ={13.83; 3.185e04; 5.603; 1.725e04;...
+%             5.759; 1.4e04; 5.678; 0.870e04;...
+%             -3004;-3238}; 
+ParVal    ={28.3353; 3.3031e04; 23.2665; 1.5814e04;...
+            28.2389; 3.9189e04; 28.041; 1.8099e04;...
+            -3140.72;-2901.08};  
+% Initial parameters. Np = 3*4
+InitialStates = output_array(1,:)';           % Initial initial states.
+Ts            = 0;                 % Time-continuous system.
+
+ParMin   = {eps(0);eps(0);eps(0);eps(0);eps(0);eps(0);eps(0);eps(0);-Inf;-Inf};
+ParMax   = {Inf;Inf;Inf;Inf;Inf;Inf;Inf;Inf;-eps(0);-eps(0);};   % No maximum constraint.
+ParFix = {0; 0; 0; 0;...
+          0; 0; 0; 0;...
+          0; 0;};
+Parameters = struct('Name', ParName, 'Unit', ParUnit,'Value',ParVal,'Minimum', ParMin, 'Maximum', ParMax, 'Fixed', ParFix);
+nlgr = idnlgrey(FileName, Order, Parameters,InitialStates, Ts, ...
+    'Name', 'og');
+present(nlgr)
+%%%
+compare(nlgr,z1)
+%%
+opt = nlgreyestOptions('Display', 'off');
+nlgr1 = nlgreyest(z1, nlgr, opt);
+nlgr1.Name = 'refined1';
+close all
+compare(nlgr1,nlgr,z1);
+%%
+testData = par_set.trial1;
+nlgr1 = funcGreyboxRep(testData,par_set,nlgr,opt);
+
+testData = par_set.trial2;
+nlgr2 = funcGreyboxRep(testData,par_set,nlgr,opt);
+
+testData = par_set.trial3;
+nlgr3 = funcGreyboxRep(testData,par_set,nlgr,opt);
+
+testData = par_set.trial4;
+nlgr4 = funcGreyboxRep(testData,par_set,nlgr,opt);
+
+testData = par_set.trial5;
+nlgr5 = funcGreyboxRep(testData,par_set,nlgr,opt);
+
+testData = par_set.trial6;
+nlgr6 = funcGreyboxRep(testData,par_set,nlgr,opt);
+
+testData = par_set.trial7;
+nlgr7 = funcGreyboxRep(testData,par_set,nlgr,opt);
+
+testData = par_set.trial8;
+nlgr8 = funcGreyboxRep(testData,par_set,nlgr,opt);
+
+testData = par_set.trial9;
+nlgr9 = funcGreyboxRep(testData,par_set,nlgr,opt);
+
+testData = par_set.trial10;
+nlgr10 = funcGreyboxRep(testData,par_set,nlgr,opt);
+
+testData = par_set.trial11;
+nlgr11 = funcGreyboxRep(testData,par_set,nlgr,opt);
+
+testData = par_set.trial12;
+nlgr12 = funcGreyboxRep(testData,par_set,nlgr,opt);
+
+beep
+%%
+k1_array = [nlgr1.Parameters(1).Value;nlgr2.Parameters(1).Value;...
+           nlgr3.Parameters(1).Value;nlgr4.Parameters(1).Value;...
+           nlgr5.Parameters(1).Value;nlgr6.Parameters(1).Value;...
+           nlgr7.Parameters(1).Value;nlgr8.Parameters(1).Value;...
+           nlgr9.Parameters(1).Value;nlgr10.Parameters(1).Value;...
+           nlgr11.Parameters(1).Value;nlgr12.Parameters(1).Value;];
+
+k2_array = [nlgr1.Parameters(2).Value;nlgr2.Parameters(2).Value;...
+           nlgr3.Parameters(2).Value;nlgr4.Parameters(2).Value;...
+           nlgr5.Parameters(2).Value;nlgr6.Parameters(2).Value;...
+           nlgr7.Parameters(2).Value;nlgr8.Parameters(2).Value;...
+           nlgr9.Parameters(2).Value;nlgr10.Parameters(2).Value;...
+           nlgr11.Parameters(2).Value;nlgr12.Parameters(2).Value;];
+
+k3_array = [nlgr1.Parameters(3).Value;nlgr2.Parameters(3).Value;...
+           nlgr3.Parameters(3).Value;nlgr4.Parameters(3).Value;...
+           nlgr5.Parameters(3).Value;nlgr6.Parameters(3).Value;...
+           nlgr7.Parameters(3).Value;nlgr8.Parameters(3).Value;...
+           nlgr9.Parameters(3).Value;nlgr10.Parameters(3).Value;...
+           nlgr11.Parameters(3).Value;nlgr12.Parameters(3).Value;];
+
+k4_array = [nlgr1.Parameters(4).Value;nlgr2.Parameters(4).Value;...
+           nlgr3.Parameters(4).Value;nlgr4.Parameters(4).Value;...
+           nlgr5.Parameters(4).Value;nlgr6.Parameters(4).Value;...
+           nlgr7.Parameters(4).Value;nlgr8.Parameters(4).Value;...
+           nlgr9.Parameters(4).Value;nlgr10.Parameters(4).Value;...
+           nlgr11.Parameters(4).Value;nlgr12.Parameters(4).Value;];
+close all
+figure(1)
+for i = 1:12
+    subplot(1,4,1)
+    scatter(1,k1_array(i),'red')
+    hold on
+    subplot(1,4,2)
+    scatter(1,k3_array(i),'blue')
+    hold on   
+    subplot(1,4,3)
+    scatter(1,k2_array(i),'red')
+    hold on
+    subplot(1,4,4)
+    scatter(1,k4_array(i),'blue')
+    hold on 
+end
+k_array_mean = [mean(k1_array);mean(k2_array);mean(k3_array);mean(k4_array);]
+
+d1_array = [nlgr1.Parameters(5).Value;nlgr2.Parameters(5).Value;...
+           nlgr3.Parameters(5).Value;nlgr4.Parameters(5).Value;...
+           nlgr5.Parameters(5).Value;nlgr6.Parameters(5).Value;...
+           nlgr7.Parameters(5).Value;nlgr8.Parameters(5).Value;...
+           nlgr9.Parameters(5).Value;nlgr10.Parameters(5).Value;...
+           nlgr11.Parameters(5).Value;nlgr12.Parameters(5).Value;];
+
+d2_array = [nlgr1.Parameters(6).Value;nlgr2.Parameters(6).Value;...
+           nlgr3.Parameters(6).Value;nlgr4.Parameters(6).Value;...
+           nlgr5.Parameters(6).Value;nlgr6.Parameters(6).Value;...
+           nlgr7.Parameters(6).Value;nlgr8.Parameters(6).Value;...
+           nlgr9.Parameters(6).Value;nlgr10.Parameters(6).Value;...
+           nlgr11.Parameters(6).Value;nlgr12.Parameters(6).Value;];
+
+d3_array = [nlgr1.Parameters(7).Value;nlgr2.Parameters(7).Value;...
+           nlgr3.Parameters(7).Value;nlgr4.Parameters(7).Value;...
+           nlgr5.Parameters(7).Value;nlgr6.Parameters(7).Value;...
+           nlgr7.Parameters(7).Value;nlgr8.Parameters(7).Value;...
+           nlgr9.Parameters(7).Value;nlgr10.Parameters(7).Value;...
+           nlgr11.Parameters(7).Value;nlgr12.Parameters(7).Value;];
+
+d4_array = [nlgr1.Parameters(8).Value;nlgr2.Parameters(8).Value;...
+           nlgr3.Parameters(8).Value;nlgr4.Parameters(8).Value;...
+           nlgr5.Parameters(8).Value;nlgr6.Parameters(8).Value;...
+           nlgr7.Parameters(8).Value;nlgr8.Parameters(8).Value;...
+           nlgr9.Parameters(8).Value;nlgr10.Parameters(8).Value;...
+           nlgr11.Parameters(8).Value;nlgr12.Parameters(8).Value;];
+close all
+figure(1)
+for i = 1:12
+    subplot(1,4,1)
+    scatter(1,d1_array(i),'red')
+    hold on
+    subplot(1,4,2)
+    scatter(1,d3_array(i),'blue')
+    hold on   
+    subplot(1,4,3)
+    scatter(1,d2_array(i),'red')
+    hold on
+    subplot(1,4,4)
+    scatter(1,d4_array(i),'blue')
+    hold on 
+end
+d_array_mean = [mean(d1_array);mean(d2_array);mean(d3_array);mean(d4_array);]
+
+koff1_array = [nlgr1.Parameters(9).Value;nlgr2.Parameters(9).Value;...
+           nlgr3.Parameters(9).Value;nlgr4.Parameters(9).Value;...
+           nlgr5.Parameters(9).Value;nlgr6.Parameters(9).Value;...
+           nlgr7.Parameters(9).Value;nlgr8.Parameters(9).Value;...
+           nlgr9.Parameters(9).Value;nlgr10.Parameters(9).Value;...
+           nlgr11.Parameters(9).Value;nlgr12.Parameters(9).Value;];
+
+koff2_array = [nlgr1.Parameters(10).Value;nlgr2.Parameters(10).Value;...
+           nlgr3.Parameters(10).Value;nlgr4.Parameters(10).Value;...
+           nlgr5.Parameters(10).Value;nlgr6.Parameters(10).Value;...
+           nlgr7.Parameters(10).Value;nlgr8.Parameters(10).Value;...
+           nlgr9.Parameters(10).Value;nlgr10.Parameters(10).Value;...
+           nlgr11.Parameters(10).Value;nlgr12.Parameters(10).Value;];
+
+
+close all
+figure(3)
+for i = 1:12
+    subplot(1,2,1)
+    scatter(1,koff1_array(i),'red')
+    hold on
+    subplot(1,2,2)
+    scatter(1,koff2_array(i),'blue')
+end
+koff_array_mean = [mean(koff1_array);mean(koff2_array)]
+
+%% Validation of mean model
+testData = par_set.trial2;
+outputKnown = funcComputeStateVar_v3(testData,par_set);
+close all
+spt=1;ept=length(testData.pd_MPa);
+output_array = [outputKnown.state_array_wire(spt:ept,1:2:end)];
+input_array = testData.pm_psi(spt:ept,:);
+z1 = iddata(output_array,input_array,par_set.Ts,'Name','train');
+%%%
+FileName      = 'func1stNoPmDyn';       % File describing the model structure.
+Order         = [4 6 4];           % Model orders [ny nu nx].
+ParName = {'k1';'k2';'k3';'k4';'d1';'d2';'d3';'d4';'koff1';'koff2'};
+ParUnit ={'none';'none';'none';'none';'none';'none';'none';'none';'none';'none';};  
+% ParVal    ={13.83; 3.185e04; 5.603; 1.725e04;...
+%             5.759; 1.4e04; 5.678; 0.870e04;...
+%             -3004;-3238}; 
+
+ParVal    ={28.3353; 3.3031e04; 23.2665; 1.5814e04;...
+            28.2389; 3.9189e04; 28.041; 1.8099e04;...
+            -3140.72;-2901.08};  
+% ParVal    ={k_array_mean(1);k_array_mean(2);k_array_mean(3);k_array_mean(4);...
+%             d_array_mean(1);d_array_mean(2);d_array_mean(3);d_array_mean(4);
+%             koff_array_mean(1);koff_array_mean(2);};  
+% Initial parameters. Np = 3*4
+InitialStates = output_array(1,:)';           % Initial initial states.
+Ts            = par_set.Ts;                 % Time-continuous system.
+
+ParMin   = {eps(0);eps(0);eps(0);eps(0);eps(0);eps(0);eps(0);eps(0);-Inf;-Inf};
+ParMax   = {Inf;Inf;Inf;Inf;Inf;Inf;Inf;Inf;-eps(0);-eps(0);};   % No maximum constraint.
+ParFix = {0; 0; 0; 0;...
+          0; 0; 0; 0;...
+          0; 0;};
+Parameters = struct('Name', ParName, 'Unit', ParUnit,'Value',ParVal,'Minimum', ParMin, 'Maximum', ParMax, 'Fixed', ParFix);
+nlgr_mean = idnlgrey(FileName, Order, Parameters,InitialStates, Ts, ...
+    'Name', 'mean');
+present(nlgr_mean)
+compare(nlgr_mean,z1)
+
+opt = nlgreyestOptions('Display', 'off');
+nlgr1 = nlgreyest(z1, nlgr_mean, opt);
+nlgr1.Name = 'refined1';
+%%
+close all
+compare(nlgr1,nlgr_mean,z1);
+%% RK4 sim with trained parameters
+testData = par_set.trial2;
+outputKnown = funcComputeStateVar_v3(testData,par_set);
+h=1.0/30;
+x_pred = [];
+x10x1 = [testData.pm_psi(1,:),outputKnown.state_array_wire(1,1:2:end)]';
+for i = 1:length(testData.pm_psi)  
+    u6x1 = testData.pd_psi(i,:)';
+    x_pred(i,:) = funcRK4fullODEv3_m(x10x1,u6x1,h,par_set);
+    x10x1 = x_pred(i,:)';
+end
+close all
+figure(1)
+for i  = 1:6
+subplot(6,1,i)
+plot(testData.time_stamp, testData.pm_psi(:,i),'k')
+hold on
+plot(testData.time_stamp,x_pred(:,i),'r--')
+hold on
+ylim([0 20])
+if i ==1
+    legend('rk4','exp')
+end
+hold on
+end
+figure(2)
+state_array = outputKnown.state_array_wire(1,1:2:end);
+for i  = 1:4
+subplot(4,1,i)
+yyaxis left
+plot(testData.time_stamp,state_array(:,i))
+hold on
+yyaxis right
+plot(testData.time_stamp,x_pred(:,i+6))
+hold on
+% ylim([0 20])
+if i ==1
+    legend('rk4','exp')
+end
+hold on
+end
+% present(nlgr1)
+%end of Otc2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% off-diag term
 testData = par_set.trial3;
