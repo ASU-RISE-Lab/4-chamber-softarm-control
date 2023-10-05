@@ -114,6 +114,60 @@ end
 % plot(fkResult.camFrameE1(:,3)-testData.rigid_2_pose(:,3))
 % hold on
 % legend('x','y','z')
+
+%% Oct4 pm dependent 
+testData = par_set.trial3;
+outputKnown = funcComputeStateVar_v3(testData,par_set);
+alpha = -0.9665; beta = 0.9698;
+spt=1;ept=length(testData.pd_MPa);
+input_array=[];output_array=[];
+output_array = [testData.pm_psi(spt:ept,:), outputKnown.state_array_wire(spt:ept,1:2:end)];
+input_array = testData.pd_psi(spt:ept,:);
+z = iddata(output_array,input_array,par_set.Ts,'Name','train');
+FileName      = 'func1stWithPmDynStateDep';       % File describing the model structure.
+Order         = [10 6 10];           % Model orders [ny nu nx].
+ParName = {'kpm1';'kpm2';'kpm3';'kpm4';...
+           'ko1';'ko2';'ko3';'ko4';...
+    'dpm1';'dpm2';'dpm3';'dpm4';...
+    'do1';'do2';'do3';'do4'};
+ParUnit ={'none';'none';'none';'none';...
+    'none';'none';'none';'none';...
+    'none';'none';'none';'none';...
+    'none';'none';'none';'none';};
+ParVal    ={1; 1; 1; 1;...
+    1; 1; 1; 1;...
+    1;1;1;1;...
+    1;1;1;1};
+InitialStates = output_array(1,:)';           % Initial initial states.
+Ts            = 0;                 % Time-continuous system.
+
+ParMin   = {-Inf;-Inf;-Inf;-Inf;...
+    -Inf;-Inf;-Inf;-Inf;...
+    -Inf;-Inf;-Inf;-Inf;...
+    -Inf;-Inf;-Inf;-Inf};
+ParMax   = {Inf;Inf;Inf;Inf;...
+    Inf;Inf;Inf;Inf;...
+    Inf;Inf;Inf;Inf;...;
+    Inf;Inf;Inf;Inf;};   % No maximum constraint.
+ParFix = {0; 0; 0; 0;...
+    0; 0; 0; 0;...
+    0; 0; 0; 0;...
+    0;0;0;0;};
+Parameters = struct('Name', ParName, 'Unit', ParUnit,'Value',ParVal,'Minimum', ParMin, 'Maximum', ParMax, 'Fixed', ParFix);
+nlgr = idnlgrey(FileName, Order, Parameters,InitialStates, Ts, ...
+    'Name', 'og');
+present(nlgr)
+close all
+compare(nlgr,z)
+%%
+opt = nlgreyestOptions('Display', 'off');
+nlgr2 = nlgreyest(z, nlgr, opt);
+nlgr2.Name = 'refined';
+% compare(nlgr1,z);
+close all
+compare(nlgr2,nlgr,z);
+present(nlgr2)
+return
 %% Oct3 use delta L for elongation
 testData = par_set.trial3;
 outputKnown = funcComputeStateVar_v3(testData,par_set);
