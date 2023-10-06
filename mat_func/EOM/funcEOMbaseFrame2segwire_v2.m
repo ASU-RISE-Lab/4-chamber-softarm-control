@@ -1,8 +1,8 @@
-function par =funcEOMbaseFrame2segwire_v1(par)
+function par =funcEOMbaseFrame2segwire_v2(par)
 fprintf( 'EOM... \n' )
 % par=[];
 %% Transformations
-par.n= 8;%DOF
+par.n= 6;%DOF
 % deltaL 
 syms m0 g a1 a2 lc1
 xi = sym('xi', [par.n 1]);
@@ -19,39 +19,37 @@ rigid_theta=sym(zeros(1,par.n));
 rigid_m = sym(zeros(1,par.n));
 %%% DH talbe %%% z0+ points inward, x0+ points left
 %%% Link    theta   d     alpha   a   
-%%% 1       xi(1)   0     -pi/2   0   
+%%% 1       xi(1)   0     pi/2   0   
 %%% 2       0      xi(2)+d2   0   
-%%% 3       0      xi(3)+d3   pi/2   0
-%%% 4       xi(4)   0     0      0
-%%% 5       xi(5)   0     -pi/2   0   
-%%% 6       0      xi(6)+d6   0   
-%%% 7       0      xi(7)+d7   pi/2   0
-%%% 8       xi(8)        0      0
+%%% 3       0      xi(3)+d3   -pi/2   0
+%%% 4       xi(4)   0     +pi/2   0   
+%%% 5       0      xi(5)+d6   0   
+%%% 6       0      xi(6)+d7   -pi/2   0
+
 
 rigid_theta(1)= xi(1);
 rigid_theta(4)= xi(4);
-rigid_theta(5)= xi(5);
-rigid_theta(8)= xi(8);
+
 
 rigid_alpha(1)= pi/2;
 rigid_alpha(3)= -pi/2;
-rigid_alpha(5)= pi/2;
-rigid_alpha(7)= -pi/2;
+rigid_alpha(4)= pi/2;
+rigid_alpha(6)= -pi/2;
 
 rigid_d(2)= xi(2)+a1;
 rigid_d(3)= xi(3)+a1;
+rigid_d(5)= xi(5)+a2;
 rigid_d(6)= xi(6)+a2;
-rigid_d(7)= xi(7)+a2;
 
 rigid_m(2)= m0/3;
 rigid_m(3)= 2*m0/3;
+rigid_m(5)= m0/3;
 rigid_m(6)= m0/3;
-rigid_m(7)= m0/3;
 
 Izzi(2) = rigid_m(2)*rigid_d(2)*rigid_d(2);
 Izzi(3) = rigid_m(3)*rigid_d(3)*rigid_d(3);
 Izzi(6) = rigid_m(6)*rigid_d(6)*rigid_d(6);
-Izzi(7) = rigid_m(7)*rigid_d(7)*rigid_d(7);
+Izzi(5) = rigid_m(5)*rigid_d(5)*rigid_d(5);
 
 gvec=[0;-g;0];
 % n=length(q);% DOF
@@ -221,7 +219,7 @@ lc2 = (l21 + l22)/2;
 b_theta1 = lc1/(theta1)*sin(theta1/2);
 b_theta2 = lc2/(theta2)*sin(theta2/2);
 
-m_q=[0.5*theta1 b_theta1 b_theta1 0.5*theta1 0.5*theta2 b_theta2 b_theta2 0.5*theta2].';% 8x1
+m_q=[theta1 b_theta1 b_theta1 theta2 b_theta2 b_theta2].';% 8x1
 
 J_f=[diff(m_q,l11),diff(m_q,l12),diff(m_q,l21),diff(m_q,l22)];%8x4
 

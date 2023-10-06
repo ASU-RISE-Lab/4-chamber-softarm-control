@@ -5,7 +5,7 @@ fprintf( 'EOM... \n' )
 par.n= 8;%DOF
 %q1=phi_i, q2=theta_i/2 - zeta_theta_i, q3 = zeta_theta_i,q4=bi
 % pi =sym('pi');
-syms m0 g a1 lc1
+syms m0 g a0 lc1
 xi = sym('xi', [par.n 1]);
 %q1=phi_i, q2=theta_i/2 - zeta_theta_i, q3 = zeta_theta_i,q4=bi
 dxi = sym('dxi', [par.n 1]);
