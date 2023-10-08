@@ -84,16 +84,17 @@ par.rigid_3_htm = Ti{end};
 E_p=0;
 Ep{1}=0;
 for link_i=2:length(rigid_r)
-    rigid_m(link_i)*gvec.'*p_i{link_i+1}
+    rigid_m(link_i)*gvec.'*p_i{link_i+1};
 % p_i{link_i+1}
     E_p=E_p+rigid_m(link_i)*gvec.'*p_i{link_i+1};
 end
 fprintf( 'J_v... \n' )
-par.Ep = E_p;
+E_p = simplify(E_p);
+par.Ep = simplify(E_p);
 
 Phi = sym(zeros(par.n,1));
 for i1 = 1:par.n
-    Phi(i1) = diff(E_p,xi(i1));
+    Phi(i1) = diff(par.Ep,xi(i1));
 %     Phi = Phi;2345
 end
 % simplify(E_p)

@@ -1,7 +1,7 @@
 function [M,G,detM] = funcMCGcalv2(x)
 theta1 = x(1); dtheta1 = x(5); lc1 = x(2); dlc1 = x(6);
 theta2 = x(3); dtheta2 = x(7); lc2 = x(4); dlc2 = x(8);
-angle_th = deg2rad(1);
+angle_th = deg2rad(2);
 a1=0.0430;a2 =0.0576;
 m0 = (100 + 34*2 + 25*5)/1000; %kg
 g = -9.8; %N/kg
@@ -59,7 +59,7 @@ else
 
     G = [3*g*m0*cos(theta1/2)*((lc1*cos(theta1/2))/(2*theta1) - (lc1*sin(theta1/2))/theta1^2) - (g*m0*(2*(sin(theta2/2)*(cos(theta1/2)^2 - sin(theta1/2)^2) + 2*cos(theta1/2)*cos(theta2/2)*sin(theta1/2))*(a2 + (lc2*sin(theta2/2))/theta2) + 2*sin(theta1/2)*(a1 + (lc1*sin(theta1/2))/theta1)))/6 - (5*g*m0*sin(theta1/2)*(a1 + (lc1*sin(theta1/2))/theta1))/6 - (g*m0*((sin(theta2/2)*(cos(theta1/2)^2 - sin(theta1/2)^2) + 2*cos(theta1/2)*cos(theta2/2)*sin(theta1/2))*(a2 + (lc2*sin(theta2/2))/theta2) + 2*sin(theta1/2)*(a1 + (lc1*sin(theta1/2))/theta1)))/6 - (g*m0*(sin(theta2/2)*(cos(theta1/2)^2 - sin(theta1/2)^2) + 2*cos(theta1/2)*cos(theta2/2)*sin(theta1/2))*(a2 + (lc2*sin(theta2/2))/theta2))/2
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  (3*g*m0*cos(theta1/2)*sin(theta1/2))/theta1
-                                                                                                                                                                                                                                                                                                                                                                                       g*m0*(cos(theta2/2)*(cos(theta1/2)^2 - sin(theta1/2)^2) - 2*cos(theta1/2)*sin(theta1/2)*sin(theta2/2))*((lc2*cos(theta2/2))/(2*theta2) - (lc2*sin(theta2/2))/theta2^2) - (g*m0*(sin(theta2/2)*(cos(theta1/2)^2 - sin(theta1/2)^2) + 2*cos(theta1/2)*cos(theta2/2)*sin(theta1/2))*(a2 + (lc2*sin(theta2/2))/theta2))/2
+                                                                                                                                                                                                                                                                                                                                                                                     g*m0*(cos(theta2/2)*(cos(theta1/2)^2 - sin(theta1/2)^2) - 2*cos(theta1/2)*sin(theta1/2)*sin(theta2/2))*((lc2*cos(theta2/2))/(2*theta2) - (lc2*sin(theta2/2))/theta2^2) - (g*m0*(sin(theta2/2)*(cos(theta1/2)^2 - sin(theta1/2)^2) + 2*cos(theta1/2)*cos(theta2/2)*sin(theta1/2))*(a2 + (lc2*sin(theta2/2))/theta2))/2
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                (g*m0*sin(theta2/2)*(cos(theta2/2)*(cos(theta1/2)^2 - sin(theta1/2)^2) - 2*cos(theta1/2)*sin(theta1/2)*sin(theta2/2)))/theta2
 ];
     condition =3;
@@ -67,4 +67,5 @@ end
 % condition    
 % det(M)
 detM = det(M);
+invM = [];
 end
