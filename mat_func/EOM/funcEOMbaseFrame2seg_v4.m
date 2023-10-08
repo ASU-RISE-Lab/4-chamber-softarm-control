@@ -268,7 +268,7 @@ dJ_fdt=subs(temp.dJ_f,[theta1_t(t),diff(theta1_t(t),t),lc1_t(t),diff(lc1_t(t),t)
 par.J_xi2q=J_f;%8x4
 temp.xi=m_q;%8x1
 temp.dxi=J_f*[dtheta1 dlc1 dtheta2 dlc2].'; %8x4 * 4x1
-temp.ddxi=dJ_fdt*[dtheta1 dlc1 dtheta2 dlc2].'+J_f*[ddtheta1 ddlc1 dtheta2 dlc2].';% 8x4 * 4x1 + 8x4 * 4x1
+temp.ddxi=dJ_fdt*[dtheta1 dlc1 dtheta2 dlc2].'+J_f*[ddtheta1 ddlc1 ddtheta2 ddlc2].';% 8x4 * 4x1 + 8x4 * 4x1
 % %%
 B_xi_q=subs(D,xi,m_q);
 par.sym_J_xi2q=subs(par.J_xyz{end},xi,m_q);
