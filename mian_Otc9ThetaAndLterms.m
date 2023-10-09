@@ -83,7 +83,7 @@ par_set = funcEOMbaseFrame2seg_v5(par_set);
 %%% END %%%
 %%
 %%% Check theta and delta lc close to zero %%%
-syms theta1 theta2 lc1 lc2 a1 a2 r0 m0
+syms theta1 theta2 lc1 lc2
 Bqtheta1limit =limit(par_set.B_q,theta1,0);
 Bqtheta2limit = limit(par_set.B_q,theta2,0);
 Bqtotallimit = limit(Bqtheta1limit,theta2,0);
@@ -98,7 +98,7 @@ Gqtheta2limit = limit(par_set.G_q,theta2,0);
 Gqtotallimit = limit(Gqtheta1limit,theta2,0);
 %%
 %%% Check lii close to zero %%
-syms l11 l12 l21 l22 a1 a2 r0 m0
+syms l11 l12 l21 l22 
 Bql11limit =limit(par_set.B_q,l11,0);
 Bql12limit =limit(par_set.B_q,l12,0);
 
@@ -116,7 +116,7 @@ det(BqFulllimit)
 %%% End %%%
 %%
 %%% Calculate State variable from sensor readings%%%
-testData = par_set.trial7;
+testData = par_set.trial6;
 outputKnown = [];
 % Get deltaL1*(t) = L1*(t,p>0)-L1*(p=0) Unit meters
 s1.l_t = (testData.enco_volts(:,1)-par_set.enco_volt_p0(1))/5;
@@ -197,22 +197,31 @@ for i =1:4
 end
 %%
 %%% gather data for training
+gall=[];gnmall=[];
 spt =1;ept =length(testData.enco_volts);
 q1all = iddata(outputKnown.arc_state_wire(spt:ept,1),outputKnown.u_pm_psi(spt:ept,1),par_set.Ts);
 q2all = iddata(outputKnown.arc_state_wire(spt:ept,2),outputKnown.u_pm_psi(spt:ept,2),par_set.Ts);
 q3all = iddata(outputKnown.arc_state_wire(spt:ept,3),outputKnown.u_pm_psi(spt:ept,3),par_set.Ts);
 q4all = iddata(outputKnown.arc_state_wire(spt:ept,4),outputKnown.u_pm_psi(spt:ept,4),par_set.Ts);
+
+gall2 = iddata(outputKnown.arc_state_wire(spt:ept,1:4),outputKnown.u_pm_tf(spt:ept,:),par_set.Ts);
+gnmall = iddata(outputKnown.arc_state_wire(spt:ept,1:8),outputKnown.u_pm_tf(spt:ept,:),par_set.Ts);
 %%
 spt =1;ept =length(testData.enco_volts);
 q1i = iddata(outputKnown.arc_state_wire(spt:ept,1),outputKnown.u_pm_psi(spt:ept,1),par_set.Ts);
 q2i = iddata(outputKnown.arc_state_wire(spt:ept,2),outputKnown.u_pm_psi(spt:ept,2),par_set.Ts);
 q3i = iddata(outputKnown.arc_state_wire(spt:ept,3),outputKnown.u_pm_psi(spt:ept,3),par_set.Ts);
 q4i = iddata(outputKnown.arc_state_wire(spt:ept,4),outputKnown.u_pm_psi(spt:ept,4),par_set.Ts);
+gi = iddata(outputKnown.arc_state_wire(spt:ept,1:4),outputKnown.u_pm_tf(spt:ept,:),par_set.Ts);
+gnmi = iddata(outputKnown.arc_state_wire(spt:ept,1:8),outputKnown.u_pm_tf(spt:ept,:),par_set.Ts);
 
 q1all = merge(q1all,q1i);
 q2all = merge(q2all,q2i);
 q3all = merge(q3all,q3i);
 q4all = merge(q4all,q4i);
+
+gall2  = merge(gall2,gi);
+gnmall  = merge(gnmall,gnmi);
 %% 
 %%% system id 1st order
 spt =1;ept =length(testData.enco_volts);
@@ -283,73 +292,150 @@ i=1
     wirefit2y = outputKnown.state_vel(spt:ept)';
     wirefit2z =(outputKnown.u_pm_psi(spt:ept,i)');
     %%
-    %%% RK4 with trained k2=2362 d2=1490 assuming theta1 not change
-other_cont = [outputKnown.arc_state_wire(spt,1),outputKnown.arc_state_wire(spt,3:8)];
+    %%% RK4 with mid p=2
 x_pred = [];
 h=1/30
-spt=200;ept=700;
-x1x1 = [outputKnown.arc_state_wire(spt,2),outputKnown.arc_state_wire(spt,5)]';
+spt =1;ept =length(testData.enco_volts);
+x4x1 = [outputKnown.arc_state_wire(spt,1:4)]';
 for i = spt:ept
-    u2x1 = outputKnown.u_pm_tf(i,1:2)';
-    x_pred(i,:) = funcRK4NoPmDynSeg1_m(x1x1,u2x1,h,other_cont,par_set);
-    x1x1 = x_pred(i,:)';
+    u4x1 = outputKnown.u_pm_psi(i,1:4)';
+    x_pred(i,:) = funcRK4NoPmDynSegall_m(x4x1,u4x1,h,par_set);
+    x4x1 = x_pred(i,:)';
 end
 %%%%%%% Plot result
 close all
+clc
+ylabelvec={'theta1';'lc1';'theta2';'lc2'};
 figure(1)
-
-    plot(testData.time_stamp(spt:ept),outputKnown.arc_state_wire(:,2))
+    for i =1:4
+    subplot(4,1,i)
+    plot(testData.time_stamp(spt:ept),outputKnown.arc_state_wire(:,i))
     hold on
-    plot(testData.time_stamp(spt:ept),x_pred)
+    plot(testData.time_stamp(spt:ept),x_pred(:,i))
     hold on
+    ylabel(ylabelvec{i})
     % ylim([0 20])
     if i ==1
         legend('exp','rk4')
         title('rk4 state sim')
     end
     hold on
-      
+    end
 %% 
-%%% Build lc1 model no pm dynamics%%%
+%%% Build full model no pm dynamics%%%
 clc
-spt=200;ept=205;
+spt =1;ept =length(testData.enco_volts);
 input_array=[];output_array=[];z=[];
-output_array = [outputKnown.arc_state_wire(spt:ept,1:2),outputKnown.arc_state_wire(spt:ept,5:6)];
-input_array = outputKnown.u_pm_tf(spt:ept,1:2);
-z = iddata(output_array,input_array,par_set.Ts,'Name','Mterm only');
-FileName      = 'func2ndNoPmDyn';       % File describing the model structure.
-Order         = [4 2 4];           % Model orders [ny nu nx].
-ParName = {'ktheta1';'klc1';...
-    'dtheta1';'dlc1';};
-ParVal    = {100; 2362;...
-    10; 1490;};  
-ParUnit ={'N/m';'N/m';...
-'Nms/rad';'Ns/m';};% Initial parameters. Np = 3*4
-InitialStates = output_array(1,1:4)';           % Initial initial states.
+% output_array = [outputKnown.arc_state_wire(spt:ept,1:2),outputKnown.arc_state_wire(spt:ept,5:6)];
+% input_array = outputKnown.u_pm_tf(spt:ept,1:2);
+z = gall2;
+FileName      = 'func1stNoPmUnitpsi';       % File describing the model structure.
+Order         = [4 4 4];           % Model orders [ny nu nx].
+ParName = {'ktheta1';'klc1';'ktheta2';'klc2';...
+    'dtheta1';'dlc1';'dtheta2';'dlc2';};
+ParVal    = {31.05;2667.2;20.7519;3373.2;...
+18.1638;944.3;29.6254;1084.5;};  
+ParUnit ={'N/rad';'N/m';'N/rad';'N/m';...
+'Nms/rad';'Ns/m';'Nms/rad';'Ns/m';};% Initial parameters. Np = 3*4
+InitialStates = zeros(4,1);           % Initial initial states.
 Ts            = 0;                 % Time-continuous system.
 
-ParMin   = {eps(0);eps(0);...
-             eps(0);eps(0);};
-ParMax   = {Inf;Inf;...
-    Inf;Inf;};   % No maximum constraint.
-ParFix = {0; 0;...
-    0; 0;};
+ParMin   = {eps(0);eps(0);eps(0);eps(0);...
+             eps(0);eps(0);eps(0);eps(0);};
+ParMax   = {Inf;Inf;Inf;Inf;...
+    Inf;Inf;Inf;Inf;};   % No maximum constraint.
+ParFix = {0; 0;0; 0;...
+    0; 0;0; 0;};
 Parameters = struct('Name', ParName, 'Unit', ParUnit,'Value',ParVal,'Minimum', ParMin, 'Maximum', ParMax, 'Fixed', ParFix);
-nlgr_lc1 = idnlgrey(FileName, Order, Parameters,InitialStates, Ts, ...
-    'Name', 'nlgr_lc1');
-present(nlgr_lc1)
+nlgr = idnlgrey(FileName, Order, Parameters,InitialStates, Ts, ...
+    'Name', 'nlgr');
+present(nlgr)
 close all
-compare(nlgr_lc1,z)
+compare(nlgr,z)
 %%
-opt = nlgreyestOptions('Display', 'off');
-nlgr1 = nlgreyest(z, nlgr, opt);
-compare(nlgr1,nlgr_lc1,z);
-present(nlgr1)
+close all
+opt = nlgreyestOptions('Display', 'on');
+nlgr1z = nlgreyest(z, nlgr, opt);
+figure
+compare(nlgr1z,nlgr,z);
+present(nlgr1z)
 %%% END %%%
+%%
+close all
+gi = iddata(outputKnown.arc_state_wire(spt:ept,1:4),outputKnown.u_pm_psi(spt:ept,:),par_set.Ts);
+figure
+nlgr1.OutputName={'theta1';'lc1';'theta2';'lc2'};
+compare(nlgr1,gi);
+present(nlgr1)
 
+%%    
+    %%% RK4 with mid p=2
+x_pred = [];
+h=1/30
+spt =1;ept =length(testData.enco_volts);
+x8x1 = [outputKnown.arc_state_wire(spt,1:8)]';
+for i = spt:ept
+    u4x1 = outputKnown.u_pm_tf(i,1:4)';
+    x_pred(i,:) = funcRK4NoPmDyn2ndSegall_m(x8x1,u4x1,h,par_set);
+    x8x1 = x_pred(i,:)';
+end
+%%%%%%% Plot result
+close all
+clc
+ylabelvec={'theta1';'lc1';'theta2';'lc2'};
+figure(1)
+    for i =1:4
+    subplot(4,1,i)
+    plot(testData.time_stamp(spt:ept),outputKnown.arc_state_wire(:,2*i-1))
+    hold on
+    plot(testData.time_stamp(spt:ept),x_pred(:,2*i-1))
+    hold on
+    ylabel(ylabelvec{i})
+    % ylim([0 20])
+    if i ==1
+        legend('exp','rk4')
+        title('rk4 state sim')
+    end
+    hold on
+    end
+%% 
+%%% Build full model no pm dynamics%%%
+clc
+spt =1;ept =length(testData.enco_volts);
+input_array=[];output_array=[];z=[];
+% output_array = [outputKnown.arc_state_wire(spt:ept,1:2),outputKnown.arc_state_wire(spt:ept,5:6)];
+% input_array = outputKnown.u_pm_tf(spt:ept,1:2);
+z = gnmall;
+FileName      = 'func2ndNoPmUnitnm';       % File describing the model structure.
+Order         = [8 4 8];           % Model orders [ny nu nx].
+ParName = {'ktheta1';'klc1';'ktheta2';'klc2';...
+    'dtheta1';'dlc1';'dtheta2';'dlc2';};
+ParVal    = {31.05;2667.2;20.7519;3373.2;...
+18.1638;944.3;29.6254;1084.5;};  
+ParUnit ={'N/rad';'N/m';'N/rad';'N/m';...
+'Nms/rad';'Ns/m';'Nms/rad';'Ns/m';};% Initial parameters. Np = 3*4
+InitialStates = zeros(8,1);           % Initial initial states.
+Ts            = 0;                 % Time-continuous system.
 
-
-
+ParMin   = {eps(0);eps(0);eps(0);eps(0);...
+             eps(0);eps(0);eps(0);eps(0);};
+ParMax   = {Inf;Inf;Inf;Inf;...
+    Inf;Inf;Inf;Inf;};   % No maximum constraint.
+ParFix = {0; 0;0; 0;...
+    0; 0;0; 0;};
+Parameters = struct('Name', ParName, 'Unit', ParUnit,'Value',ParVal,'Minimum', ParMin, 'Maximum', ParMax, 'Fixed', ParFix);
+nlgr = idnlgrey(FileName, Order, Parameters,InitialStates, Ts, ...
+    'Name', 'nlgr');
+present(nlgr)
+close all
+% compare(nlgr,z)
+%%
+close all
+opt = nlgreyestOptions('Display', 'on');
+nlgr1 = nlgreyest(z, nlgr, opt);
+figure
+compare(nlgr1,z);
+present(nlgr1)
 
 
 
