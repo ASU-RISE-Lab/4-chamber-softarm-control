@@ -51,8 +51,15 @@ end
     par.pd_MPa=[]; par.pd_MPa(:,1:6) = par.pd_Pa*1e-6;
     par.pd_psi = []; par.pd_psi(:,1:6) = [resampleData(:,1:3),resampleData(:,7:9)];
 
-    par.pm_Pa = []; par.pm_Pa(:,1:6) = 1e5 *[resampleData(:,4:6),resampleData(:,10:12)]* 0.0689476;
     par.pm_psi = []; par.pm_psi(:,1:6) = [resampleData(:,4:6),resampleData(:,10:12)];
+    for i =1:6
+        for j = 1:length(par.pm_psi)
+            if par.pm_psi(j,i)<=0
+                par.pm_psi(j,i)=0;
+            end
+        end
+    end
+    par.pm_Pa = []; par.pm_Pa(:,1:6) = 1e5 *par.pm_psi* 0.0689476;
     par.pm_MPa= []; par.pm_MPa(:,1:6) = par.pd_Pa*1e-6;
 
     par.enco_volts = [];par.enco_volts = resampleData(:,13:16);
