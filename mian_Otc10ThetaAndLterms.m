@@ -738,9 +738,17 @@ present(nlgr1t)
 j=1;
 for i  =1:length(nlgr1t.Parameters)
 para_array(j,i)=nlgr1t.Parameters(i).Value;
+x_fpm(j,1) = outputKnown.u_pm_psi(ept,1);
+x_fpm(j,2) = outputKnown.u_pm_psi(ept,2);
+x_fpm(j,3) = outputKnown.u_pm_psi(ept,3);
+x_fpm(j,4) = outputKnown.u_pm_psi(ept,4);
+x_fpm(j,5) = outputKnown.u_pm_psi(ept,1);
+x_fpm(j,6) = outputKnown.u_pm_psi(ept,2);
+x_fpm(j,7) = outputKnown.u_pm_psi(ept,3);
+x_fpm(j,8) = outputKnown.u_pm_psi(ept,4);
 end
 j=j+1;
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 testData = par_set.trial2;
 outputKnown = [];
 % Get deltaL1*(t) = L1*(t,p>0)-L1*(p=0) Unit meters
@@ -852,9 +860,17 @@ present(nlgr1t)
 
 for i  =1:length(nlgr1t.Parameters)
 para_array(j,i)=nlgr1t.Parameters(i).Value;
+x_fpm(j,1) = outputKnown.u_pm_psi(ept,1);
+x_fpm(j,2) = outputKnown.u_pm_psi(ept,2);
+x_fpm(j,3) = outputKnown.u_pm_psi(ept,3);
+x_fpm(j,4) = outputKnown.u_pm_psi(ept,4);
+x_fpm(j,5) = outputKnown.u_pm_psi(ept,1);
+x_fpm(j,6) = outputKnown.u_pm_psi(ept,2);
+x_fpm(j,7) = outputKnown.u_pm_psi(ept,3);
+x_fpm(j,8) = outputKnown.u_pm_psi(ept,4);
 end
 j=j+1;
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 testData = par_set.trial3;
 outputKnown = [];
 % Get deltaL1*(t) = L1*(t,p>0)-L1*(p=0) Unit meters
@@ -966,9 +982,17 @@ present(nlgr1t)
 
 for i  =1:length(nlgr1t.Parameters)
 para_array(j,i)=nlgr1t.Parameters(i).Value;
+x_fpm(j,1) = outputKnown.u_pm_psi(ept,1);
+x_fpm(j,2) = outputKnown.u_pm_psi(ept,2);
+x_fpm(j,3) = outputKnown.u_pm_psi(ept,3);
+x_fpm(j,4) = outputKnown.u_pm_psi(ept,4);
+x_fpm(j,5) = outputKnown.u_pm_psi(ept,1);
+x_fpm(j,6) = outputKnown.u_pm_psi(ept,2);
+x_fpm(j,7) = outputKnown.u_pm_psi(ept,3);
+x_fpm(j,8) = outputKnown.u_pm_psi(ept,4);
 end
 j=j+1;
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 testData = par_set.trial4;
 outputKnown = [];
 % Get deltaL1*(t) = L1*(t,p>0)-L1*(p=0) Unit meters
@@ -1080,9 +1104,17 @@ present(nlgr1t)
 
 for i  =1:length(nlgr1t.Parameters)
 para_array(j,i)=nlgr1t.Parameters(i).Value;
+x_fpm(j,1) = outputKnown.u_pm_psi(ept,1);
+x_fpm(j,2) = outputKnown.u_pm_psi(ept,2);
+x_fpm(j,3) = outputKnown.u_pm_psi(ept,3);
+x_fpm(j,4) = outputKnown.u_pm_psi(ept,4);
+x_fpm(j,5) = outputKnown.u_pm_psi(ept,1);
+x_fpm(j,6) = outputKnown.u_pm_psi(ept,2);
+x_fpm(j,7) = outputKnown.u_pm_psi(ept,3);
+x_fpm(j,8) = outputKnown.u_pm_psi(ept,4);
 end
 j=j+1;
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 testData = par_set.trial5;
 outputKnown = [];
 % Get deltaL1*(t) = L1*(t,p>0)-L1*(p=0) Unit meters
@@ -1194,9 +1226,17 @@ present(nlgr1t)
 
 for i  =1:length(nlgr1t.Parameters)
 para_array(j,i)=nlgr1t.Parameters(i).Value;
+x_fpm(j,1) = outputKnown.u_pm_psi(ept,1);
+x_fpm(j,2) = outputKnown.u_pm_psi(ept,2);
+x_fpm(j,3) = outputKnown.u_pm_psi(ept,3);
+x_fpm(j,4) = outputKnown.u_pm_psi(ept,4);
+x_fpm(j,5) = outputKnown.u_pm_psi(ept,1);
+x_fpm(j,6) = outputKnown.u_pm_psi(ept,2);
+x_fpm(j,7) = outputKnown.u_pm_psi(ept,3);
+x_fpm(j,8) = outputKnown.u_pm_psi(ept,4);
 end
 j=j+1;
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 testData = par_set.trial6;
 outputKnown = [];
 % Get deltaL1*(t) = L1*(t,p>0)-L1*(p=0) Unit meters
@@ -1308,6 +1348,14 @@ present(nlgr1t)
 
 for i  =1:length(nlgr1t.Parameters)
 para_array(j,i)=nlgr1t.Parameters(i).Value;
+x_fpm(j,1) = outputKnown.u_pm_psi(ept,1);
+x_fpm(j,2) = outputKnown.u_pm_psi(ept,2);
+x_fpm(j,3) = outputKnown.u_pm_psi(ept,3);
+x_fpm(j,4) = outputKnown.u_pm_psi(ept,4);
+x_fpm(j,5) = outputKnown.u_pm_psi(ept,1);
+x_fpm(j,6) = outputKnown.u_pm_psi(ept,2);
+x_fpm(j,7) = outputKnown.u_pm_psi(ept,3);
+x_fpm(j,8) = outputKnown.u_pm_psi(ept,4);
 end
 j=j+1;
 %%
@@ -1318,19 +1366,145 @@ ParName = {'ktheta1';'klc1';'ktheta2';'klc2';...
     'dtheta1';'dlc1';'dtheta2';'dlc2';};
 for i =1:8
     subplot(8,1,i)
-    for j =1:6
-    scatter(j,para_array(j,i))
+    scatter(abs(x_fpm(:,i)),para_array(:,i))
     hold on
-    end
     title(ParName{i})
 end
 mean(para_array,2)
 
-pa1 = para_array(:,1)
-pa2 = para_array(:,2)
-pa3 = para_array(:,3)
-pa4 = para_array(:,4)
-pa5 = para_array(:,5)
-pa6 = para_array(:,6)
-pa7 = para_array(:,7)
-pa8 = para_array(:,8)
+pa1 = para_array(:,1);
+pa2 = para_array(:,2);
+pa3 = para_array(:,3);
+pa4 = para_array(:,4);
+pa5 = para_array(:,5);
+pa6 = para_array(:,6);
+pa7 = para_array(:,7);
+pa8 = para_array(:,8);
+
+xfpm1 = abs(x_fpm(:,1));
+xfpm2 = abs(x_fpm(:,2));
+xfpm3 = abs(x_fpm(:,3));
+xfpm4 = abs(x_fpm(:,4));
+xfpm5 = abs(x_fpm(:,5));
+xfpm6 = abs(x_fpm(:,6));
+xfpm7 = abs(x_fpm(:,7));
+xfpm8 = abs(x_fpm(:,8));
+close all
+figure(1)
+for i =1:4
+    subplot(4,1,i)
+    yyaxis left
+    plot(outputKnown.arc_state_wire(:,i))
+    hold on
+    yyaxis right
+    plot(outputKnown.u_pm_tf(:,i))
+end
+%%
+%%% RK4 for pm dependent kd
+testData = par_set.trial6;
+outputKnown = [];
+% Get deltaL1*(t) = L1*(t,p>0)-L1*(p=0) Unit meters
+s1.l_t = (testData.enco_volts(:,1)-par_set.enco_volt_p0(1))/5;
+s1.r_t = (testData.enco_volts(:,2)-par_set.enco_volt_p0(2))/5;
+% Get deltaL2*(t) = L2*(t,p>0)-L2*(p=0)-deltaL1* Unit meters
+s2.l_t = (testData.enco_volts(:,4)-par_set.enco_volt_p0(4))/5-s1.l_t;
+s2.r_t = (testData.enco_volts(:,3)-par_set.enco_volt_p0(3))/5-s1.r_t;
+outputKnown.raw_wire_readings = [s1.l_t,s1.r_t,s2.l_t,s2.r_t];
+% Get wire velocity readings
+    for i = 1:length(s1.l_t)
+        if i ==1
+            outputKnown.state_vel(i,1) = 0; 
+            outputKnown.state_vel(i,2) = 0; 
+            outputKnown.state_vel(i,3) = 0; 
+            outputKnown.state_vel(i,4) = 0; 
+
+
+        else
+            outputKnown.state_vel(i,1) = (s1.l_t(i,1)-s1.l_t(i-1))/par_set.Ts; 
+            outputKnown.state_vel(i,2) = (s1.r_t(i,1)-s1.r_t(i-1))/par_set.Ts;
+            outputKnown.state_vel(i,3) = (s2.l_t(i,1)-s2.l_t(i-1))/par_set.Ts;
+            outputKnown.state_vel(i,4) = (s2.r_t(i,1)-s2.r_t(i-1))/par_set.Ts; 
+        end
+    end
+    for i = 1:length(s1.l_t)
+        if i ==1
+            outputKnown.state_acc(i,1) = 0; 
+            outputKnown.state_acc(i,2) = 0; 
+            outputKnown.state_acc(i,3) = 0; 
+            outputKnown.state_acc(i,4) = 0; 
+
+
+        else
+            outputKnown.state_acc(i,1) = (outputKnown.state_vel(i,1)-outputKnown.state_vel(i-1))/par_set.Ts; 
+            outputKnown.state_acc(i,2) = (outputKnown.state_vel(i,1)-outputKnown.state_vel(i-1))/par_set.Ts;
+            outputKnown.state_acc(i,3) = (outputKnown.state_vel(i,1)-outputKnown.state_vel(i-1))/par_set.Ts;
+            outputKnown.state_acc(i,4) = (outputKnown.state_vel(i,1)-outputKnown.state_vel(i-1))/par_set.Ts; 
+        end
+    end
+% Get theta, deltaLc for each segment
+s1.theta_wire_rad = (-s1.r_t + s1.l_t)/par_set.r0;
+s1.l_wire_m = (s1.r_t + s1.l_t)/2;
+s2.theta_wire_rad = (-s2.r_t + s2.l_t)/par_set.r0;
+s2.l_wire_m = (s2.r_t + s2.l_t)/2;
+s1.dtheta_rad = (outputKnown.state_vel(:,1)-outputKnown.state_vel(:,2))/par_set.r0;
+s1.dl_m = (outputKnown.state_vel(:,1)+outputKnown.state_vel(:,2))/2;
+s2.dtheta_rad = (outputKnown.state_vel(:,3)-outputKnown.state_vel(:,4))/par_set.r0;
+s2.dl_m = (outputKnown.state_vel(:,3)+outputKnown.state_vel(:,4))/2;
+outputKnown.arc_state_wire = [s1.theta_wire_rad,s1.l_wire_m,s2.theta_wire_rad,s2.l_wire_m,s1.dtheta_rad,s1.dl_m,s2.dtheta_rad,s2.dl_m];
+outputKnown.arc_acc_wire = [(outputKnown.state_acc(:,1)-outputKnown.state_acc(:,2))/par_set.r0,...
+    (outputKnown.state_vel(:,1)+outputKnown.state_vel(:,2))/2,...
+    (outputKnown.state_vel(:,3)-outputKnown.state_vel(:,4))/par_set.r0,...
+    (outputKnown.state_vel(:,3)+outputKnown.state_vel(:,4))/2];
+% Get torque force using pm measurement
+outputKnown.u_pm_psi(:,1) = testData.pm_psi(:,2) - testData.pm_psi(:,1);
+outputKnown.u_pm_psi(:,2) = testData.pm_psi(:,2) + testData.pm_psi(:,1);
+outputKnown.u_pm_psi(:,3) = (testData.pm_psi(:,5) - testData.pm_psi(:,4));
+outputKnown.u_pm_psi(:,4) = testData.pm_psi(:,5) + testData.pm_psi(:,4);
+outputKnown.u_pm_pa = outputKnown.u_pm_psi * 6894.76; % from psi to pa
+% Convert unit to Nm; N; Nm;N
+outputKnown.u_pm_tf(:,1) = outputKnown.u_pm_pa(:,1) * par_set.fz_a0* par_set.tau_l0 ;
+outputKnown.u_pm_tf(:,2) = outputKnown.u_pm_pa(:,2) * par_set.fz_a0;
+outputKnown.u_pm_tf(:,3) = outputKnown.u_pm_pa(:,3) * par_set.fz_a0* par_set.tau_l0;
+outputKnown.u_pm_tf(:,4) = outputKnown.u_pm_pa(:,4) * par_set.fz_a0;
+a1=mean((testData.rigid_1_pose(:,3)-testData.rigid_2_pose(:,3)-par_set.R1_stand_off)/2);
+a2=mean((testData.rigid_2_pose(:,3)-testData.rigid_3_pose(:,3))/2);
+x_pred = [];
+h=1/30
+spt =1;ept =length(testData.enco_volts);
+x4x1 = [outputKnown.arc_state_wire(spt,1:4)]';
+for i = spt:ept
+    u4x1 = outputKnown.u_pm_psi(i,1:4)';
+    x_pred(i,:) = funcRK4NoPmDynSegallpmpara_m(x4x1,u4x1,h,par_set);
+    x4x1 = x_pred(i,:)';
+end
+%%%%%%% Plot result
+close all
+clc
+ylabelvec={'theta1';'lc1';'theta2';'lc2';'tau1';'f1';'tau2';'f2'};
+figure(1)
+    for i =1:4
+    subplot(2,4,i)
+    plot(testData.time_stamp(spt:ept),outputKnown.arc_state_wire(spt:ept,i))
+    hold on
+    plot(testData.time_stamp(spt:ept),x_pred(spt:ept,i))
+    hold on
+    ylabel(ylabelvec{i})
+    % ylim([0 20])
+    if i ==1
+        legend('exp','rk4')
+        title('rk4 state sim')
+    end
+    hold on
+    end
+    for i =5:8
+    subplot(2,4,i)
+    plot(testData.time_stamp(spt:ept),outputKnown.u_pm_psi(spt:ept,i-4))
+    hold on
+    ylabel(ylabelvec{i})
+    % ylim([ 20])
+    if i ==5
+        legend('Input(psi)')
+%         title('rk4 state sim')
+    end
+    hold on
+    end
