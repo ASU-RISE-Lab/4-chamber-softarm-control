@@ -1381,14 +1381,26 @@ pa6 = para_array(:,6);
 pa7 = para_array(:,7);
 pa8 = para_array(:,8);
 
-xfpm1 = abs(x_fpm(:,1));
-xfpm2 = abs(x_fpm(:,2));
-xfpm3 = abs(x_fpm(:,3));
-xfpm4 = abs(x_fpm(:,4));
-xfpm5 = abs(x_fpm(:,5));
-xfpm6 = abs(x_fpm(:,6));
-xfpm7 = abs(x_fpm(:,7));
-xfpm8 = abs(x_fpm(:,8));
+% xfpm1 = abs(x_fpm(:,1));
+% xfpm2 = abs(x_fpm(:,2));
+% xfpm3 = abs(x_fpm(:,3));
+% xfpm4 = abs(x_fpm(:,4));
+% xfpm5 = abs(x_fpm(:,5));
+% xfpm6 = abs(x_fpm(:,6));
+% xfpm7 = abs(x_fpm(:,7));
+% xfpm8 = abs(x_fpm(:,8));
+
+xfpm1 = (x_fpm(:,1));
+xfpm2 = (x_fpm(:,2));
+xfpm3 = (x_fpm(:,3));
+xfpm4 = (x_fpm(:,4));
+xfpm5 = (x_fpm(:,5));
+xfpm6 = (x_fpm(:,6));
+xfpm7 = (x_fpm(:,7));
+xfpm8 = (x_fpm(:,8));
+
+modx= [xfpm1;-xfpm1];
+mody = [pa1;pa1];
 close all
 figure(1)
 for i =1:4
