@@ -124,9 +124,12 @@ a2=mean((testData.rigid_2_pose(:,3)-testData.rigid_3_pose(:,3))/2);
 fprintf('State Var estimation done \n')
 %%% End %%%
 
-xold = zeros(8,1); uold = zeros(4,1); Pk_old = 1000*eye(8);Pk_old2 = Pk_old;Pk_old3 =Pk_old;
+xold = zeros(8,1); uold = zeros(4,1); 
+Pk_old = 1*eye(8);Pk_old2 = Pk_old;Pk_old3 =Pk_old;
+Pk_old4 = 1*eye(12);
 q_arc =10;r_arc =200;
 Q = diag([q_arc*ones(4,1);ones(4,1)]) ;R = diag([r_arc*ones(4,1);10*ones(4,1)]); H = eye(8);
+Q4 = diag([q_arc*ones(4,1);ones(4,1);q_arc*ones(4,1);]) ;R4 = diag([r_arc*ones(4,1);10*ones(4,1);]); H4 = [eye(8),zeros(8,4)];
 dT = 1/1000;
 e_max = 1.0; e_min = 0.2;
 x_min=[-pi/4,0,-pi/4,0,zeros(1,4)];
@@ -136,10 +139,11 @@ xk_old=[];x_pred=[];x_pred2=[];x_pred3=[];
 xk_old = [outputKnown.arc_state_wire(spt-1,1:4),testData.pm_psi(spt-1,1:2),testData.pm_psi(spt-1,4:5)];
 xk_old2 =xk_old;
 xk_old3 = xk_old;
-
+xk_old4 = [xk_old3,zeros(1,4)];
 x_pred = xk_old;
 x_pred2 = xk_old2;
 x_pred3 = xk_old3;
+x_pred4 = xk_old4;
 lamda = 1.1;
 for i = spt:ept
     uk = [testData.pd_psi(i,1:2),testData.pd_psi(i,4:5)]';
@@ -158,15 +162,19 @@ xk_old =xk_est;
 P_old3 = Pk3;
 x_pred3(i,:)  = xk_est3;
 xk_old3 =xk_est3;
+
+[xk_est4,Pk4] =funcEKF_disturbance(xk_old4,uk,zk,Pk_old4,Q4,R4,H4,dT);
+P_old4 = Pk4;
+x_pred4(i,:)  = xk_est4;
+xk_old4 =xk_est4;
 end
 
 close all
 clc
-ylabelvec={'theta1';'lc1';'theta2';'lc2';'pm11';'pm12';'pm21';'pm22'};
+ylabelvec={'theta1';'lc1';'theta2';'lc2';'pm11';'pm12';'pm21';'pm22';'d1';'d2';'d3';'d4'};
 exp_arr = [outputKnown.arc_state_wire(:,1:4),testData.pm_psi(:,1:2),testData.pm_psi(:,4:5)];
 figure(1)
-
-        hold on
+hold on
     for i =1:8
     subplot(2,4,i)
     plot(testData.time_stamp(spt:ept),exp_arr(spt:ept,i),'r',LineWidth=2)
@@ -175,7 +183,7 @@ figure(1)
     hold on
 %     plot(testData.time_stamp(spt:ept),x_pred2(spt:ept,i),'k')
 %     hold on
-        plot(testData.time_stamp(spt:ept),x_pred3(spt:ept,i),'g')
+        plot(testData.time_stamp(spt:ept),x_pred4(spt:ept,i),'g')
     hold on
     ylabel(ylabelvec{i})
     % ylim([0 20])
@@ -184,6 +192,30 @@ figure(1)
             legend('exp','ekf','ekf_robust')
        sgtitle("ekf state est"+ " P="+string(Pk_old(1,1))+" Q="+string(Q(1,1))+" R="+string(R(1,1))+" T="+string(dT))
 
+
+ figure(3)
+hold on
+    for i =1:12
+    subplot(3,4,i)
+    if i <=8
+    plot(testData.time_stamp(spt:ept),exp_arr(spt:ept,i),'r',LineWidth=2)
+    hold on
+    plot(testData.time_stamp(spt:ept),x_pred(spt:ept,i),'b')
+    hold on
+%     plot(testData.time_stamp(spt:ept),x_pred2(spt:ept,i),'k')
+%     hold on
+        plot(testData.time_stamp(spt:ept),x_pred4(spt:ept,i),'g')
+    hold on
+    else
+    plot(testData.time_stamp(spt:ept),x_pred4(spt:ept,i),'g')
+    hold on    
+    ylabel(ylabelvec{i})
+    % ylim([0 20])
+    hold on
+    end
+    end
+            legend('exp','ekf','ekf_d')
+       sgtitle("ekf state est"+ " P="+string(Pk_old(1,1))+" Q="+string(Q(1,1))+" R="+string(R(1,1))+" T="+string(dT)) 
 % figure(2)
 % 
 %         hold on
