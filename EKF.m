@@ -22,7 +22,7 @@ clc;close all;clear all;
 %%%% Initialize the system %%%
 par_set=[];
 fprintf( 'Loading... \n' );
-load('trainData3.mat');
+load('trainData4.mat');
 fprintf( 'Data loaded \n' );
 
 
@@ -121,7 +121,21 @@ outputKnown.u_pm_tf(:,3) = outputKnown.u_pm_pa(:,3) * par_set.fz_a0* par_set.tau
 outputKnown.u_pm_tf(:,4) = outputKnown.u_pm_pa(:,4) * par_set.fz_a0;
 a1=mean((testData.rigid_1_pose(:,3)-testData.rigid_2_pose(:,3)-par_set.R1_stand_off)/2);
 a2=mean((testData.rigid_2_pose(:,3)-testData.rigid_3_pose(:,3))/2);
-fprintf('State Var estimation done \n')
+
+quat1(:,1) = testData.rigid_1_rot(:,4);
+quat1(:,2:4) = testData.rigid_1_rot(:,1:3);
+RPY1 = quat2eul(quat1,'XYZ')';
+
+quat2(:,1) = testData.rigid_2_rot(:,4);
+quat2(:,2:4) = testData.rigid_2_rot(:,1:3);
+RPY2 = quat2eul(quat2,'XYZ')';
+
+quat3(:,1) = testData.rigid_3_rot(:,4);
+quat3(:,2:4) = testData.rigid_3_rot(:,1:3);
+RPY3 = quat2eul(quat3,'XYZ')';
+mocap_theta1 = [RPY2(2,:)-RPY1(2,:)]';
+mocap_theta2 = [RPY3(2,:)-RPY2(2,:)]';
+fprintf('State Var e:stimation done \n')
 %%% End %%%
 
 xold = zeros(8,1); uold = zeros(4,1); 
@@ -130,7 +144,7 @@ Pk_old4 = 1*eye(12);
 q_arc =10;r_arc =200;
 Q = diag([q_arc*ones(4,1);ones(4,1)]) ;R = diag([r_arc*ones(4,1);10*ones(4,1)]); H = eye(8);
 Q4 = diag([q_arc*ones(4,1);ones(4,1);q_arc*ones(4,1);]) ;R4 = diag([r_arc*ones(4,1);10*ones(4,1);]); H4 = [eye(8),zeros(8,4)];
-dT = 1/1000;
+dT = 1/1e06;
 e_max = 1.0; e_min = 0.2;
 x_min=[-pi/4,0,-pi/4,0,zeros(1,4)];
 x_max =[pi/4,0.025,pi/4,0.025,20,20,20,20];
@@ -153,20 +167,25 @@ P_old = Pk;
 x_pred(i,:)  = xk_est;
 xk_old =xk_est;
 
+[xk_est2,Pk2] =funcUKF_baseline(xk_old2,uk,zk,Pk_old2,Q,R,dT,lamda);
+P_old2 = Pk2;
+x_pred2(i,:)  = xk_est2;
+xk_old2 =xk_est2;
+
 % [xk_est2,Pk2] =funcEKF_improve(xk_old2,uk,zk,Pk_old2,Q,R,H,dT,e_max,e_min,x_min,x_max);
 % P_old2 = Pk2;
 % x_pred2(i,:)  = xk_est2;
 % xk_old2 =xk_est2;
 
-[xk_est3,Pk3] =funcEKF_robust(xk_old3,uk,zk,Pk_old3,Q,R,H,dT,lamda);
-P_old3 = Pk3;
-x_pred3(i,:)  = xk_est3;
-xk_old3 =xk_est3;
+% [xk_est3,Pk3] =funcEKF_robust(xk_old3,uk,zk,Pk_old3,Q,R,H,dT,lamda);
+% P_old3 = Pk3;
+% x_pred3(i,:)  = xk_est3;
+% xk_old3 =xk_est3;
 
-[xk_est4,Pk4] =funcEKF_disturbance(xk_old4,uk,zk,Pk_old4,Q4,R4,H4,dT);
-P_old4 = Pk4;
-x_pred4(i,:)  = xk_est4;
-xk_old4 =xk_est4;
+% [xk_est4,Pk4] =funcEKF_disturbance(xk_old4,uk,zk,Pk_old4,Q4,R4,H4,dT);
+% P_old4 = Pk4;
+% x_pred4(i,:)  = xk_est4;
+% xk_old4 =xk_est4;
 end
 
 close all
@@ -181,9 +200,16 @@ hold on
     hold on
     plot(testData.time_stamp(spt:ept),x_pred(spt:ept,i),'b')
     hold on
+%     if i ==1
+%     plot(testData.time_stamp(spt:ept),mocap_theta1(spt:ept,1),'k')
+%     hold on
+%     elseif i==3
+%         plot(testData.time_stamp(spt:ept),mocap_theta2(spt:ept,1),'k')
+%     hold on
+%     end
 %     plot(testData.time_stamp(spt:ept),x_pred2(spt:ept,i),'k')
 %     hold on
-        plot(testData.time_stamp(spt:ept),x_pred4(spt:ept,i),'g')
+%         plot(testData.time_stamp(spt:ept),x_pred4(spt:ept,i),'g')
     hold on
     ylabel(ylabelvec{i})
     % ylim([0 20])
@@ -193,44 +219,44 @@ hold on
        sgtitle("ekf state est"+ " P="+string(Pk_old(1,1))+" Q="+string(Q(1,1))+" R="+string(R(1,1))+" T="+string(dT))
 
 
- figure(3)
-hold on
-    for i =1:12
-    subplot(3,4,i)
-    if i <=8
-    plot(testData.time_stamp(spt:ept),exp_arr(spt:ept,i),'r',LineWidth=2)
-    hold on
-    plot(testData.time_stamp(spt:ept),x_pred(spt:ept,i),'b')
-    hold on
-%     plot(testData.time_stamp(spt:ept),x_pred2(spt:ept,i),'k')
+%  figure(3)
+% hold on
+%     for i =1:12
+%     subplot(3,4,i)
+%     if i <=8
+%     plot(testData.time_stamp(spt:ept),exp_arr(spt:ept,i),'r',LineWidth=2)
 %     hold on
-        plot(testData.time_stamp(spt:ept),x_pred4(spt:ept,i),'g')
-    hold on
-    else
-    plot(testData.time_stamp(spt:ept),x_pred4(spt:ept,i),'g')
-    hold on    
-    ylabel(ylabelvec{i})
-    % ylim([0 20])
-    hold on
-    end
-    end
-            legend('exp','ekf','ekf_d')
-       sgtitle("ekf state est"+ " P="+string(Pk_old(1,1))+" Q="+string(Q(1,1))+" R="+string(R(1,1))+" T="+string(dT)) 
-% figure(2)
-% 
-%         hold on
-%     for i =1:8
-%     subplot(2,4,i)
-% 
-% 
-%     plot(testData.time_stamp(spt:ept),(exp_arr(spt:ept,i)-x_pred2(spt:ept,i))/(x_max(i)-x_min(i)),'k')
+%     plot(testData.time_stamp(spt:ept),x_pred(spt:ept,i),'b')
 %     hold on
-%     plot(testData.time_stamp(spt:ept),(exp_arr(spt:ept,i)-x_pred(spt:ept,i))/(x_max(i)-x_min(i)),'r:',LineWidth=2)
+% %     plot(testData.time_stamp(spt:ept),x_pred2(spt:ept,i),'k')
+% %     hold on
+%         plot(testData.time_stamp(spt:ept),x_pred4(spt:ept,i),'g')
+%     hold on
+%     else
+%     plot(testData.time_stamp(spt:ept),x_pred4(spt:ept,i),'g')
+%     hold on    
 %     ylabel(ylabelvec{i})
 %     % ylim([0 20])
 %     hold on
 %     end
-%             legend('ekf_imp','ekf')
-%        sgtitle("ekf error"+ " P="+string(Pk_old(1,1))+" Q="+string(Q(1,1))+" R="+string(R(1,1))+" T="+string(dT))
-
+%     end
+%             legend('exp','ekf','ekf_d')
+%        sgtitle("ekf state est"+ " P="+string(Pk_old(1,1))+" Q="+string(Q(1,1))+" R="+string(R(1,1))+" T="+string(dT)) 
+% % figure(2)
+% % 
+% %         hold on
+% %     for i =1:8
+% %     subplot(2,4,i)
+% % 
+% % 
+% %     plot(testData.time_stamp(spt:ept),(exp_arr(spt:ept,i)-x_pred2(spt:ept,i))/(x_max(i)-x_min(i)),'k')
+% %     hold on
+% %     plot(testData.time_stamp(spt:ept),(exp_arr(spt:ept,i)-x_pred(spt:ept,i))/(x_max(i)-x_min(i)),'r:',LineWidth=2)
+% %     ylabel(ylabelvec{i})
+% %     % ylim([0 20])
+% %     hold on
+% %     end
+% %             legend('ekf_imp','ekf')
+% %        sgtitle("ekf error"+ " P="+string(Pk_old(1,1))+" Q="+string(Q(1,1))+" R="+string(R(1,1))+" T="+string(dT))
+% 
 
