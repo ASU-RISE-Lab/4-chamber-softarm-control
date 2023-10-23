@@ -33,7 +33,7 @@ class recordFromLocalHost(object):
 
 def main():
     try:
-        file_name='data_collect_6.txt'
+        file_name='data_collect_2.txt'
         lines=""
         print (file_name)
         input("Press Enter to Start.")

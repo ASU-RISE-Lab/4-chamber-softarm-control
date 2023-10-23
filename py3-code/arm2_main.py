@@ -224,12 +224,12 @@ class pc_client(object):
                     # self.pres_single_step_response_v2(pd_array,td,time())
 
 
-                    seg1_r= 10.
-                    seg1_l = 10.
+                    seg1_r= 15.
+                    seg1_l = 0.
                     seg1_m = 2.0
 
-                    seg2_r = 10.0
-                    seg2_l = 10.0
+                    seg2_r = 0.0
+                    seg2_l = 15.0
                     seg2_m = 0.0
 
                     td = 10
