@@ -23,6 +23,7 @@ clc;close all;clear all;
 par_set=[];
 fprintf( 'Loading... \n' );
 load('trainData4.mat','par_set');
+
 fprintf( 'Data loaded \n' );
 
 
@@ -380,10 +381,10 @@ xold = [outputKnown.arc_state_wire(1,1:4)]';
 
 h = 1/30
 Dmax1 = 5e2;Dmax2 =4e4;
-dkmax1 = 40; dcmax1 = 18;dxmax1 = 1;
-dkmax2 = 852; dcmax2 = 1709;dxmax2 = 1; 
-dkmax3 = 40; dcmax3 = 18;dxmax3 = 1;
-dkmax4 = 852; dcmax4 = 1709;dxmax4 = 1; 
+dkmax1 = 40*2; dcmax1 = 18*2;dxmax1 = 1;
+dkmax2 = 852*2; dcmax2 = 1709*2;dxmax2 = 1; 
+dkmax3 = 40*2; dcmax3 = 18*2;dxmax3 = 1;
+dkmax4 = 852*2; dcmax4 = 1709*2;dxmax4 = 1; 
 xest=[]
 xd = [outputKnown.arc_state_wire(:,1:4)]';
 dtdxd = [outputKnown.arc_state_wire(:,5:8)]';
@@ -634,29 +635,29 @@ destnew4=0;
 intvar4 =0;intvar4old = 0;
 pxold4=0;
 
-% l1 = -0.1;eta01 = 3e4;    eta1 = 1e1;
-% destold1 =0;
-% destnew1=0;
-% intvar1new =0;dtdintvar1 = 0;
-% pxold1=0;
-% 
-% l2 = -0.1;eta02 = 1e8;    eta2 = 1e2;
-% destold2 =0;
-% destnew2=0;
-% intvar2new =0;dtdintvar2 = 0;
-% pxold2=0;
-% 
-% l3 = -0.1;eta03 = 3e4;    eta3 = 1e1;
-% destold3 =0;
-% destnew3=0;
-% intvar3new =0;dtdintvar3 = 0;
-% pxold3=0;
-% 
-% l4 = -0.1;eta04 = 1e8;    eta4 = 1e2;
-% destold4 =0;
-% destnew4=0;
-% intvar4new =0;dtdintvar4 = 0;
-% pxold4=0;
+l1 = -0.1;eta01 = 3e4;    eta1 = 1e1;
+destold1 =0;
+destnew1=0;
+intvar1new =0;dtdintvar1 = 0;
+pxold1=0;
+
+l2 = -0.1;eta02 = 1e8;    eta2 = 1e2;
+destold2 =0;
+destnew2=0;
+intvar2new =0;dtdintvar2 = 0;
+pxold2=0;
+
+l3 = -0.1;eta03 = 3e4;    eta3 = 1e1;
+destold3 =0;
+destnew3=0;
+intvar3new =0;dtdintvar3 = 0;
+pxold3=0;
+
+l4 = -0.1;eta04 = 1e8;    eta4 = 1e2;
+destold4 =0;
+destnew4=0;
+intvar4new =0;dtdintvar4 = 0;
+pxold4=0;
 %%%%%%%%%%%
 for i = 1:length(xd)
 kk1 = -1.767*zold1^2 + 17.55*abs(zold1)+33.471;
@@ -694,8 +695,8 @@ d4= 4.34*zold4^2 - 155.21*zold4+2146;
 
 %     Dmax1 = 1/d1*(dkmax1*abs(xold(1))+dcmax1*dxmax1);
 %     Dmax2 = 1/d2*(dkmax2*abs(xold(2))+dcmax2*dxmax2);
-    Dmax3 = 1/d3*(dkmax3*abs(xold(1))+dcmax3*dxmax3);
-Dmax4 = 1/d4*(dkmax4*abs(xold(2))+dcmax4*dxmax4);
+%     Dmax3 = 1/d3*(dkmax3*abs(xold(1))+dcmax3*dxmax3);
+% Dmax4 = 1/d4*(dkmax4*abs(xold(2))+dcmax4*dxmax4);
 
     u1 = 1/d1*(dtdxd(1,i) - kk1*xold(1) +eta01*e01+eta1*sign(e01)-destold1);
     u2 = 1/d2*(dtdxd(2,i) - kk2*xold(2) +eta02*e02+eta2*sign(e02)-destold2);
@@ -776,6 +777,10 @@ Dmax4 = 1/d4*(dkmax4*abs(xold(2))+dcmax4*dxmax4);
     destold2 = destnew2;
     destold3 = destnew3;
     destold4 = destnew4;
+    dest1(i) = destnew1;
+    dest2(i) = destnew2;
+    dest3(i) = destnew3;
+    dest4(i) = destnew4;
 end
 close all
 figure(1)
@@ -838,7 +843,30 @@ plot(pm4)
 title(['$p_4$'],'Interpreter','latex')
 legend('pd','pm')
 ylabel('psi')
-sgtitle("NDOBASMC LPV at 40Hz")
+sgtitle("NDOBSMC LPV at 40Hz")
+
+figure(2)
+subplot(4,1,1)
+plot(dest1)
+hold on
+title('$\theta_1$','Interpreter','latex')
+legend('d1',Location='south')
+subplot(4,1,2)
+plot(dest2)
+hold on
+title('$L_1$','Interpreter','latex')
+legend('d2',Location='south')
+subplot(4,1,3)
+plot(dest3)
+hold on
+title('$\theta_2$','Interpreter','latex')
+legend('d3',Location='south')
+subplot(4,1,4)
+plot(dest4)
+hold on
+title('$L_2$','Interpreter','latex')
+legend('d4',Location='south')
+sgtitle("NDOBSMC LPV at 40Hz")
 
 %% theta1, lc1, theta2, lc2 INDOBASMC
 alpha = -0.9665; beta = 0.9698;
@@ -886,26 +914,29 @@ pdmax =20;pdmin=0;
 % intvar4 =0;dtdintvar4 = 0;
 % pxold4=0;
 
-l1x = 0.1;eta01 = 3e3; etalx1 =1e2;
+l1x = 0.1;eta01 = 7e3; etalx1 =1e2;
 dtdestmax1 = 0.01;
 destold1 =0;
 destnew1=0;
 intvar1new =0;dtdintvar1 = 0;
 pxold1=0;
 
-l2x = 0.1;eta02 = 1e8;    eta2 = 1e2;
+l2x = 0.1;eta02 = 1e8;   etalx2 =1e2;
+dtdestmax2 = 0.01;
 destold2 =0;
 destnew2=0;
 intvar2new =0;dtdintvar2 = 0;
 pxold2=0;
 
-l3x = 0.1;eta03 = 3e4;    eta3 = 1e1;
+l3x = 0.1;eta03 = 3e3;   etalx3 =1e1;
+dtdestmax3 = 0.01;
 destold3 =0;
 destnew3=0;
 intvar3new =0;dtdintvar3 = 0;
 pxold3=0;
 
-l4x = 0.1;eta04 = 1e8;    eta4 = 1e2;
+l4x = 0.1;eta04 = 1e8;    etalx4 =1e2;
+dtdestmax4 = 0.01;
 destold4 =0;
 destnew4=0;
 intvar4new =0;dtdintvar4 = 0;
@@ -933,19 +964,26 @@ d4= 4.34*zold4^2 - 155.21*zold4+2146;
     destnew1 = intvar1new + pxold1;
 
 
-    pxold2 = l2*xold(2);
-    intvar2new = funcRK4fintvar_onestate(h,l2,e02,eta2);
+    pxold2 = l2x*xold(2) + etalx2*xold(2)^2*sign(xold(2));
+    l2 = l2x + 2*etalx1*abs(xold(2));
+    intvar2new = funcRK4fintvar_onestate_improve(h,l2,pxold2,kk2,d2,xold(2),zold2,intvar2old);
     destnew2 = intvar2new + pxold2;
 
-    pxold3 = l3*xold(3);
-    intvar3new = funcRK4fintvar_onestate(h,l3,e03,eta3);
+    pxold3 = l3x*xold(3) + etalx3*xold(3)^2*sign(xold(3));
+    l3 = l3x + 2*etalx3*abs(xold(3));
+    intvar3new = funcRK4fintvar_onestate_improve(h,l3,pxold3,kk3,d3,xold(3),zold3,intvar3old);
     destnew3 = intvar3new + pxold3;
 
 
-    pxold4 = l4*xold(4);
-    intvar4new = funcRK4fintvar_onestate(h,l4,e04,eta4);
+    pxold4 = l4x*xold(4) + etalx4*xold(4)^2*sign(xold(4));
+    l4 = l4x + 2*etalx4*abs(xold(4));
+    intvar4new = funcRK4fintvar_onestate_improve(h,l4,pxold4,kk4,d4,xold(4),zold4,intvar4old);
     destnew4 = intvar4new + pxold4;
+
     eta1 = abs(dtdxd(1,i)) + dtdestmax1/l1; 
+    eta2 = abs(dtdxd(2,i)) + dtdestmax2/l2; 
+    eta3 = abs(dtdxd(3,i)) + dtdestmax3/l3; 
+    eta4 = abs(dtdxd(4,i)) + dtdestmax4/l4; 
 
 
     u1 = 1/d1*(dtdxd(1,i) - kk1*xold(1) +eta01*e01+eta1*sign(e01)-destold1);
@@ -1024,6 +1062,10 @@ d4= 4.34*zold4^2 - 155.21*zold4+2146;
     destold2 = destnew2;
     destold3 = destnew3;
     destold4 = destnew4;
+    dest1(i) = destnew1;
+    dest2(i) = destnew2;
+    dest3(i) = destnew3;
+    dest4(i) = destnew4;
 end
 close all
 figure(1)
@@ -1086,6 +1128,29 @@ plot(pm4)
 title(['$p_4$'],'Interpreter','latex')
 legend('pd','pm')
 ylabel('psi')
+sgtitle("INDOBASMC LPV at 40Hz")
+
+figure(2)
+subplot(4,1,1)
+plot(dest1)
+hold on
+title('$\theta_1$','Interpreter','latex')
+legend('d1',Location='south')
+subplot(4,1,2)
+plot(dest2)
+hold on
+title('$L_1$','Interpreter','latex')
+legend('d2',Location='south')
+subplot(4,1,3)
+plot(dest3)
+hold on
+title('$\theta_2$','Interpreter','latex')
+legend('d3',Location='south')
+subplot(4,1,4)
+plot(dest4)
+hold on
+title('$L_2$','Interpreter','latex')
+legend('d4',Location='south')
 sgtitle("INDOBASMC LPV at 40Hz")
 %% bsmc for 1 state
 h = 1/30;alpha = -0.9665; beta = 0.9698;
