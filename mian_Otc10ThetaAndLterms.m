@@ -1447,10 +1447,10 @@ outputKnown.raw_wire_readings = [s1.l_t,s1.r_t,s2.l_t,s2.r_t];
 
 
         else
-            outputKnown.state_acc(i,1) = (outputKnown.state_vel(i,1)-outputKnown.state_vel(i-1))/par_set.Ts; 
-            outputKnown.state_acc(i,2) = (outputKnown.state_vel(i,1)-outputKnown.state_vel(i-1))/par_set.Ts;
-            outputKnown.state_acc(i,3) = (outputKnown.state_vel(i,1)-outputKnown.state_vel(i-1))/par_set.Ts;
-            outputKnown.state_acc(i,4) = (outputKnown.state_vel(i,1)-outputKnown.state_vel(i-1))/par_set.Ts; 
+            outputKnown.state_acc(i,1) = (outputKnown.state_vel(i,1)-outputKnown.state_vel(i-1,1))/par_set.Ts; 
+            outputKnown.state_acc(i,2) = (outputKnown.state_vel(i,2)-outputKnown.state_vel(i-1,2))/par_set.Ts;
+            outputKnown.state_acc(i,3) = (outputKnown.state_vel(i,3)-outputKnown.state_vel(i-1,3))/par_set.Ts;
+            outputKnown.state_acc(i,4) = (outputKnown.state_vel(i,4)-outputKnown.state_vel(i-1,4))/par_set.Ts; 
         end
     end
 % Get theta, deltaLc for each segment
@@ -1499,6 +1499,7 @@ figure(1)
     plot(testData.time_stamp(spt:ept),outputKnown.arc_state_wire(spt:ept,i))
     hold on
     plot(testData.time_stamp(spt:ept),x_pred(spt:ept,i))
+    
     hold on
     ylabel(ylabelvec{i})
     % ylim([0 20])
