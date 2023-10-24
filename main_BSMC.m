@@ -309,8 +309,10 @@ Dmax2 = 1/d2*(dkmax2*abs(xold(2))+dcmax2*dxmax2);
     eta1 = Dmax1+0.01;
     eta2 = Dmax2+0.01;
 
-    u1 = (1/d1)*(dtdxd(1,i)-kk1*xold(1)+eta01*e01+eta1*sign(e01));
-    u2 = (1/d2)*(dtdxd(2,i)-kk2*xold(2)+eta02*e02+eta2*sign(e02));
+%     u1 = (1/d1)*(dtdxd(1,i)-kk1*xold(1)+eta01*e01+eta1*sign(e01));
+%     u2 = (1/d2)*(dtdxd(2,i)-kk2*xold(2)+eta02*e02+eta2*sign(e02));
+        u1 = (d1)*(dtdxd(1,i)-kk1*xold(1)+eta01*e01+eta1*sign(e01));
+    u2 = (d2)*(dtdxd(2,i)-kk2*xold(2)+eta02*e02+eta2*sign(e02));
 
     if u1 <=umin
         u1=umin;
@@ -698,10 +700,10 @@ d4= 4.34*zold4^2 - 155.21*zold4+2146;
 %     Dmax3 = 1/d3*(dkmax3*abs(xold(1))+dcmax3*dxmax3);
 % Dmax4 = 1/d4*(dkmax4*abs(xold(2))+dcmax4*dxmax4);
 
-    u1 = 1/d1*(dtdxd(1,i) - kk1*xold(1) +eta01*e01+eta1*sign(e01)-destold1);
-    u2 = 1/d2*(dtdxd(2,i) - kk2*xold(2) +eta02*e02+eta2*sign(e02)-destold2);
-    u3 = 1/d3*(dtdxd(3,i) - kk3*xold(1) +eta03*e03+eta3*sign(e03)-destold3);
-    u4 = 1/d4*(dtdxd(4,i) - kk4*xold(2) +eta04*e04+eta4*sign(e04)-destold4);
+    u1 = d1*(dtdxd(1,i) - kk1/d1*xold(1) +eta01*e01+eta1*sign(e01)-destold1);
+    u2 = d2*(dtdxd(2,i) - kk2/d2*xold(2) +eta02*e02+eta2*sign(e02)-destold2);
+    u3 = d3*(dtdxd(3,i) - kk3/d3*xold(1) +eta03*e03+eta3*sign(e03)-destold3);
+    u4 = d4*(dtdxd(4,i) - kk4/d4*xold(2) +eta04*e04+eta4*sign(e04)-destold4);
 % %     u1 = (1/d1)*(xd(1,i)-kk1*xold(1)+eta01*e01+eta1*sign(e01));
 % %     u2 = (1/d2)*(xd(2,i)-kk2*xold(2)+eta02*e02+eta2*sign(e02));
 %     u3 = (1/d3)*(xd(3,i)-kk3*xold(1)+eta03*e03+eta3*sign(e03));
@@ -885,7 +887,10 @@ zold1 = testData.pm_psi(1,2)-testData.pm_psi(1,1);
 zold2 = testData.pm_psi(1,2)+testData.pm_psi(1,1);
 zold3 = testData.pm_psi(1,5)-testData.pm_psi(1,4);
 zold4 = testData.pm_psi(1,5)+testData.pm_psi(1,4);
-
+intvar1old =0;
+intvar2old =0;
+intvar3old =0;
+intvar4old =0;
 umax =20;umin=-20;
 pdmax =20;pdmin=0;
 %%%%%   NDOB  %%%%%%%
@@ -986,10 +991,10 @@ d4= 4.34*zold4^2 - 155.21*zold4+2146;
     eta4 = abs(dtdxd(4,i)) + dtdestmax4/l4; 
 
 
-    u1 = 1/d1*(dtdxd(1,i) - kk1*xold(1) +eta01*e01+eta1*sign(e01)-destold1);
-    u2 = 1/d2*(dtdxd(2,i) - kk2*xold(2) +eta02*e02+eta2*sign(e02)-destold2);
-    u3 = 1/d3*(dtdxd(3,i) - kk3*xold(1) +eta03*e03+eta3*sign(e03)-destold3);
-    u4 = 1/d4*(dtdxd(4,i) - kk4*xold(2) +eta04*e04+eta4*sign(e04)-destold4);
+    u1 = d1*(dtdxd(1,i) - kk1*xold(1) +eta01*e01+eta1*sign(e01)-destold1);
+    u2 = d2*(dtdxd(2,i) - kk2*xold(2) +eta02*e02+eta2*sign(e02)-destold2);
+    u3 = d3*(dtdxd(3,i) - kk3*xold(1) +eta03*e03+eta3*sign(e03)-destold3);
+    u4 = d4*(dtdxd(4,i) - kk4*xold(2) +eta04*e04+eta4*sign(e04)-destold4);
 
     if u1 <=umin
         u1=umin;
