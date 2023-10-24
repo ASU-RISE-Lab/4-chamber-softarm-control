@@ -148,18 +148,18 @@ class pc_client(object):
         self.t_old = time()
         self.d_est_old = np.array([0.]*4)
         # NDOB parameters
-        self.l1 = -0.1
-        self.l2 = -0.1
-        self.l3 = -0.1
-        self.l4 = -0.1
-        self.eta1 = 1*10**1
+        self.l1 = -1*10**2
+        self.l2 = -1*10**2
+        self.l3 = -1*10**2
+        self.l4 = -1*10**2
+        self.eta1 = 1*10**2
         self.eta2 = 1*10**2
-        self.eta3 = 1*10**1
+        self.eta3 = 1*10**2
         self.eta4 = 1*10**2
-        self.eta01 = 3*10**4
-        self.eta02 = 1*10**8
-        self.eta03 = 3*10**4
-        self.eta04 = 1*10**8
+        self.eta01 = 3*10**2
+        self.eta02 = 1*10**2
+        self.eta03 = 3*10**2
+        self.eta04 = 1*10**2
         # self.step_response(np.array([5.0,1.0,1.0]),5)
 
     def th_pd_gen(self):
@@ -178,7 +178,6 @@ class pc_client(object):
             self.t0_on_glob = time()
             try:
                 while(self.flag_end_test):
-
                     td = 10
                     theta1d = np.deg2rad(-20)
                     l1d = 0.006 # 0-0.019
@@ -186,13 +185,20 @@ class pc_client(object):
                     l2d = 0.006 # 0-0.019
                     self.position_d_array=np.array([theta1d,l1d,theta2d,l2d,0,0,0,0])
                     self.seg1and2_position_step_response(self.position_d_array,td,time())
+
+                    td = 10
+                    theta1d = np.deg2rad(-30)
+                    l1d = 0.006 # 0-0.019
+                    theta2d = np.deg2rad(-30)
+                    l2d = 0.006 # 0-0.019
+                    self.position_d_array=np.array([theta1d,l1d,theta2d,l2d,0,0,0,0])
+                    self.seg1and2_position_step_response(self.position_d_array,td,time())
                     self.flag_end_test = 0
             except KeyboardInterrupt:
-                print("E-stop")
-                self.th1_flag=False
-                self.th2_flag=False
+                    print("E-stop")
+                    self.th1_flag=False
+                    self.th2_flag=False
             if self.flag_reset==0:
-
                 self.t0_on_trial = time()
                 seg1_r= 0.0
                 seg1_l = 0.0
@@ -220,7 +226,7 @@ class pc_client(object):
                 self.pd_pm_array_1 = self.recv_zipped_socket3()
                 self.pd_pm_array_2 = self.recv_zipped_socket5()
                 self.filt_array_wireEnco = self.recv_zipped_socket6()
-                print(self.pd_pm_array_1[0:3],self.pd_pm_array_2[0:3])
+                # print(self.pd_pm_array_1[0:3],self.pd_pm_array_2[0:3])
                 # if self.flag_reset==0:
                 #     self.send_zipped_socket1(self.arr_comb_record)
             except KeyboardInterrupt:
@@ -229,24 +235,23 @@ class pc_client(object):
                 self.th2_flag=False
                 exit()
 
-
     def th_data_exchange_high(self):# thread config of read data from mocap and send packed msg to record file.
         while self.run_event.is_set() and self.th3_flag:
             try:
                 self.arr_comb_record=np.concatenate((self.pd_pm_array_1, self.pd_pm_array_2, self.filt_array_wireEnco, self.array3setswithrotation,self.position_est_array,self.position_d_array), axis=None)
-                print(self.pd_pm_array_1[0:3],self.pd_pm_array_2[0:3])
+                # print(self.pd_pm_array_1[0:3],self.pd_pm_array_2[0:3])
                 if self.flag_reset==0:
                     self.send_zipped_socket1(self.arr_comb_record)
             except KeyboardInterrupt:
                 break
                 exit()
 
-    def seg1and2_position_step_response(self,position_array,step_time,t0_time)
+    def seg1and2_position_step_response(self,position_array,step_time,t0_time):
         t = time() - t0_time # range from 0
         self.t_old =time()
-        while (self.th1_flag and self.th2_flag and (t <= step_time)):
+        while (self.th1_flag and self.th2_flag and (t <= step_time)):   
             try:
-                t = time() - self.t0_on_trial # range from 0
+                t = time() - t0_time # range from 0
                 t_new = time()
                 # State Parameter update
                 x1d = self.position_d_array[0]
@@ -269,10 +274,11 @@ class pc_client(object):
                 x3 = (s2_l-s2_r)/self.act_r0
                 x4 = (s2_l+s2_r)/2
                 self.position_est_array = np.array([x1,x2,x3,x4])
-                e01 = theta1d - theta1
-                e02 = l1d - l1
-                e03 = theta2d - theta2
-                e04 = l2d - l2
+
+                e01 = x1d - x1
+                e02 = x2d - x2
+                e03 = x3d - x3
+                e04 = x4d - x4
                 # LPV parameter
                 zold1 = self.pd_pm_array_1[4] - self.pd_pm_array_1[3]
                 zold2 = self.pd_pm_array_1[4] + self.pd_pm_array_1[3]
@@ -310,7 +316,7 @@ class pc_client(object):
                 u2 = 1/d2*(dtdx2d - kk2*x2 +self.eta02*e02+self.eta2*np.sign(e02)-self.d_est_old[1])
                 u3 = 1/d3*(dtdx3d - kk3*x3 +self.eta03*e03+self.eta3*np.sign(e03)-self.d_est_old[2])
                 u4 = 1/d4*(dtdx4d - kk4*x4 +self.eta04*e04+self.eta4*np.sign(e04)-self.d_est_old[3])
-
+                # print(u1,u2,u3,u4)
                 pd1_ub = (u2-u1)/2
                 pd2_ub = (u2+u1)/2
                 pd3_ub = (u4-u3)/2
@@ -320,7 +326,7 @@ class pc_client(object):
                 pd2 = self.func_input_saturation(pd2_ub)
                 pd3 = self.func_input_saturation(pd3_ub)
                 pd4 = self.func_input_saturation(pd4_ub)
-###################################################################################
+
                 self.pd_pm_array_1[0] = pd1
                 self.pd_pm_array_1[1] = pd2
                 self.pd_pm_array_1[2] = 2.0
@@ -330,6 +336,12 @@ class pc_client(object):
                 self.send_zipped_socket0(self.pd_pm_array_1[0:3])
                 self.send_zipped_socket4(self.pd_pm_array_2[0:3])
                 self.t_old = t_new
+                print(self.position_d_array[0:4]-self.position_est_array)
+            except KeyboardInterrupt:
+                self.th1_flag = 0
+                self.th2_flag = 0
+
+
     def pres_single_step_response(self,pd_array,step_time):
         t = time() - self.t0_on_trial # range from 0
         while (self.th1_flag and self.th2_flag and (t <= step_time)):
@@ -361,16 +373,17 @@ class pc_client(object):
                 break
                 self.th1_flag = 0
                 self.th2_flag = 0
-    def func_input_saturation(pdi_ub)
-        if pdi_ub <=0
+
+    def func_input_saturation(self,pdi_ub):
+        if pdi_ub <=0:
             pd =0
-        elif pdi_ub>=20
+        elif pdi_ub>=20:
             pd =20
-        else
+        else:
             pd = pdi_ub
         return pd
         
-    def funcRK4_z_update(self,dt,li,e0i,etai)
+    def funcRK4_z_update(self,dt,li,e0i,etai):
         xold_k1 = e0i
         dtdintvar = -li*etai*np.sign(xold_k1)
         k1 = dtdintvar

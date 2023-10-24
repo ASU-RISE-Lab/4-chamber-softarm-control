@@ -148,10 +148,10 @@ class pc_client(object):
         self.t_old = time()
         self.d_est_old = np.array([0.]*4)
         # INDOB parameters
-        self.l1 = 0.1
-        self.l2 = 0.1
-        self.l3 = 0.1
-        self.l4 = 0.1
+        self.l1 = 1*10**1
+        self.l2 = 1*10**1
+        self.l3 = 1*10**1
+        self.l4 = 1*10**1
 
         self.l12 = 1*10**2
         self.l22 = 1*10**2
@@ -259,7 +259,7 @@ class pc_client(object):
                 break
                 exit()
 
-    def seg1and2_position_step_response(self,position_array,step_time,t0_time)
+    def seg1and2_position_step_response(self,position_array,step_time,t0_time):
         t = time() - t0_time # range from 0
         self.t_old =time()
         while (self.th1_flag and self.th2_flag and (t <= step_time)):
@@ -351,7 +351,7 @@ class pc_client(object):
                 pd2 = self.func_input_saturation(pd2_ub)
                 pd3 = self.func_input_saturation(pd3_ub)
                 pd4 = self.func_input_saturation(pd4_ub)
-###################################################################################
+
                 self.pd_pm_array_1[0] = pd1
                 self.pd_pm_array_1[1] = pd2
                 self.pd_pm_array_1[2] = 2.0
@@ -361,6 +361,9 @@ class pc_client(object):
                 self.send_zipped_socket0(self.pd_pm_array_1[0:3])
                 self.send_zipped_socket4(self.pd_pm_array_2[0:3])
                 self.t_old = t_new
+            except KeyboardInterrupt:
+                self.th1_flag = 0
+                self.th2_flag = 0
 
     def pres_single_step_response(self,pd_array,step_time):
         t = time() - self.t0_on_trial # range from 0
@@ -394,16 +397,16 @@ class pc_client(object):
                 self.th1_flag = 0
                 self.th2_flag = 0
                 
-    def func_input_saturation(pdi_ub)
-        if pdi_ub <=0
+    def func_input_saturation(pdi_ub):
+        if pdi_ub <=0:
             pd =0
-        elif pdi_ub>=20
-            pd =20
-        else
+        elif pdi_ub>=15:
+            pd =15
+        else:
             pd = pdi_ub
         return pd
 
-    def funcRK4_z_update(self,dt,li,e0i,etai)
+    def funcRK4_z_update(self,dt,li,e0i,etai):
         xold_k1 = e0i
         dtdintvar = -li*etai*np.sign(xold_k1)
         k1 = dtdintvar
@@ -423,7 +426,7 @@ class pc_client(object):
         x_new = e0i + dt/6*(k1 + 2*k2 + 2*k3 +k4);
         return x_new
 
-    def funcRK4_z_update_improve(self,dt,li,pi,kki,di,xi,ui,z_old)
+    def funcRK4_z_update_improve(self,dt,li,pi,kki,di,xi,ui,z_old):
         xold_k1 = z_old
         dtdintvar = li*(1/dietai*(-kki*xi - ui)-(z_old+pi))
         k1 = dtdintvar

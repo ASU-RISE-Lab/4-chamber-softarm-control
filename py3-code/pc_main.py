@@ -9,6 +9,8 @@ import arm_main # mode 0high -- low1-pressure + low1-sensor + low2-pressure
 import cali_main
 import elong_main
 import arm2_main
+import ai_main
+import insmc_main
 # import sensor_test # mode 1
 # import ramp_test # mode 2
 # import step_test # mode 3
@@ -18,11 +20,11 @@ from time import sleep
 def main():
     try:
         #### Select control method ####
-        flag_ctrl_mode=3
+        flag_ctrl_mode=0
         if flag_ctrl_mode==0:
-            p_client=arm_main.pc_client()
+            p_client=ai_main.pc_client()
         elif flag_ctrl_mode==1:
-            p_client=cali_main.pc_client()
+            p_client=insmc_main.pc_client()
         elif flag_ctrl_mode==2:
             p_client=elong_main.pc_client()
         elif flag_ctrl_mode==3:
