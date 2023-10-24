@@ -611,29 +611,29 @@ umax =20;umin=-20;
 pdmax =20;pdmin=0;
 %%%%%   NDOB  %%%%%%%
 %%%% optimal
-l1 = -0.1;eta01 = 3e3;    eta1 = 1e1;
-destold1 =0;
-destnew1=0;
-intvar1 =0;intvar1old = 0;
-pxold1=0;
-
-l2 = -0.1;eta02 = 1e7;    eta2 = 1e2;
-destold2 =0;
-destnew2=0;
-intvar2 =0;intvar2old= 0;
-pxold2=0;
-
-l3 = -0.1;eta03 = 3e3;    eta3 = 1e1;
-destold3 =0;
-destnew3=0;
-intvar3 =0;intvar3old = 0;
-pxold3=0;
-
-l4 = -0.1;eta04 = 1e7;    eta4 = 1e2;
-destold4 =0;
-destnew4=0;
-intvar4 =0;intvar4old = 0;
-pxold4=0;
+% l1 = -0.1;eta01 = 3e3;    eta1 = 1e1;
+% destold1 =0;
+% destnew1=0;
+% intvar1 =0;intvar1old = 0;
+% pxold1=0;
+% 
+% l2 = -0.1;eta02 = 1e7;    eta2 = 1e2;
+% destold2 =0;
+% destnew2=0;
+% intvar2 =0;intvar2old= 0;
+% pxold2=0;
+% 
+% l3 = -0.1;eta03 = 3e3;    eta3 = 1e1;
+% destold3 =0;
+% destnew3=0;
+% intvar3 =0;intvar3old = 0;
+% pxold3=0;
+% 
+% l4 = -0.1;eta04 = 1e7;    eta4 = 1e2;
+% destold4 =0;
+% destnew4=0;
+% intvar4 =0;intvar4old = 0;
+% pxold4=0;
 
 l1 = -0.1;eta01 = 3e4;    eta1 = 1e1;
 destold1 =0;
