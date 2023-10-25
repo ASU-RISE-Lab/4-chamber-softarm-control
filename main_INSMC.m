@@ -57,34 +57,30 @@ testData = par_set.trial1;
 close all
 
 figure(1)
-testData = par_set.trial1;
+testData = par_set.trial2;
 for i  =1:4
-    subplot(6,1,i)
+    subplot(8,1,i)
 plot(testData.xd(:,i))
 hold on
-subplot(6,1,i)
+subplot(8,1,i)
 plot(testData.xm(:,i))
 hold on
 end
-subplot(6,1,5)
+subplot(8,1,5)
 plot(testData.pd_psi(:,1))
 hold on
 plot(testData.pm_psi(:,1))
 hold on
 legend('pm1')
-subplot(6,1,6)
+subplot(8,1,6)
 plot(testData.pd_psi(:,2))
 hold on
 plot(testData.pm_psi(:,2))
 legend('pm2')
-for i  =1:4
-subplot(6,1,i)
-% plot(testData.xd(:,i))
-% hold on
-plot(testData.xm(:,i))
-hold on
-end
-
+subplot(8,1,7)
+plot(testData.d_est(:,1))
+subplot(8,1,8)
+plot(testData.d_est(:,2))
 legend('ref','insmc','base')
 
 %%
@@ -197,56 +193,52 @@ for i =1:4
         legend('$u_{pm}$','MCG',Interpreter = "latex")
     end
 end
-%% RK4 with mean model
+%% RK4 with mean model and LPV
 h=1/30
 spt =1;ept =length(testData.enco_volts);
 x4x1 = [outputKnown.arc_state_wire(spt,1:4)]';
+x4x1mean=[outputKnown.arc_state_wire(spt,1:4)]';
+x_pred=[];x_pred2 = [];
 for i = spt:ept
     u4x1 = outputKnown.u_pm_psi(i,1:4)';
     x_pred(i,:) = funcRK4NoPmDynSegallpmpara_m(x4x1,u4x1,h,par_set);
+    x_pred2(i,:) = funcRK4NoPmDynSegallpmmean_m(x4x1mean,u4x1,h,par_set);
     x4x1 = x_pred(i,:)';
+    x4x1mean = x_pred2(i,:)';
 end
 h=1/30
-spt =1;ept =length(testData.enco_volts);
-x8x1 = [outputKnown.arc_state_wire(spt,1:8)]';
-for i = spt:ept
-    u4x1 = outputKnown.u_pm_tf(:,1:4)';
-    x_pred2(i,:) = funcRK4_pm_minus_M(x8x1,u4x1,h,par_set);
-    x8x1 = x_pred2(i,:)';
-end
+% spt =1;ept =length(testData.enco_volts);
+% x8x1 = [outputKnown.arc_state_wire(spt,1:8)]';
+% for i = spt:ept
+%     u4x1 = outputKnown.u_pm_tf(:,1:4)';
+%     x_pred2(i,:) = funcRK4_pm_minus_M(x8x1,u4x1,h,par_set);
+%     x8x1 = x_pred2(i,:)';
+% end
 
 %%%%%%% Plot result
 close all
 clc
-ylabelvec={'theta1';'lc1';'theta2';'lc2';'tau1';'f1';'tau2';'f2'};
+ylabelvec={'rad';'m';'rad';'m';};
+title_array = {'$\theta_1$';'$L_1$';'$\theta_2$';'$L_2$'};
+spt =1;ept =1600;
 figure(1)
     for i =1:4
-    subplot(2,4,i)
-    plot(testData.time_stamp(spt:ept),outputKnown.arc_state_wire(spt:ept,i))
+    subplot(2,2,i)
+    plot(testData.time_stamp(spt:ept),outputKnown.arc_state_wire(spt:ept,i),LineStyle="-",LineWidth=1,Color='b')
     hold on
-    plot(testData.time_stamp(spt:ept),x_pred(spt:ept,i))
-    
+    plot(testData.time_stamp(spt:ept),x_pred2(spt:ept,i),LineStyle="-",LineWidth=2,Color='k')
     hold on
+    plot(testData.time_stamp(spt:ept),x_pred(spt:ept,i),LineStyle="-",LineWidth=2,Color='r')
+    hold on
+
     ylabel(ylabelvec{i})
+    title(title_array{i},Interpreter="latex",FontSize=12)
+    xlim([0,50])
     % ylim([0 20])
-    if i ==1
-        legend('exp','rk4')
-        title('rk4 state sim')
-    end
+        legend('Exp','Mean','LPV',Location='southeast')
     hold on
     end
-    for i =5:8
-    subplot(2,4,i)
-    plot(testData.time_stamp(spt:ept),outputKnown.u_pm_psi(spt:ept,i-4))
-    hold on
-    ylabel(ylabelvec{i})
-    % ylim([ 20])
-    if i ==5
-        legend('Input(psi)')
-%         title('rk4 state sim')
-    end
-    hold on
-    end
+   
 %% theta1
 xold = [outputKnown.arc_state_wire(1,1)]';
 h = 1/40
@@ -431,12 +423,11 @@ plot(pm2)
 %% theta1, lc1, theta2, lc2 ASMC
 alpha = -0.9665; beta = 0.9698;
 xold = [outputKnown.arc_state_wire(1,1:4)]';
-
 h = 1/30
 Dmax1 = 5e2;Dmax2 =4e4;
-dkmax1 = 40*2; dcmax1 = 18*2;dxmax1 = 1;
-dkmax2 = 852*2; dcmax2 = 1709*2;dxmax2 = 1; 
-dkmax3 = 40*2; dcmax3 = 18*2;dxmax3 = 1;
+dkmax1 = 40; dcmax1 = 18*2;dxmax1 = 1;
+dkmax2 = 1000; dcmax2 = 1709*2;dxmax2 = 1; 
+dkmax3 = 40; dcmax3 = 18*2;dxmax3 = 1;
 dkmax4 = 852*2; dcmax4 = 1709*2;dxmax4 = 1; 
 xest=[]
 xd = [outputKnown.arc_state_wire(:,1:4)]';
@@ -460,10 +451,11 @@ d1= 0.9725*zold1^2- 11.2*abs(zold1)+38.471;
 d2= -0.9725*zold2^2+ 30.23*zold2+435.471;
 d3=  0.1125*zold3^2- 1.2*abs(zold3)+14.471;
 d4= 4.34*zold4^2 - 155.21*zold4+2146;
-eta01 = 4e3;eta02 = 9e7;
-eta03 = 4e3;eta04 = 9e7;
-umax =20;umin=-20;
-pdmax =20;pdmin=0;
+eta01 = 1;eta02 = 1;
+eta03 = 1;eta04 = 1;
+umaxt =30;umint=-30;
+umaxf =30;uminf=0;
+pdmax =15;pdmin=0;
 for i = 1:length(xd)
 kk1 = -1.767*zold1^2 + 17.55*abs(zold1)+33.471;
 kk2 = 10.25*zold2^2 - 325.1*zold2+3299;
@@ -475,41 +467,41 @@ d2= -0.9725*zold2^2+ 30.23*zold2+435.471;
 d3=  0.1125*zold3^2- 1.2*abs(zold3)+14.471;
 d4= 4.34*zold4^2 - 155.21*zold4+2146;
 
-    e01 = xd(1,i)-xold(1);
-    e02 = xd(2,i)-xold(2);
-    e03 = xd(3,i)-xold(3);
-    e04 = xd(4,i)-xold(4);
+    e01 = -(xd(1,i)-xold(1));
+    e02 = -(xd(2,i)-xold(2));
+    e03 = -(xd(3,i)-xold(3));
+    e04 = -(xd(4,i)-xold(4));
     Dmax1 = 1/d1*(dkmax1*abs(xold(1))+dcmax1*dxmax1);
     Dmax2 = 1/d2*(dkmax2*abs(xold(2))+dcmax2*dxmax2);
     Dmax3 = 1/d3*(dkmax3*abs(xold(1))+dcmax3*dxmax3);
-Dmax4 = 1/d4*(dkmax4*abs(xold(2))+dcmax4*dxmax4);
-    eta1 = Dmax1+0.01;
-    eta2 = Dmax2+0.01;
-    eta3 = Dmax1+0.01;
-    eta4 = Dmax2+0.01;
-    u1 = (d1)*(dtdxd(1,i)-kk1*xold(1)+eta01*e01+eta1*sign(e01));
-    u2 = (d2)*(dtdxd(2,i)-kk2*xold(2)+eta02*e02+eta2*sign(e02));
-    u3 = (d3)*(dtdxd(3,i)-kk3*xold(1)+eta03*e03+eta3*sign(e03));
-    u4 = (d4)*(dtdxd(4,i)-kk4*xold(2)+eta04*e04+eta4*sign(e04));
-    if u1 <=umin
-        u1=umin;
-    elseif u1>=umax
-        u1=umax;
+    Dmax4 = 1/d4*(dkmax4*abs(xold(2))+dcmax4*dxmax4);
+    eta1 = Dmax1+eta01*abs(e01);
+    eta2 = Dmax2+eta01*abs(e02);
+    eta3 = Dmax3+eta01*abs(e03);
+    eta4 = Dmax4+eta01*abs(e04);
+    u1 = (d1)*(dtdxd(1,i) + kk1/d1*xold(1) - (eta01*e01+eta1*sign(e01)));
+    u2 = (d2)*(dtdxd(2,i) + kk2/d2*xold(2) - (eta02*e02+eta2*sign(e02)));
+    u3 = (d3)*(dtdxd(3,i) + kk3/d3*xold(1) - (eta03*e03+eta3*sign(e03)));
+    u4 = (d4)*(dtdxd(4,i) + kk4/d4*xold(2) - (eta04*e04+eta4*sign(e04)));
+    if u1 <=umint
+        u1=umint;
+    elseif u1>=umaxt
+        u1=umaxt;
     end
-    if u2 <=umin
-        u2=umin;
-    elseif u2>=umax
-        u2=umax;
+    if u2 <=uminf
+        u2=uminf;
+    elseif u2>=umaxf
+        u2=umaxf;
     end
-    if u3 <=umin
-        u3=umin;
-    elseif u3>=umax
-        u3=umax;
+    if u3 <=umint
+        u3=umint;
+    elseif u3>=umaxt
+        u3=umaxt;
     end
-    if u4 <=umin
-        u4=umin;
-    elseif u4>=umax
-        u4=umax;
+    if u4 <=uminf
+        u4=uminf;
+    elseif u4>=umaxf
+        u4=umaxf;
     end
 
     x1new = funcRK4_one_state(xold(1),u1,kk1,d1,h);
@@ -550,6 +542,26 @@ Dmax4 = 1/d4*(dkmax4*abs(xold(2))+dcmax4*dxmax4);
     zold2 =pnew2+pnew1 ;
     zold3 =pnew4-pnew3;
     zold4 =pnew4+pnew3;
+    if zold1<=-20
+        zold1 = -20;
+    elseif zold1>=20
+        zold1 =20;
+    end
+    if zold2<=0
+        zold2 = 0;
+    elseif zold2>=20
+        zold2 =20;
+    end
+    if zold3<=-20
+        zold3 = -20;
+    elseif zold3>=20
+        zold3 =20;
+    end
+    if zold4<=0
+        zold4 = 0;
+    elseif zold4>=20
+        zold4 =20;
+    end
     pold1=pnew1;
     pold2=pnew2;
     pold3=pnew3;
@@ -622,7 +634,28 @@ legend('pd','pm')
 ylabel('psi')
 sgtitle("ASMC LPV at 40Hz")
 
-%% theta1, lc1, theta2, lc2 ANDOBSMC
+close all
+clc
+ylabelvec={'rad';'m';'rad';'m';};
+title_array = {'$\theta_1$';'$L_1$';'$\theta_2$';'$L_2$'};
+spt =1;ept =1600;
+
+figure(2)
+    for i =1:4
+    subplot(2,2,i)
+    plot(testData.time_stamp(spt:ept),xest(spt:ept,i),LineStyle="-",LineWidth=1,Color='r')
+    hold on
+    plot(testData.time_stamp(spt:ept),outputKnown.arc_state_wire(spt:ept,i),LineStyle="-",LineWidth=2,Color='b')
+    hold on
+    ylabel(ylabelvec{i})
+    title(title_array{i},Interpreter="latex",FontSize=12)
+    xlim([0,50])
+    % ylim([0 20])
+        legend('ASMC','Ref',Location='southeast')
+    hold on
+    end
+   
+%% theta1, lc1, theta2, lc2 NDOBASMC
 alpha = -0.9665; beta = 0.9698;
 xold = [outputKnown.arc_state_wire(1,1:4)]';
 h = 1/30
@@ -660,57 +693,58 @@ eta03 = 4e3;eta04 = 9e7;
     eta2 = Dmax2+0.01;
     eta3 = Dmax1+0.01;
     eta4 = Dmax2+0.01;
-umax =20;umin=-20;
-pdmax =20;pdmin=0;
+umaxt =30;umint=-30;
+umaxf =30;uminf=0;
+pdmax =15;pdmin=0;
 %%%%%   NDOB  %%%%%%%
 %%%% optimal
-% l1 = -0.1;eta01 = 3e3;    eta1 = 1e1;
-% destold1 =0;
-% destnew1=0;
-% intvar1 =0;intvar1old = 0;
-% pxold1=0;
-% 
-% l2 = -0.1;eta02 = 1e7;    eta2 = 1e2;
-% destold2 =0;
-% destnew2=0;
-% intvar2 =0;intvar2old= 0;
-% pxold2=0;
-% 
-% l3 = -0.1;eta03 = 3e3;    eta3 = 1e1;
-% destold3 =0;
-% destnew3=0;
-% intvar3 =0;intvar3old = 0;
-% pxold3=0;
-% 
-% l4 = -0.1;eta04 = 1e7;    eta4 = 1e2;
-% destold4 =0;
-% destnew4=0;
-% intvar4 =0;intvar4old = 0;
-% pxold4=0;
-
-l1 = -0.1;eta01 = 3e4;    eta1 = 1e1;
+l1 = 1e1;eta01 = 1e1;    eta1 = 1e0;
 destold1 =0;
 destnew1=0;
-intvar1new =0;dtdintvar1 = 0;
+intvar1 =0;intvar1old = 0;
 pxold1=0;
 
-l2 = -0.1;eta02 = 1e8;    eta2 = 1e2;
+l2 = 1e1;eta02 = 1e0;    eta2 = 1e0;
 destold2 =0;
 destnew2=0;
-intvar2new =0;dtdintvar2 = 0;
+intvar2 =0;intvar2old= 0;
 pxold2=0;
 
-l3 = -0.1;eta03 = 3e4;    eta3 = 1e1;
+l3 = 1e1;eta03 = 1e1;    eta3 = 1e0;
 destold3 =0;
 destnew3=0;
-intvar3new =0;dtdintvar3 = 0;
+intvar3 =0;intvar3old = 0;
 pxold3=0;
 
-l4 = -0.1;eta04 = 1e8;    eta4 = 1e2;
+l4 = 1e1;eta04 = 1e0;    eta4 = 1e0;
 destold4 =0;
 destnew4=0;
-intvar4new =0;dtdintvar4 = 0;
-pxold4=0;
+intvar4 =0;intvar4old = 0;
+% pxold4=0;
+
+% l1 = -0.1;eta01 = 3e4;    eta1 = 1e1;
+% destold1 =0;
+% destnew1=0;
+% intvar1new =0;dtdintvar1 = 0;
+% pxold1=0;
+% 
+% l2 = -0.1;eta02 = 1e8;    eta2 = 1e2;
+% destold2 =0;
+% destnew2=0;
+% intvar2new =0;dtdintvar2 = 0;
+% pxold2=0;
+% 
+% l3 = -0.1;eta03 = 3e4;    eta3 = 1e1;
+% destold3 =0;
+% destnew3=0;
+% intvar3new =0;dtdintvar3 = 0;
+% pxold3=0;
+% 
+% l4 = -0.1;eta04 = 1e8;    eta4 = 1e2;
+% destold4 =0;
+% destnew4=0;
+% intvar4new =0;dtdintvar4 = 0;
+% pxold4=0;
 %%%%%%%%%%%
 for i = 1:length(xd)
 kk1 = -1.767*zold1^2 + 17.55*abs(zold1)+33.471;
@@ -723,27 +757,31 @@ d2= -0.9725*zold2^2+ 30.23*zold2+435.471;
 d3=  0.1125*zold3^2- 1.2*abs(zold3)+14.471;
 d4= 4.34*zold4^2 - 155.21*zold4+2146;
 
-    e01 = xd(1,i)-xold(1);
-    e02 = xd(2,i)-xold(2);
-    e03 = xd(3,i)-xold(3);
-    e04 = xd(4,i)-xold(4);
+    e01 = -xd(1,i) + xold(1);
+    e02 = -xd(2,i) + xold(2);
+    e03 = -xd(3,i) + xold(3);
+    e04 = -xd(4,i) + xold(4);
 
     pxold1 = l1*xold(1);
-    intvar1new = funcRK4fintvar_onestate(h,l1,e01,eta1);
+%     intvar1new = funcRK4fintvar_onestate(h,l1,e01,eta1);
+    intvar1new = funcRK4fintvar_onestate_v2(h,l1,e01,eta1,eta01);
     destnew1 = intvar1new + pxold1;
 
 
     pxold2 = l2*xold(2);
-    intvar2new = funcRK4fintvar_onestate(h,l2,e02,eta2);
+%     intvar2new = funcRK4fintvar_onestate(h,l2,e02,eta2);
+    intvar2new = funcRK4fintvar_onestate_v2(h,l2,e02,eta2,eta02);
     destnew2 = intvar2new + pxold2;
 
         pxold3 = l3*xold(3);
-    intvar3new = funcRK4fintvar_onestate(h,l3,e03,eta3);
+%     intvar3new = funcRK4fintvar_onestate(h,l3,e03,eta3);
+    intvar3new = funcRK4fintvar_onestate_v2(h,l3,e03,eta3,eta03);
     destnew3 = intvar3new + pxold3;
 
 
     pxold4 = l4*xold(4);
-    intvar4new = funcRK4fintvar_onestate(h,l4,e04,eta4);
+%     intvar4new = funcRK4fintvar_onestate(h,l4,e04,eta4);
+    intvar4new = funcRK4fintvar_onestate_v2(h,l4,e04,eta4,eta04);
     destnew4 = intvar4new + pxold4;
 
 %     Dmax1 = 1/d1*(dkmax1*abs(xold(1))+dcmax1*dxmax1);
@@ -751,33 +789,33 @@ d4= 4.34*zold4^2 - 155.21*zold4+2146;
 %     Dmax3 = 1/d3*(dkmax3*abs(xold(1))+dcmax3*dxmax3);
 % Dmax4 = 1/d4*(dkmax4*abs(xold(2))+dcmax4*dxmax4);
 
-    u1 = d1*(dtdxd(1,i) - kk1/d1*xold(1) +eta01*e01+eta1*sign(e01)-destold1);
-    u2 = d2*(dtdxd(2,i) - kk2/d2*xold(2) +eta02*e02+eta2*sign(e02)-destold2);
-    u3 = d3*(dtdxd(3,i) - kk3/d3*xold(1) +eta03*e03+eta3*sign(e03)-destold3);
-    u4 = d4*(dtdxd(4,i) - kk4/d4*xold(2) +eta04*e04+eta4*sign(e04)-destold4);
+    u1 = d1*(dtdxd(1,i) + kk1/d1*xold(1) - (eta01*e01+eta1*sign(e01))-destnew1);
+    u2 = d2*(dtdxd(2,i) + kk2/d2*xold(2) - (eta02*e02+eta2*sign(e02))-destnew2);
+    u3 = d3*(dtdxd(3,i) + kk3/d3*xold(1) - (eta03*e03+eta3*sign(e03))-destnew3);
+    u4 = d4*(dtdxd(4,i) + kk4/d4*xold(2) - (eta04*e04+eta4*sign(e04))-destnew4);
 % %     u1 = (1/d1)*(xd(1,i)-kk1*xold(1)+eta01*e01+eta1*sign(e01));
 % %     u2 = (1/d2)*(xd(2,i)-kk2*xold(2)+eta02*e02+eta2*sign(e02));
 %     u3 = (1/d3)*(xd(3,i)-kk3*xold(1)+eta03*e03+eta3*sign(e03));
 %     u4 = (1/d4)*(xd(4,i)-kk4*xold(2)+eta04*e04+eta4*sign(e04));
-    if u1 <=umin
-        u1=umin;
-    elseif u1>=umax
-        u1=umax;
+if u1 <=umint
+        u1=umint;
+    elseif u1>=umaxt
+        u1=umaxt;
     end
-    if u2 <=umin
-        u2=umin;
-    elseif u2>=umax
-        u2=umax;
+    if u2 <=uminf
+        u2=uminf;
+    elseif u2>=umaxf
+        u2=umaxf;
     end
-    if u3 <=umin
-        u3=umin;
-    elseif u3>=umax
-        u3=umax;
+    if u3 <=umint
+        u3=umint;
+    elseif u3>=umaxt
+        u3=umaxt;
     end
-    if u4 <=umin
-        u4=umin;
-    elseif u4>=umax
-        u4=umax;
+    if u4 <=uminf
+        u4=uminf;
+    elseif u4>=umaxf
+        u4=umaxf;
     end
 
     x1new = funcRK4_one_state(xold(1),u1,kk1,d1,h);
@@ -818,6 +856,26 @@ d4= 4.34*zold4^2 - 155.21*zold4+2146;
     zold2 =pnew2+pnew1 ;
     zold3 =pnew4-pnew3;
     zold4 =pnew4+pnew3;
+    if zold1<=-20
+        zold1 = -20;
+    elseif zold1>=20
+        zold1 =20;
+    end
+    if zold2<=0
+        zold2 = 0;
+    elseif zold2>=20
+        zold2 =20;
+    end
+    if zold3<=-20
+        zold3 = -20;
+    elseif zold3>=20
+        zold3 =20;
+    end
+    if zold4<=0
+        zold4 = 0;
+    elseif zold4>=20
+        zold4 =20;
+    end
     pold1=pnew1;
     pold2=pnew2;
     pold3=pnew3;
@@ -826,10 +884,6 @@ d4= 4.34*zold4^2 - 155.21*zold4+2146;
     pm2(i)=pnew2;
     pm3(i)=pnew3;
     pm4(i)=pnew4;
-    destold1 = destnew1;
-    destold2 = destnew2;
-    destold3 = destnew3;
-    destold4 = destnew4;
     dest1(i) = destnew1;
     dest2(i) = destnew2;
     dest3(i) = destnew3;
@@ -920,6 +974,21 @@ hold on
 title('$L_2$','Interpreter','latex')
 legend('d4',Location='south')
 sgtitle("NDOBSMC LPV at 40Hz")
+
+figure(2)
+    for i =1:4
+    subplot(2,2,i)
+    plot(testData.time_stamp(spt:ept),xest(spt:ept,i),LineStyle="-",LineWidth=1,Color='r')
+    hold on
+    plot(testData.time_stamp(spt:ept),outputKnown.arc_state_wire(spt:ept,i),LineStyle="-",LineWidth=2,Color='b')
+    hold on
+    ylabel(ylabelvec{i})
+    title(title_array{i},Interpreter="latex",FontSize=12)
+    xlim([0,50])
+    % ylim([0 20])
+        legend('ASMC','Ref',Location='southeast')
+    hold on
+    end
 
 %% theta1, lc1, theta2, lc2 INDOBASMC
 alpha = -0.9665; beta = 0.9698;
@@ -939,57 +1008,34 @@ zold2 = testData.pm_psi(1,2)+testData.pm_psi(1,1);
 zold3 = testData.pm_psi(1,5)-testData.pm_psi(1,4);
 zold4 = testData.pm_psi(1,5)+testData.pm_psi(1,4);
 
-umax =20;umin=-20;
-pdmax =20;pdmin=0;
+umaxt =30;umint=-30;
+umaxf =30;uminf=0;
+pdmax =15;pdmin=0;
 %%%%%   NDOB  %%%%%%%
-%%%% optimal
-% l1 = -0.1;eta01 = 3e3;    eta1 = 1e1;
-% destold1 =0;
-% destnew1=0;
-% intvar1 =0;dtdintvar1 = 0;
-% pxold1=0;
-% 
-% l2 = -0.1;eta02 = 1e7;    eta2 = 1e2;
-% destold2 =0;
-% destnew2=0;
-% intvar2 =0;dtdintvar2 = 0;
-% pxold2=0;
-% 
-% l3 = -0.1;eta03 = 3e3;    eta3 = 1e1;
-% destold3 =0;
-% destnew3=0;
-% intvar3 =0;dtdintvar3 = 0;
-% pxold3=0;
-% 
-% l4 = -0.1;eta04 = 1e7;    eta4 = 1e2;
-% destold4 =0;
-% destnew4=0;
-% intvar4 =0;dtdintvar4 = 0;
-% pxold4=0;
 
-l1x = 0.1;eta01 = 4e1; etalx1 =1e0;
-dtdestmax1 = 0.01;
+l1x = 1e0;eta01 = 1e1; etalx1 =1e0;
+dtdestmax1 = 0.1;
 destold1 =0;
 destnew1=0;
 intvar1new =0;dtdintvar1 = 0;
 pxold1=0;
 
-l2x = 0.001;eta02 = 1e0;   etalx2 =1e0;
-dtdestmax2 = 0.01;
+l2x = 1e0;eta02 = 1e0;   etalx2 =1e0;
+dtdestmax2 = 0.1;
 destold2 =0;
 destnew2=0;
 intvar2new =0;dtdintvar2 = 0;
 pxold2=0;
 
-l3x = 0.1;eta03 = 2e1;   etalx3 =1e0;
-dtdestmax3 = 0.01;
+l3x = 1e0;eta03 = 1e1;   etalx3 =1e0;
+dtdestmax3 = 0.1;
 destold3 =0;
 destnew3=0;
 intvar3new =0;dtdintvar3 = 0;
 pxold3=0;
 
-l4x = 0.1;eta04 = 1e0;    etalx4 =1e0;
-dtdestmax4 = 0.01;
+l4x = 1e0;eta04 = 1e0;    etalx4 =1e0;
+dtdestmax4 = 0.1;
 destold4 =0;
 destnew4=0;
 intvar4new =0;dtdintvar4 = 0;
@@ -999,10 +1045,6 @@ l2 = 1;
 l3 = 1;
 l4 = 1;
 
-    eta1 = abs(dtdxd(1,i)) + dtdestmax1/l1; 
-    eta2 = abs(dtdxd(2,i)) + dtdestmax2/l2; 
-    eta3 = abs(dtdxd(3,i)) + dtdestmax3/l3; 
-    eta4 = abs(dtdxd(4,i)) + dtdestmax4/l4; 
 %%%%%%%%%%%
 for i = 1:length(xd)
 kk1 = -1.767*zold1^2 + 17.55*abs(zold1)+33.471;
@@ -1015,67 +1057,68 @@ d2= -0.9725*zold2^2+ 30.23*zold2+435.471;
 d3=  0.1125*zold3^2- 1.2*abs(zold3)+14.471;
 d4= 4.34*zold4^2 - 155.21*zold4+2146;
 
-    e01 = xd(1,i)-xold(1);
-    e02 = xd(2,i)-xold(2);
-    e03 = xd(3,i)-xold(3);
-    e04 = xd(4,i)-xold(4);
+    e01 = -xd(1,i) + xold(1);
+    e02 = -xd(2,i) + xold(2);
+    e03 = -xd(3,i) + xold(3);
+    e04 = -xd(4,i) + xold(4);
 
     pxold1 = l1x*xold(1) + etalx1*xold(1)^2*sign(xold(1));
     l1 = l1x + 2*etalx1*abs(xold(1));
-%     intvar1new = funcRK4fintvar_onestate_improve(h,l1,pxold1,kk1,d1,xold(1),zold1,intvar1old);
-    intvar1new = funcRK4fintvar_onestate_improve_v2( h,l1,dtdxd(1,i),eta01,eta1,e01);
+%     intvar1new = funcRK4fintvar_onestate_improve_v2( h,l1,dtdxd(1,i),eta01,eta1,e01);
+    intvar1new = funcRK4fintvar_onestate_improve_v3( h,l1,dtdxd(1,i),eta01,eta1,e01);
     destnew1 = intvar1new + pxold1;
+
 
 
     pxold2 = l2x*xold(2) + etalx2*xold(2)^2*sign(xold(2));
     l2 = l2x + 2*etalx1*abs(xold(2));
-%     intvar2new = funcRK4fintvar_onestate_improve(h,l2,pxold2,kk2,d2,xold(2),zold2,intvar2old);
-    intvar2new = funcRK4fintvar_onestate_improve_v2( h,l2,dtdxd(2,i),eta02,eta2,e02);
+%     intvar2new = funcRK4fintvar_onestate_improve_v2( h,l2,dtdxd(2,i),eta02,eta2,e02);
+    intvar2new = funcRK4fintvar_onestate_improve_v3( h,l2,dtdxd(2,i),eta02,eta2,e02);
     destnew2 = intvar2new + pxold2;
 
     pxold3 = l3x*xold(3) + etalx3*xold(3)^2*sign(xold(3));
     l3 = l3x + 2*etalx3*abs(xold(3));
-%     intvar3new = funcRK4fintvar_onestate_improve(h,l3,pxold3,kk3,d3,xold(3),zold3,intvar3old);
-    intvar3new = funcRK4fintvar_onestate_improve_v2( h,l3,dtdxd(3,i),eta03,eta3,e03);
+%     intvar3new = funcRK4fintvar_onestate_improve_v2( h,l3,dtdxd(3,i),eta03,eta3,e03);
+    intvar3new = funcRK4fintvar_onestate_improve_v3( h,l3,dtdxd(3,i),eta03,eta3,e03);
     destnew3 = intvar3new + pxold3;
 
 
     pxold4 = l4x*xold(4) + etalx4*xold(4)^2*sign(xold(4));
     l4 = l4x + 2*etalx4*abs(xold(4));
-%     intvar4new = funcRK4fintvar_onestate_improve(h,l4,pxold4,kk4,d4,xold(4),zold4,intvar4old);
-    intvar4new = funcRK4fintvar_onestate_improve_v2( h,l4,dtdxd(4,i),eta04,eta4,e04);
+%     intvar4new = funcRK4fintvar_onestate_improve_v2( h,l4,dtdxd(4,i),eta04,eta4,e04);
+    intvar4new = funcRK4fintvar_onestate_improve_v3( h,l4,dtdxd(4,i),eta04,eta4,e04);
     destnew4 = intvar4new + pxold4;
 
-    eta1 = abs(dtdxd(1,i)) + dtdestmax1/l1; 
-    eta2 = abs(dtdxd(2,i)) + dtdestmax2/l2; 
-    eta3 = abs(dtdxd(3,i)) + dtdestmax3/l3; 
-    eta4 = abs(dtdxd(4,i)) + dtdestmax4/l4; 
+    eta1 = eta01*abs(e01) + dtdestmax1/l1; 
+    eta2 = eta02*abs(e02) + dtdestmax2/l2; 
+    eta3 = eta03*abs(e03) + dtdestmax3/l3; 
+    eta4 = eta04*abs(e04) + dtdestmax4/l4; 
 
 
-    u1 = (d1)*(dtdxd(1,i) - kk1/d1*xold(1) +eta01*e01+eta1*sign(e01)-destold1);
-    u2 = (d2)*(dtdxd(2,i) - kk2/d2*xold(2) +eta02*e02+eta2*sign(e02)-destold2);
-    u3 = (d3)*(dtdxd(3,i) - kk3/d3*xold(1) +eta03*e03+eta3*sign(e03)-destold3);
-    u4 = (d4)*(dtdxd(4,i) - kk4/d4*xold(2) +eta04*e04+eta4*sign(e04)-destold4);
+    u1 = d1*(dtdxd(1,i) + kk1/d1*xold(1) - (eta01*e01+eta1*sign(e01))-destnew1);
+    u2 = d2*(dtdxd(2,i) + kk2/d2*xold(2) - (eta02*e02+eta2*sign(e02))-destnew2);
+    u3 = d3*(dtdxd(3,i) + kk3/d3*xold(1) - (eta03*e03+eta3*sign(e03))-destnew3);
+    u4 = d4*(dtdxd(4,i) + kk4/d4*xold(2) - (eta04*e04+eta4*sign(e04))-destnew4);
 
-    if u1 <=umin
-        u1=umin;
-    elseif u1>=umax
-        u1=umax;
+if u1 <=umint
+        u1=umint;
+    elseif u1>=umaxt
+        u1=umaxt;
     end
-    if u2 <=umin
-        u2=umin;
-    elseif u2>=umax
-        u2=umax;
+    if u2 <=uminf
+        u2=uminf;
+    elseif u2>=umaxf
+        u2=umaxf;
     end
-    if u3 <=umin
-        u3=umin;
-    elseif u3>=umax
-        u3=umax;
+    if u3 <=umint
+        u3=umint;
+    elseif u3>=umaxt
+        u3=umaxt;
     end
-    if u4 <=umin
-        u4=umin;
-    elseif u4>=umax
-        u4=umax;
+    if u4 <=uminf
+        u4=uminf;
+    elseif u4>=umaxf
+        u4=umaxf;
     end
 
     x1new = funcRK4_one_state(xold(1),u1,kk1,d1,h);
@@ -1116,6 +1159,26 @@ d4= 4.34*zold4^2 - 155.21*zold4+2146;
     zold2 =pnew2+pnew1 ;
     zold3 =pnew4-pnew3;
     zold4 =pnew4+pnew3;
+        if zold1<=-20
+        zold1 = -20;
+    elseif zold1>=20
+        zold1 =20;
+    end
+    if zold2<=0
+        zold2 = 0;
+    elseif zold2>=20
+        zold2 =20;
+    end
+    if zold3<=-20
+        zold3 = -20;
+    elseif zold3>=20
+        zold3 =20;
+    end
+    if zold4<=0
+        zold4 = 0;
+    elseif zold4>=20
+        zold4 =20;
+    end
     pold1=pnew1;
     pold2=pnew2;
     pold3=pnew3;
@@ -1124,10 +1187,7 @@ d4= 4.34*zold4^2 - 155.21*zold4+2146;
     pm2(i)=pnew2;
     pm3(i)=pnew3;
     pm4(i)=pnew4;
-    destold1 = destnew1;
-    destold2 = destnew2;
-    destold3 = destnew3;
-    destold4 = destnew4;
+
     dest1(i) = destnew1;
     dest2(i) = destnew2;
     dest3(i) = destnew3;
@@ -1218,6 +1278,23 @@ hold on
 title('$L_2$','Interpreter','latex')
 legend('d4',Location='south')
 sgtitle("INDOBASMC LPV at 40Hz")
+
+figure(3)
+    for i =1:4
+    subplot(2,2,i)
+    plot(testData.time_stamp(spt:ept),xest(spt:ept,i),LineStyle="-",LineWidth=1,Color='r')
+    hold on
+    plot(testData.time_stamp(spt:ept),outputKnown.arc_state_wire(spt:ept,i),LineStyle="-",LineWidth=2,Color='b')
+    hold on
+    ylabel(ylabelvec{i})
+    title(title_array{i},Interpreter="latex",FontSize=12)
+    xlim([0,50])
+    % ylim([0 20])
+        legend('INASMC','Ref',Location='southeast')
+    hold on
+    end
+
+
 %% bsmc for 1 state
 h = 1/30;alpha = -0.9665; beta = 0.9698;
 clc

@@ -149,15 +149,15 @@ class pc_client(object):
         self.t_old = time()
 
         # INDOB parameters
-        self.l1 = 1*10**0
-        self.l2 = 1*10**0
-        self.l3 = 1*10**0
-        self.l4 = 1*10**0
+        self.l1 = 5*10**2
+        self.l2 = 5*10**9
+        self.l3 = 5*10**2
+        self.l4 = 5*10**9
 
-        self.l12 = 1*10**(0)
-        self.l22 = 1*10**(0)
-        self.l32 = 1*10**(0)
-        self.l42 = 1*10**(0)
+        self.l12 = 1*10**(1)
+        self.l22 = 1*10**(9)
+        self.l32 = 1*10**(1)
+        self.l42 = 1*10**(9)
 
         self.dtddmax1 = 1*10**(-1)
         self.dtddmax2 = 1*10**(-1)
@@ -169,10 +169,11 @@ class pc_client(object):
         self.eta3 = 1
         self.eta4 = 1
 
-        self.eta01 = 1*10**1
-        self.eta02 = 1*10**0
-        self.eta03 = 1*10**0
-        self.eta04 = 1*10**0
+
+        self.eta01 = 5*10**1
+        self.eta02 = 5*10**8
+        self.eta03 = 5*10**2
+        self.eta04 = 5*10**8
 
         self.u1 = 0.
         self.u2 = 0.
@@ -184,15 +185,21 @@ class pc_client(object):
         self.zold3 =0.
         self.zold4 =0.
 
-        self.a_array = np.array([-np.deg2rad(20),0.01,-np.deg2rad(20),0.01])
-        # self.a_array = np.array([-np.deg2rad(0),0.015,-np.deg2rad(0),0.015])
-        self.b_array = np.array([0.0,0.005,0.0,0.005])
-        self.freq = 1/60
+        # self.a_array = np.array([-np.deg2rad(30),0.005,-np.deg2rad(30),0.005])
+        # self.b_array = np.array([0.0,0.005,0.0,0.005])
+        self.a_array = np.array([-np.deg2rad(0),0.00,-np.deg2rad(0),0.00])
+        self.b_array = np.array([-np.deg2rad(-20),0.008,-np.deg2rad(20),0.008])
+        self.freq = 1.0/30
+
+        # self.sat_bound1 = np.deg2rad(1)
+        # self.sat_bound2 = 0.0001
+        # self.sat_bound3 = np.deg2rad(1)
+        # self.sat_bound4 = 0.0001
 
         self.sat_bound1 = np.deg2rad(1)
-        self.sat_bound2 = 0.005
+        self.sat_bound2 = 0.0001
         self.sat_bound3 = np.deg2rad(1)
-        self.sat_bound4 = 0.005
+        self.sat_bound4 = 0.0001
     def th_pd_gen(self):
         try:
             if self.flag_reset==1:
@@ -210,7 +217,26 @@ class pc_client(object):
             try:
                 while(self.flag_end_test):
                     td = 60
+                    self.a_array = np.array([np.deg2rad(0),0.00,np.deg2rad(0),0.00])
+                    self.b_array = np.array([np.deg2rad(-12.5*2),0.01,np.deg2rad(-12.5*2),0.01])
                     self.seg1and2_position_sin_square_response(td,time())
+                    # td = 30
+                    # self.a_array = np.array([np.deg2rad(0),0.00,np.deg2rad(0),0.00])
+                    # self.b_array = np.array([np.deg2rad(-12.5*2),0.01,np.deg2rad(-12.5*2),0.01])
+                    # self.seg1and2_position_sin_square_response(td,time())
+
+                    # self.a_array = np.array([-np.deg2rad(0),0.00,-np.deg2rad(0),0.00])
+                    # self.b_array = np.array([-np.deg2rad(-30),0.01,-np.deg2rad(30),0.01])
+                    # self.seg1and2_position_sin_square_response(td,time())
+                    # td = 20
+                    # self.b_array = np.array([-np.deg2rad(20),0.02,-np.deg2rad(-20),0.02])
+                    # self.seg1and2_position_sin_square_response(td,time())
+                    # td = 10
+                    # self.b_array = np.array([-np.deg2rad(10),0.008,-np.deg2rad(-10),0.008])
+                    # self.seg1and2_position_sin_square_response(td,time())
+                    # td = 10
+                    # self.b_array = np.array([-np.deg2rad(20),0.008,-np.deg2rad(-20),0.008])
+                    # self.seg1and2_position_sin_square_response(td,time())
                     self.flag_end_test = 0
             except KeyboardInterrupt:
                 print("E-stop")
@@ -295,10 +321,10 @@ class pc_client(object):
                 x3 = (s2_l-s2_r)/self.act_r0
                 x4 = (s2_l+s2_r)/2
                 self.position_est_array = np.array([x1,x2,x3,x4])
-                e01 = x1d - x1
-                e02 = x2d - x2
-                e03 = x3d - x3
-                e04 = x4d - x4
+                e01 = -x1d + x1
+                e02 = -x2d + x2
+                e03 = -x3d + x3
+                e04 = -x4d + x4
                 # LPV parameter
                 zold1unb = self.pd_pm_array_1[4] - self.pd_pm_array_1[3]
                 zold2unb = self.pd_pm_array_1[4] + self.pd_pm_array_1[3]
@@ -321,9 +347,10 @@ class pc_client(object):
                 d3=  0.1125*zold3**2- 1.2*np.absolute(zold3)+14.471
                 d4= 4.34*zold4**2 - 155.21*zold4+2146
                 # INDOB estimation
+                dt = time()-self.t_old
                 pxold1 = self.l1*x1 +self.l12*x1**2*np.sign(x1)
                 l1 = self.l1 + self.l12*np.absolute(x1)
-                z_new1 = self.funcRK4_z_update_improve(time()-self.t_old,l1,self.eta01,self.eta1,dtdx1d,e01)
+                z_new1 = self.funcRK4_z_update_improve(dt,l1,self.eta01,self.eta1,dtdx1d,e01)
                 # z_new1 = self.funcRK4_z_update_improve(,l1,pxold1,kk1,d1,x1,self.u1,self.zold1)
                 self.zold1 =z_new1
                 self.d_est_old[0] = z_new1 + pxold1
@@ -332,29 +359,29 @@ class pc_client(object):
                 pxold2 = self.l2*x2 +self.l22*x2**2*np.sign(x2)
                 l2 = self.l2 + self.l22*np.absolute(x2)
 
-                z_new2 = self.funcRK4_z_update_improve(time()-self.t_old,l1,self.eta02,self.eta2,dtdx2d,e02)
-                # z_new2 = self.funcRK4_z_update_improve(time()-self.t_old,l2,pxold2,kk2,d2,x2,self.u2,self.zold2)
+                z_new2 = self.funcRK4_z_update_improve(dt,l1,self.eta02,self.eta2,dtdx2d,e02)
+                # z_new2 = self.funcRK4_z_update_improve(dt,l2,pxold2,kk2,d2,x2,self.u2,self.zold2)
                 self.zold2 =z_new2
                 self.d_est_old[1] = z_new2 + pxold2
 
                 pxold3 = self.l3*x3 +self.l32*x3**2*np.sign(x3)
                 l3 = self.l3 + self.l32*np.absolute(x3)
-                z_new3 = self.funcRK4_z_update_improve(time()-self.t_old,l3,self.eta03,self.eta3,dtdx3d,e03)
-                # z_new3 = self.funcRK4_z_update_improve(time()-self.t_old,l3,pxold3,kk3,d3,x3,self.u3,self.zold3)
+                z_new3 = self.funcRK4_z_update_improve(dt,l3,self.eta03,self.eta3,dtdx3d,e03)
+                # z_new3 = self.funcRK4_z_update_improve(dt,l3,pxold3,kk3,d3,x3,self.u3,self.zold3)
                 self.zold3 =z_new3
                 self.d_est_old[2] = z_new3 + pxold3
 
                 pxold4 = self.l4*x4 +self.l42*x4**2*np.sign(x4)
                 l4 = self.l4 + self.l42*np.absolute(x4)
-                z_new4 = self.funcRK4_z_update_improve(time()-self.t_old,l4,self.eta04,self.eta4,dtdx4d,e04)
-                # z_new4 = self.funcRK4_z_update_improve(time()-self.t_old,l4,pxold4,kk4,d4,x4,self.u4,self.zold4)
+                z_new4 = self.funcRK4_z_update_improve(dt,l4,self.eta04,self.eta4,dtdx4d,e04)
+                # z_new4 = self.funcRK4_z_update_improve(dt,l4,pxold4,kk4,d4,x4,self.u4,self.zold4)
                 self.zold4 =z_new4
                 self.d_est_old[3] = z_new4 + pxold4
 
-                # self.eta1 = np.absolute(dtdx1d) +self.dtddmax1/l1
-                # self.eta2 = np.absolute(dtdx2d) +self.dtddmax2/l2
-                # self.eta3 = np.absolute(dtdx3d) +self.dtddmax3/l3
-                # self.eta4 = np.absolute(dtdx4d) +self.dtddmax4/l4
+                self.eta1 = self.eta01*np.absolute(e01) +self.dtddmax1/l1
+                self.eta2 = self.eta02*np.absolute(e02) +self.dtddmax2/l2
+                self.eta3 = self.eta03*np.absolute(e03) +self.dtddmax3/l3
+                self.eta4 = self.eta04*np.absolute(e04) +self.dtddmax4/l4
 
                 # torque 
                 sat_e01 = self.func_saturation(e01,self.sat_bound1)
@@ -362,19 +389,24 @@ class pc_client(object):
                 sat_e03 = self.func_saturation(e03,self.sat_bound3)
                 sat_e04 = self.func_saturation(e04,self.sat_bound4)
 
-                u1ub = d1*(dtdx1d - kk1/d1*x1 +self.eta01*e01+self.eta1*np.sign(e01)-self.d_est_old[0])
-                u2ub = d2*(dtdx2d - kk2/d2*x2 +self.eta02*e02+self.eta2*np.sign(e02)-self.d_est_old[1])
-                u3ub = d3*(dtdx3d - kk3/d3*x3 +self.eta03*e03+self.eta3*np.sign(e03)-self.d_est_old[2])
-                u4ub = d4*(dtdx4d - kk4/d4*x4 +self.eta04*e04+self.eta4*np.sign(e04)-self.d_est_old[3])
+                u1ub = d1*(dtdx1d + kk1/d1*x1 - (self.eta01*e01+self.eta1*np.sign(e01))-self.d_est_old[0])
+                u2ub = d2*(dtdx2d + kk2/d2*x2 - (self.eta02*e02+self.eta2*np.sign(e02))-self.d_est_old[1])
+                u3ub = d3*(dtdx3d + kk3/d3*x3 - (self.eta03*e03+self.eta3*np.sign(e03))-self.d_est_old[2])
+                u4ub = d4*(dtdx4d + kk4/d4*x4 - (self.eta04*e04+self.eta4*np.sign(e04))-self.d_est_old[3])
 
-                # u1 = self.func_torque_saturation(u1ub,30,-30)
-                # u2 = self.func_torque_saturation(u2ub,30,0)
-                # u3 = self.func_torque_saturation(u3ub,30,-30)
-                # u4 = self.func_torque_saturation(u4ub,30,0)
-                u1 =u1ub
-                u2 =u2ub
-                u3 =u3ub
-                u4 =u4ub
+                u1ub = d1*(dtdx1d + kk1/d1*x1 - (self.eta01*e01+self.eta1*sat_e01)-self.d_est_old[0])
+                u2ub = d2*(dtdx2d + kk2/d2*x2 - (self.eta02*e02+self.eta2*sat_e01)-self.d_est_old[1])
+                u3ub = d3*(dtdx3d + kk3/d3*x3 - (self.eta03*e03+self.eta3*sat_e01)-self.d_est_old[2])
+                u4ub = d4*(dtdx4d + kk4/d4*x4 - (self.eta04*e04+self.eta4*sat_e01)-self.d_est_old[3])
+
+                u1 = self.func_torque_saturation(u1ub,30,-30)
+                u2 = self.func_torque_saturation(u2ub,30,-30)
+                u3 = self.func_torque_saturation(u3ub,30,-30)
+                u4 = self.func_torque_saturation(u4ub,30,-30)
+                # u1 =u1ub
+                # u2 =u2ub
+                # u3 =u3ub
+                # u4 =u4ub
                 # self.u1 = d1*(dtdx1d - kk1*x1 +self.eta01*e01+self.eta1*sat_e01-self.d_est_old[0])
                 # self.u2 = d2*(dtdx2d - kk2*x2 +self.eta02*e02+self.eta2*sat_e02-self.d_est_old[1])
                 # self.u3 = d3*(dtdx3d - kk3*x3 +self.eta03*e03+self.eta3*sat_e03-self.d_est_old[2])
@@ -384,10 +416,10 @@ class pc_client(object):
                 pd3_ub = (u4-u3)/2
                 pd4_ub = (u4+u3)/2
 
-                pd1 = self.func_input_saturation(pd1_ub)
-                pd2 = self.func_input_saturation(pd2_ub)
-                pd3 = self.func_input_saturation(pd3_ub)
-                pd4 = self.func_input_saturation(pd4_ub)
+                pd1 = self.func_input_saturation(pd1_ub,20)
+                pd2 = self.func_input_saturation(pd2_ub,20)
+                pd3 = self.func_input_saturation(pd3_ub,20)
+                pd4 = self.func_input_saturation(pd4_ub,20)
 
                 self.pd_pm_array_1[0] = pd1
                 self.pd_pm_array_1[1] = pd2
@@ -398,7 +430,10 @@ class pc_client(object):
                 self.send_zipped_socket0(self.pd_pm_array_1[0:3])
                 self.send_zipped_socket4(self.pd_pm_array_2[0:3])
                 self.t_old = time()
-                print(self.position_d_array[0:4]-self.position_est_array)
+                if dt <= 1.0/200:
+                    sleep(1.0/200)
+                print(np.round(1/dt,0),self.position_d_array[0:4]-self.position_est_array)
+                
             except KeyboardInterrupt:
                 self.th1_flag = 0
                 self.th2_flag = 0
@@ -444,14 +479,15 @@ class pc_client(object):
             zold_bd = zold_unb
         return zold_bd
 
-    def func_input_saturation(self,pdi_ub):
+    def func_input_saturation(self,pdi_ub,up_bound):
         if pdi_ub <=0:
             pd =0
-        elif pdi_ub>=20:
-            pd =20
+        elif pdi_ub>=up_bound:
+            pd =up_bound
         else:
             pd = pdi_ub
         return pd
+
     def func_torque_saturation(self,u_ub,uupbd,udownbd):
         if u_ub >= uupbd:
             ubd = uupbd
@@ -461,12 +497,10 @@ class pc_client(object):
             ubd = u_ub
         return ubd
     def func_saturation(self,e0i,sat_bound):
-        if e0i <=sat_bound:
-            sat_e0i = -1
-        elif e0i>=sat_bound:
-            sat_e0i = 1
-        else:
+        if np.absolute(e0i) <=sat_bound:
             sat_e0i = e0i/sat_bound
+        elif np.absolute(e0i)>sat_bound:
+            sat_e0i = e0i
         return sat_e0i
 
     def position_sin_square_sin(self,a_array,b_array,freq,t_from_t0_on_glob):
@@ -475,10 +509,10 @@ class pc_client(object):
         x3d = a_array[2]*np.sin(2*np.pi*freq*t_from_t0_on_glob) + b_array[2]
         x4d = a_array[3]*np.sin(2*np.pi*freq*t_from_t0_on_glob)*np.sin(2*np.pi*freq*t_from_t0_on_glob) + b_array[3]
 
-        dtdx1d = a_array[0]*np.cos(2*np.pi*freq*t_from_t0_on_glob) + b_array[0]
-        dtdx2d = a_array[1]*np.cos(2*np.pi*freq*t_from_t0_on_glob)*np.sin(2*np.pi*freq*t_from_t0_on_glob) + b_array[1]
-        dtdx3d = a_array[2]*np.cos(2*np.pi*freq*t_from_t0_on_glob) + b_array[2]
-        dtdx4d = a_array[3]*np.cos(2*np.pi*freq*t_from_t0_on_glob)*np.sin(2*np.pi*freq*t_from_t0_on_glob) + b_array[3]
+        dtdx1d = a_array[0]*np.cos(2*np.pi*freq*t_from_t0_on_glob) 
+        dtdx2d = a_array[1]*np.cos(2*np.pi*freq*t_from_t0_on_glob)*np.sin(2*np.pi*freq*t_from_t0_on_glob)
+        dtdx3d = a_array[2]*np.cos(2*np.pi*freq*t_from_t0_on_glob) 
+        dtdx4d = a_array[3]*np.cos(2*np.pi*freq*t_from_t0_on_glob)*np.sin(2*np.pi*freq*t_from_t0_on_glob) 
         return np.array([x1d,x2d,x3d,x4d,dtdx1d,dtdx2d,dtdx3d,dtdx4d])
 
     def funcRK4_z_update(self,dt,li,e0i,etai):
@@ -502,24 +536,32 @@ class pc_client(object):
         return x_new
 
     def funcRK4_z_update_improve(self,dt,li,eta0i,etai,dtdxdi,e0i):
-        xold_k1 = e0i
-        dtdintvar = -li*(dtdxdi + eta0i*xold_k1 + etai*np.sign(xold_k1))
+        xold = e0i
+
+        xold_k1 = xold
+        sat_e01 = self.func_saturation(xold_k1,self.sat_bound1)
+        # dtdintvar = li*(-dtdxdi + eta0i*xold_k1 + etai*np.sign(xold_k1))
+        dtdintvar = li*(-dtdxdi + eta0i*xold_k1 + etai*sat_e01)
         k1 = dtdintvar
 
-        xold_k2 = e0i + 0.5*dt*k1
-        dtdintvar = -li*(dtdxdi + eta0i*xold_k2 + etai*np.sign(xold_k2))
+        xold_k2 = xold + 0.5*dt*k1
+        sat_e02 = self.func_saturation(xold_k2,self.sat_bound2)
+        dtdintvar = li*(-dtdxdi + eta0i*xold_k2 + etai*sat_e02)
         k2 = dtdintvar
 
-        xold_k3 = e0i + 0.5*dt*k2
-        dtdintvar = -li*(dtdxdi + eta0i*xold_k3 + etai*np.sign(xold_k3))
+        xold_k3 = xold + 0.5*dt*k2
+        sat_e03 = self.func_saturation(xold_k3,self.sat_bound3)
+        dtdintvar = li*(-dtdxdi + eta0i*xold_k3 + etai*sat_e03)
         k3 = dtdintvar
 
-        xold_k4 = e0i + 0.5*dt*k3
-        dtdintvar = -li*(dtdxdi + eta0i*xold_k4 + etai*np.sign(xold_k4))
+        xold_k4 = xold + 0.5*dt*k3
+        sat_e04 = self.func_saturation(xold_k4,self.sat_bound4)
+        dtdintvar = li*(-dtdxdi + eta0i*xold_k4 + etai*sat_e04)
         k4 = dtdintvar
 
-        x_new = e0i + dt/6*(k1 + 2*k2 + 2*k3 +k4);
+        x_new = xold + dt/6*(k1 + 2*k2 + 2*k3 +k4);
         return x_new
+
     def send_zipped_socket0(self, obj, flags=0, protocol=-1):
         """pack and compress an object with pickle and zlib."""
         pobj = pickle.dumps(obj, protocol)
