@@ -106,8 +106,9 @@ a2=mean((testData.rigid_2_pose(:,3)-testData.rigid_3_pose(:,3))/2);
 %%% Get Mddtdq %%%
 for i  = 1:length(s1.l_t)
     Mati = [];
-    [Mmati] = funcMCGcalv2(outputKnown.arc_state_wire);
-    outputKnown.Mddtdq(i,:) = Mmati*outputKnown.arc_acc_wire(i,:)';
+    [Mmati,Ci,Gi] = funcMCGcalv3(outputKnown.arc_state_wire);
+    outputKnown.Mddtdq(i,:) = Mmati*outputKnown.arc_acc_wire(i,:)'+Ci*;
+    outputKnown.MCG(i,:) = Mmati*outputKnown.arc_acc_wire(i,:)'+Ci*;
 end
 fprintf('State Var estimation done \n')
 %%% End %%%

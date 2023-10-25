@@ -1,4 +1,4 @@
-function [M,G,detM] = funcMCGcalv3(x)
+function [M,G] = funcMCGcalv3(x)
 theta1 = x(1); dtheta1 = x(5); lc1 = x(2); dlc1 = x(6);
 theta2 = x(3); dtheta2 = x(7); lc2 = x(4); dlc2 = x(8);
 angle_th = deg2rad(2);

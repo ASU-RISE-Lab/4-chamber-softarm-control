@@ -160,8 +160,9 @@ a2=mean((testData.rigid_2_pose(:,3)-testData.rigid_3_pose(:,3))/2);
 %%% Get Mddtdq %%%
 for i  = 1:length(s1.l_t)
     Mati = [];
-    [Mmati] = funcMCGcalv2(outputKnown.arc_state_wire);
+    [Mmati,Gi] = funcMCGcalv3(outputKnown.arc_state_wire);
     outputKnown.Mddtdq(i,:) = Mmati*outputKnown.arc_acc_wire(i,:)';
+    outputKnown.MCG(i,:) = Mmati*outputKnown.arc_acc_wire(i,:)'+Gi;
 end
 fprintf('State Var estimation done \n')
 %%% End %%%
@@ -175,8 +176,26 @@ for i =1:4
     yyaxis right
     plot(outputKnown.u_pm_tf(:,i))
     hold on
-    plot(outputKnown.u_pm_tf(:,i)-outputKnown.Mddtdq(:,i))
+    plot(outputKnown.u_pm_tf(:,i)-outputKnown.MCG(:,i))
     hold on
+end
+figure(2)
+ylabel_array = {'Nm';'N';'Nm';'N'};
+title_array = {'$\theta_1$';'$L_1$';'$\theta_2$';'$L_2$'};
+ylim_array = [-5 1;-50 200;-5 1;-50 200];
+for i =1:4
+    subplot(4,1,i)
+    plot(testData.time_stamp(1:1600),outputKnown.u_pm_tf(1:1600,i),LineStyle="-",LineWidth=2)
+    hold on
+    plot(testData.time_stamp(1:1600),outputKnown.MCG(1:1600,i),LineStyle="--",LineWidth=2)
+    hold on
+    xlim([0,50])
+    ylim([ylim_array(i,:)])
+    title(title_array{i},Interpreter="latex",FontSize=12,FontWeight="bold")
+    ylabel(ylabel_array{i},"FontSize",12,"FontWeight","bold")
+    if i ==1
+        legend('$u_{pm}$','MCG',Interpreter = "latex")
+    end
 end
 %% RK4 with mean model
 h=1/30
