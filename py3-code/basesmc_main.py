@@ -200,6 +200,12 @@ class pc_client(object):
         self.sat_bound2 = 0.0001
         self.sat_bound3 = np.deg2rad(1)
         self.sat_bound4 = 0.0001
+
+        self.x1=0.0
+        self.x2=0.0
+        self.x3=0.0
+        self.x4=0.0
+
     def th_pd_gen(self):
         try:
             if self.flag_reset==1:
@@ -211,33 +217,35 @@ class pc_client(object):
                 seg2_r = 0.0
                 seg2_l = 0.0
                 seg2_m = 0.0
-                self.pres_single_step_response(np.array([seg1_r,seg1_l,seg1_m,seg2_r,seg2_l,seg2_m]),3)
+                self.pres_single_step_response(np.array([seg1_r,seg1_l,seg1_m,seg2_r,seg2_l,seg2_m]),5)
                 self.flag_reset=0
             self.t0_on_glob = time()
             try:
                 while(self.flag_end_test):
                     td = 60
-                    self.a_array = np.array([np.deg2rad(0),0.00,np.deg2rad(0),0.00])
-                    self.b_array = np.array([np.deg2rad(-12.5*2),0.01,np.deg2rad(-12.5*2),0.01])
+                    self.a_array = np.array([np.deg2rad(20),0.00,np.deg2rad(20),0.00])
+                    self.b_array = np.array([np.deg2rad(0),0.015,np.deg2rad(0),0.015])
                     self.seg1and2_position_sin_square_response(td,time())
-
-                    # td = 30
+                    # td = 10
                     # self.a_array = np.array([np.deg2rad(0),0.00,np.deg2rad(0),0.00])
-                    # self.b_array = np.array([np.deg2rad(-12.5*2),0.01,np.deg2rad(-12.5*2),0.01])
+                    # self.b_array = np.array([np.deg2rad(-20),0.01,np.deg2rad(20),0.01])
                     # self.seg1and2_position_sin_square_response(td,time())
 
-                    # self.a_array = np.array([-np.deg2rad(0),0.00,-np.deg2rad(0),0.00])
-                    # self.b_array = np.array([-np.deg2rad(-30),0.01,-np.deg2rad(30),0.01])
-                    # self.seg1and2_position_sin_square_response(td,time())
-                    # td = 20
-                    # self.b_array = np.array([-np.deg2rad(20),0.02,-np.deg2rad(-20),0.02])
-                    # self.seg1and2_position_sin_square_response(td,time())
                     # td = 10
-                    # self.b_array = np.array([-np.deg2rad(10),0.008,-np.deg2rad(-10),0.008])
+                    # self.a_array = np.array([np.deg2rad(0),0.00,np.deg2rad(0),0.00])
+                    # self.b_array = np.array([np.deg2rad(20),0.015,np.deg2rad(-20),0.02])
                     # self.seg1and2_position_sin_square_response(td,time())
+
                     # td = 10
-                    # self.b_array = np.array([-np.deg2rad(20),0.008,-np.deg2rad(-20),0.008])
+                    # self.a_array = np.array([np.deg2rad(0),0.00,np.deg2rad(0),0.00])
+                    # self.b_array = np.array([np.deg2rad(-10),0.015,np.deg2rad(-10),0.02])
                     # self.seg1and2_position_sin_square_response(td,time())
+
+                    # td = 10
+                    # self.a_array = np.array([np.deg2rad(0),0.00,np.deg2rad(0),0.00])
+                    # self.b_array = np.array([np.deg2rad(20),0.015,np.deg2rad(20),0.02])
+                    # self.seg1and2_position_sin_square_response(td,time())
+
                     self.flag_end_test = 0
             except KeyboardInterrupt:
                 print("E-stop")
@@ -269,9 +277,17 @@ class pc_client(object):
             try:
                 if self.flag_use_mocap == True:
                     self.array3setswithrotation = self.recv_cpp_socket2()
-                self.pd_pm_array_1 = self.recv_zipped_socket3()
-                self.pd_pm_array_2 = self.recv_zipped_socket5()
                 self.filt_array_wireEnco = self.recv_zipped_socket6()
+                s1_l = (self.filt_array_wireEnco[0] - self.wireEnco_ini[0])/5
+                s1_r = (self.filt_array_wireEnco[1] - self.wireEnco_ini[1])/5
+                s2_l = (self.filt_array_wireEnco[3] - self.wireEnco_ini[3])/5 - s1_l
+                s2_r = (self.filt_array_wireEnco[2] - self.wireEnco_ini[2])/5 - s1_r
+
+                self.x1 = (s1_l-s1_r)/self.act_r0
+                self.x2 = (s1_l+s1_r)/2
+                self.x3 = (s2_l-s2_r)/self.act_r0
+                self.x4 = (s2_l+s2_r)/2
+                self.position_est_array = np.array([self.x1,self.x2,self.x3,self.x4])
                 # print(self.pd_pm_array_1[0:3],self.pd_pm_array_2[0:3])
                 # if self.flag_reset==0:
                 #     self.send_zipped_socket1(self.arr_comb_record)
@@ -289,6 +305,7 @@ class pc_client(object):
                 # print(self.pd_pm_array_1[0:3],self.pd_pm_array_2[0:3])
                 if self.flag_reset==0:
                     self.send_zipped_socket1(self.arr_comb_record)
+
             except KeyboardInterrupt:
                 break
                 exit()
@@ -312,16 +329,11 @@ class pc_client(object):
                 dtdx3d = self.position_d_array[6]
                 dtdx4d = self.position_d_array[7] 
 
-                s1_l = (self.filt_array_wireEnco[0] - self.wireEnco_ini[0])/5
-                s1_r = (self.filt_array_wireEnco[1] - self.wireEnco_ini[1])/5
-                s2_l = (self.filt_array_wireEnco[3] - self.wireEnco_ini[3])/5
-                s2_r = (self.filt_array_wireEnco[2] - self.wireEnco_ini[2])/5
+                x1 = self.x1
+                x2 = self.x2
+                x3 = self.x3
+                x4 = self.x4
 
-                x1 = (s1_l-s1_r)/self.act_r0
-                x2 = (s1_l+s1_r)/2
-                x3 = (s2_l-s2_r)/self.act_r0
-                x4 = (s2_l+s2_r)/2
-                self.position_est_array = np.array([x1,x2,x3,x4])
                 e01 = -x1d + x1
                 e02 = -x2d + x2
                 e03 = -x3d + x3
@@ -349,6 +361,7 @@ class pc_client(object):
                 d4= 4.34*zold4**2 - 155.21*zold4+2146
                 # INDOB estimation
                 dt = time()-self.t_old
+                self.t_old = time()
                 # pxold1 = self.l1*x1 +self.l12*x1**2*np.sign(x1)
                 # l1 = self.l1 + self.l12*np.absolute(x1)
                 # z_new1 = self.funcRK4_z_update_improve(dt,l1,self.eta01,self.eta1,dtdx1d,e01)
@@ -417,10 +430,10 @@ class pc_client(object):
                 pd3_ub = (u4-u3)/2
                 pd4_ub = (u4+u3)/2
 
-                pd1 = self.func_input_saturation(pd1_ub,20)
-                pd2 = self.func_input_saturation(pd2_ub,20)
-                pd3 = self.func_input_saturation(pd3_ub,20)
-                pd4 = self.func_input_saturation(pd4_ub,20)
+                pd1 = self.func_input_saturation(pd1_ub,10)
+                pd2 = self.func_input_saturation(pd2_ub,10)
+                pd3 = self.func_input_saturation(pd3_ub,10)
+                pd4 = self.func_input_saturation(pd4_ub,10)
 
                 self.pd_pm_array_1[0] = pd1
                 self.pd_pm_array_1[1] = pd2
@@ -428,11 +441,11 @@ class pc_client(object):
                 self.pd_pm_array_2[0] = pd3
                 self.pd_pm_array_2[1] = pd4
                 self.pd_pm_array_2[2] = 0.0
+
                 self.send_zipped_socket0(self.pd_pm_array_1[0:3])
                 self.send_zipped_socket4(self.pd_pm_array_2[0:3])
-                self.t_old = time()
-                if dt <= 1.0/200:
-                    sleep(1.0/200)
+                if dt <= 1.0/100:
+                    sleep(1.0/100)
                 print(np.round(1/dt,0),self.position_d_array[0:4]-self.position_est_array)
                 
             except KeyboardInterrupt:

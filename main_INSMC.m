@@ -40,7 +40,7 @@ fprintf('System initialization done \n')
 %%% End %%%
 %% Read txt file or mat file
 if par_set.flag_read_exp==1
-    for i = 1:2
+    for i = 1:3
         par_set= funcLoadExp2Seg(par_set,i);
     end
     %     par_set= funcLoadExp2Seg(par_set,1);
@@ -60,28 +60,127 @@ figure(1)
 testData = par_set.trial2;
 for i  =1:4
     subplot(8,1,i)
-plot(testData.xd(:,i))
+plot(testData.xd(:,i),LineWidth=2)
 hold on
 subplot(8,1,i)
 plot(testData.xm(:,i))
 hold on
+% subplot(8,1,i+4)
+% plot(testData.d_est(:,i),'r')
+% hold on
 end
-subplot(8,1,5)
-plot(testData.pd_psi(:,1))
+testData = par_set.trial1;
+for i  =1:4
+    subplot(8,1,i)
+% plot(testData.xd(:,i),'k')
+% hold on
+subplot(8,1,i)
+plot(testData.xm(:,i),'k')
 hold on
-plot(testData.pm_psi(:,1))
+% subplot(8,1,i+4)
+% plot(testData.d_est(:,i),'k')
+% hold on
+end
+
+testData = par_set.trial3;
+for i  =1:4
+    subplot(8,1,i)
+% plot(testData.xd(:,i),'k')
+% hold on
+subplot(8,1,i)
+plot(testData.xm(:,i),'g')
 hold on
-legend('pm1')
-subplot(8,1,6)
-plot(testData.pd_psi(:,2))
+% subplot(8,1,i+4)
+% plot(testData.d_est(:,i),'g')
+% hold on
+end
+%%
+close all
+figure(1)
+testData = par_set.trial2;
+for i  =1:4
+    subplot(4,1,i)
+plot(testData.xd(:,i),LineWidth=2)
 hold on
-plot(testData.pm_psi(:,2))
-legend('pm2')
-subplot(8,1,7)
-plot(testData.d_est(:,1))
-subplot(8,1,8)
-plot(testData.d_est(:,2))
-legend('ref','insmc','base')
+subplot(4,1,i)
+plot(testData.xm(:,i),'g')
+hold on
+xlim([1 1500])
+% subplot(8,1,i+4)
+% plot(testData.d_est(:,i),'r')
+% hold on
+end
+testData = par_set.trial1;
+for i  =1:4
+%     subplot(4,1,i)
+% plot(testData.xd(:,i),'k')
+% hold on
+subplot(4,1,i)
+plot(testData.xm(:,i),'r')
+hold on
+xlim([1 1500])
+% subplot(8,1,i+4)
+% plot(testData.d_est(:,i),'k')
+% hold on
+end
+
+testData = par_set.trial3;
+for i  =1:4
+%     subplot(4,1,i)
+% plot(testData.xd(:,i),'k')
+% hold on
+subplot(4,1,i)
+plot(testData.xm(:,i),'k')
+hold on
+xlim([1 1500])
+% subplot(8,1,i+4)
+% plot(testData.d_est(:,i),'g')
+% hold on
+end
+legend('ref','ASMC','NewWork','Frotier')
+%%
+close all
+ylabelvec={'rad';'m';'rad';'m';};
+title_array = {'$\theta_1$';'$L_1$';'$\theta_2$';'$L_2$'};
+spt =1;ept =1500;
+testData = par_set.trial1;
+testData2 = par_set.trial2;
+figure(1)
+    for i =1:4
+    subplot(2,2,i)
+    plot(testData.time_stamp(spt:ept),testData.xd(spt:ept,i),LineStyle="-",LineWidth=2,Color='b')
+    hold on
+    plot(testData.time_stamp(spt:ept),testData2.xm(spt:ept,i),LineStyle="-.",LineWidth=1,Color='k')
+    hold on
+     plot(testData.time_stamp(spt:ept),testData.xm(spt:ept,i),LineStyle="-",LineWidth=1,Color='r')
+    
+    hold on
+    ylabel(ylabelvec{i})
+    title(title_array{i},Interpreter="latex",FontSize=12)
+    xlim([0,50])
+    % ylim([0 20])
+        legend('Ref','ASMC','INASMC',Location='southeast')
+    hold on
+    end
+testData = par_set.trial1;
+testData2 = par_set.trial3;
+figure(2)
+    for i =1:4
+    subplot(2,2,i)
+    plot(testData.time_stamp(spt:ept),testData.xd(spt:ept,i),LineStyle="-",LineWidth=2,Color='b')
+    hold on
+    plot(testData.time_stamp(spt:ept),testData2.xm(spt:ept,i),LineStyle="-.",LineWidth=1,Color='k')
+    hold on
+     plot(testData.time_stamp(spt:ept),testData.xm(spt:ept,i),LineStyle="-",LineWidth=1,Color='r')
+    
+    hold on
+    ylabel(ylabelvec{i})
+    title(title_array{i},Interpreter="latex",FontSize=12)
+    xlim([0,50])
+    % ylim([0 20])
+        legend('Ref','NSMC','INASMC',Location='southeast')
+    hold on
+    end
 
 %%
 %%% Calculate State variable from sensor readings%%%

@@ -178,12 +178,29 @@ class pc_client(object):
                 seg2_r = 0.0
                 seg2_l = 0.0
                 seg2_m = 0.0
-                self.pres_single_step_response(np.array([seg1_r,seg1_l,seg1_m,seg2_r,seg2_l,seg2_m]),10)
+                self.pres_single_step_response(np.array([seg1_r,seg1_l,seg1_m,seg2_r,seg2_l,seg2_m]),3)
                 self.flag_reset=0
             self.t0_on_glob = time()
             try:
                 while(self.flag_end_test):
-                    td = 60
+                    td = 10
+                    self.a_array = np.array([np.deg2rad(0),0.00,np.deg2rad(0),0.00])
+                    self.b_array = np.array([np.deg2rad(-20),0.01,np.deg2rad(20),0.01])
+                    self.seg1and2_position_sin_square_response(td,time())
+
+                    td = 10
+                    self.a_array = np.array([np.deg2rad(0),0.00,np.deg2rad(0),0.00])
+                    self.b_array = np.array([np.deg2rad(20),0.015,np.deg2rad(-20),0.02])
+                    self.seg1and2_position_sin_square_response(td,time())
+
+                    td = 10
+                    self.a_array = np.array([np.deg2rad(0),0.00,np.deg2rad(0),0.00])
+                    self.b_array = np.array([np.deg2rad(-10),0.015,np.deg2rad(-10),0.02])
+                    self.seg1and2_position_sin_square_response(td,time())
+
+                    td = 10
+                    self.a_array = np.array([np.deg2rad(0),0.00,np.deg2rad(0),0.00])
+                    self.b_array = np.array([np.deg2rad(20),0.015,np.deg2rad(20),0.02])
                     self.seg1and2_position_sin_square_response(td,time())
                     # td = 10
                     # theta1d = np.deg2rad(-20)
@@ -299,8 +316,8 @@ class pc_client(object):
 
                 s1_l = (self.filt_array_wireEnco[0] - self.wireEnco_ini[0])/5
                 s1_r = (self.filt_array_wireEnco[1] - self.wireEnco_ini[1])/5
-                s2_l = (self.filt_array_wireEnco[3] - self.wireEnco_ini[3])/5
-                s2_r = (self.filt_array_wireEnco[2] - self.wireEnco_ini[2])/5
+                s2_l = (self.filt_array_wireEnco[3] - self.wireEnco_ini[3])/5 - s1_l
+                s2_r = (self.filt_array_wireEnco[2] - self.wireEnco_ini[2])/5 - s1_r
 
                 x1 = (s1_l-s1_r)/self.act_r0
                 x2 = (s1_l+s1_r)/2
@@ -308,15 +325,20 @@ class pc_client(object):
                 x4 = (s2_l+s2_r)/2
                 self.position_est_array = np.array([x1,x2,x3,x4])
 
-                e01 = x1d - x1
-                e02 = x2d - x2
-                e03 = x3d - x3
-                e04 = x4d - x4
+                e01 = -x1d + x1
+                e02 = -x2d + x2
+                e03 = -x3d + x3
+                e04 = -x4d + x4
                 # LPV parameter
-                zold1 = self.pd_pm_array_1[4] - self.pd_pm_array_1[3]
-                zold2 = self.pd_pm_array_1[4] + self.pd_pm_array_1[3]
-                zold3 = self.pd_pm_array_2[4] - self.pd_pm_array_2[3]
-                zold4 = self.pd_pm_array_2[4] + self.pd_pm_array_2[3]
+                zold1unb = self.pd_pm_array_1[4] - self.pd_pm_array_1[3]
+                zold2unb = self.pd_pm_array_1[4] + self.pd_pm_array_1[3]
+                zold3unb = self.pd_pm_array_2[4] - self.pd_pm_array_2[3]
+                zold4unb = self.pd_pm_array_2[4] + self.pd_pm_array_2[3]
+
+                zold1 = self.func_state_parameter_saturation(zold1unb,20,-20)
+                zold2 = self.func_state_parameter_saturation(zold2unb,20,0)
+                zold3 = self.func_state_parameter_saturation(zold3unb,20,-20)
+                zold4 = self.func_state_parameter_saturation(zold4unb,20,0)
 
                 kk1 = -1.767*zold1**2 + 17.55*np.absolute(zold1)+33.471
                 kk2 = 10.25*zold2**2 - 325.1*zold2+3299
@@ -328,37 +350,44 @@ class pc_client(object):
                 d3=  0.1125*zold3**2- 1.2*np.absolute(zold3)+14.471
                 d4= 4.34*zold4**2 - 155.21*zold4+2146
                 # NDOB estimation
+                dt = time() -self.t_old
+                self.t_old = time()
                 pxold1 = self.l1*x1
-                z_new1 = self.funcRK4_z_update(t_new-self.t_old,self.l1,e01,self.eta1)
+                z_new1 = self.funcRK4_z_update(dt,self.l1,e01,self.eta1)
                 self.d_est_old[0] = z_new1 + pxold1
 
                 pxold2 = self.l2*x2
-                z_new2 = self.funcRK4_z_update(t_new-self.t_old,self.l2,e01,self.eta2)
+                z_new2 = self.funcRK4_z_update(dt,self.l2,e01,self.eta2)
                 self.d_est_old[1] = z_new2 + pxold2
 
                 pxold3 = self.l3*x3
-                z_new3 = self.funcRK4_z_update(t_new-self.t_old,self.l3,e01,self.eta3)
+                z_new3 = self.funcRK4_z_update(dt,self.l3,e01,self.eta3)
                 self.d_est_old[2] = z_new3 + pxold3
 
                 pxold4 = self.l4*x4
-                z_new4 = self.funcRK4_z_update(t_new-self.t_old,self.l4,e01,self.eta4)
+                z_new4 = self.funcRK4_z_update(dt,self.l4,e01,self.eta4)
                 self.d_est_old[3] = z_new4 + pxold4
 
                 # torque calculation
-                u1 = d1*(dtdx1d - kk1/d1*x1 +self.eta01*e01+self.eta1*np.sign(e01)-self.d_est_old[0])
-                u2 = d2*(dtdx2d - kk2/d2*x2 +self.eta02*e02+self.eta2*np.sign(e02)-self.d_est_old[1])
-                u3 = d3*(dtdx3d - kk3/d3*x3 +self.eta03*e03+self.eta3*np.sign(e03)-self.d_est_old[2])
-                u4 = d4*(dtdx4d - kk4/d4*x4 +self.eta04*e04+self.eta4*np.sign(e04)-self.d_est_old[3])
+                u1ub = d1*(dtdx1d - kk1/d1*x1 +self.eta01*e01+self.eta1*np.sign(e01)-self.d_est_old[0])
+                u2ub = d2*(dtdx2d - kk2/d2*x2 +self.eta02*e02+self.eta2*np.sign(e02)-self.d_est_old[1])
+                u3ub = d3*(dtdx3d - kk3/d3*x3 +self.eta03*e03+self.eta3*np.sign(e03)-self.d_est_old[2])
+                u4ub = d4*(dtdx4d - kk4/d4*x4 +self.eta04*e04+self.eta4*np.sign(e04)-self.d_est_old[3])
+                u1 = self.func_torque_saturation(u1ub,30,-30)
+                u2 = self.func_torque_saturation(u2ub,30,-30)
+                u3 = self.func_torque_saturation(u3ub,30,-30)
+                u4 = self.func_torque_saturation(u4ub,30,-30)
+
                 # print(u1,u2,u3,u4)
                 pd1_ub = (u2-u1)/2
                 pd2_ub = (u2+u1)/2
                 pd3_ub = (u4-u3)/2
                 pd4_ub = (u4+u3)/2
 
-                pd1 = self.func_input_saturation(pd1_ub)
-                pd2 = self.func_input_saturation(pd2_ub)
-                pd3 = self.func_input_saturation(pd3_ub)
-                pd4 = self.func_input_saturation(pd4_ub)
+                pd1 = self.func_input_saturation(pd1_ub,15)
+                pd2 = self.func_input_saturation(pd2_ub,15)
+                pd3 = self.func_input_saturation(pd3_ub,15)
+                pd4 = self.func_input_saturation(pd4_ub,15)
 
                 self.pd_pm_array_1[0] = pd1
                 self.pd_pm_array_1[1] = pd2
@@ -368,107 +397,13 @@ class pc_client(object):
                 self.pd_pm_array_2[2] = 0.0
                 self.send_zipped_socket0(self.pd_pm_array_1[0:3])
                 self.send_zipped_socket4(self.pd_pm_array_2[0:3])
-                self.t_old = t_new
-                print(self.position_d_array[0:4]-self.position_est_array)
+                print(np.round(1/dt,0),self.position_d_array[0:4]-self.position_est_array)
+                if dt <= 1.0/100:
+                    sleep(1.0/100)
             except KeyboardInterrupt:
                 self.th1_flag = 0
                 self.th2_flag = 0
         
-    def seg1and2_position_step_response(self,position_array,step_time,t0_time):
-        t = time() - t0_time # range from 0
-        self.t_old =time()
-        while (self.th1_flag and self.th2_flag and (t <= step_time)):   
-            try:
-                t = time() - t0_time # range from 0
-                t_new = time()
-                # State Parameter update
-                x1d = self.position_d_array[0]
-                x2d =self.position_d_array[1]
-                x3d = self.position_d_array[2]
-                x4d = self.position_d_array[3] 
-
-                dtdx1d = self.position_d_array[4]
-                dtdx2d =self.position_d_array[5]
-                dtdx3d = self.position_d_array[6]
-                dtdx4d = self.position_d_array[7] 
-
-                s1_l = (self.filt_array_wireEnco[0] - self.wireEnco_ini[0])/5
-                s1_r = (self.filt_array_wireEnco[1] - self.wireEnco_ini[1])/5
-                s2_l = (self.filt_array_wireEnco[2] - self.wireEnco_ini[2])/5
-                s2_r = (self.filt_array_wireEnco[3] - self.wireEnco_ini[3])/5
-
-                x1 = (s1_l-s1_r)/self.act_r0
-                x2 = (s1_l+s1_r)/2
-                x3 = (s2_l-s2_r)/self.act_r0
-                x4 = (s2_l+s2_r)/2
-                self.position_est_array = np.array([x1,x2,x3,x4])
-
-                e01 = x1d - x1
-                e02 = x2d - x2
-                e03 = x3d - x3
-                e04 = x4d - x4
-                # LPV parameter
-                zold1 = self.pd_pm_array_1[4] - self.pd_pm_array_1[3]
-                zold2 = self.pd_pm_array_1[4] + self.pd_pm_array_1[3]
-                zold3 = self.pd_pm_array_2[4] - self.pd_pm_array_2[3]
-                zold4 = self.pd_pm_array_2[4] + self.pd_pm_array_2[3]
-
-                kk1 = -1.767*zold1**2 + 17.55*np.absolute(zold1)+33.471
-                kk2 = 10.25*zold2**2 - 325.1*zold2+3299
-                kk3 =-1.013*zold3**2+11.55*np.absolute(zold3)+4.419
-                kk4 = 15.34*zold4**2 - 474.1*zold4+4475
-
-                d1= 0.9725*zold1**2- 11.2*np.absolute(zold1)+38.471
-                d2= -0.9725*zold2**2+ 30.23*zold2+435.471
-                d3=  0.1125*zold3**2- 1.2*np.absolute(zold3)+14.471
-                d4= 4.34*zold4**2 - 155.21*zold4+2146
-                # NDOB estimation
-                pxold1 = self.l1*x1
-                z_new1 = self.funcRK4_z_update(t_new-self.t_old,self.l1,e01,self.eta1)
-                self.d_est_old[0] = z_new1 + pxold1
-
-                pxold2 = self.l2*x2
-                z_new2 = self.funcRK4_z_update(t_new-self.t_old,self.l2,e01,self.eta2)
-                self.d_est_old[1] = z_new2 + pxold2
-
-                pxold3 = self.l3*x3
-                z_new3 = self.funcRK4_z_update(t_new-self.t_old,self.l3,e01,self.eta3)
-                self.d_est_old[2] = z_new3 + pxold3
-
-                pxold4 = self.l4*x4
-                z_new4 = self.funcRK4_z_update(t_new-self.t_old,self.l4,e01,self.eta4)
-                self.d_est_old[3] = z_new4 + pxold4
-
-                # torque calculation
-                u1 = 1/d1*(dtdx1d - kk1*x1 +self.eta01*e01+self.eta1*np.sign(e01)-self.d_est_old[0])
-                u2 = 1/d2*(dtdx2d - kk2*x2 +self.eta02*e02+self.eta2*np.sign(e02)-self.d_est_old[1])
-                u3 = 1/d3*(dtdx3d - kk3*x3 +self.eta03*e03+self.eta3*np.sign(e03)-self.d_est_old[2])
-                u4 = 1/d4*(dtdx4d - kk4*x4 +self.eta04*e04+self.eta4*np.sign(e04)-self.d_est_old[3])
-                # print(u1,u2,u3,u4)
-                pd1_ub = (u2-u1)/2
-                pd2_ub = (u2+u1)/2
-                pd3_ub = (u4-u3)/2
-                pd4_ub = (u4+u3)/2
-
-                pd1 = self.func_input_saturation(pd1_ub)
-                pd2 = self.func_input_saturation(pd2_ub)
-                pd3 = self.func_input_saturation(pd3_ub)
-                pd4 = self.func_input_saturation(pd4_ub)
-
-                self.pd_pm_array_1[0] = pd1
-                self.pd_pm_array_1[1] = pd2
-                self.pd_pm_array_1[2] = 2.0
-                self.pd_pm_array_2[0] = pd3
-                self.pd_pm_array_2[1] = pd4
-                self.pd_pm_array_2[2] = 0.0
-                self.send_zipped_socket0(self.pd_pm_array_1[0:3])
-                self.send_zipped_socket4(self.pd_pm_array_2[0:3])
-                self.t_old = t_new
-                print(self.position_d_array[0:4]-self.position_est_array)
-            except KeyboardInterrupt:
-                self.th1_flag = 0
-                self.th2_flag = 0
-
 
     def pres_single_step_response(self,pd_array,step_time):
         t = time() - self.t0_on_trial # range from 0
@@ -502,14 +437,38 @@ class pc_client(object):
                 self.th1_flag = 0
                 self.th2_flag = 0
 
-    def func_input_saturation(self,pdi_ub):
+    def func_state_parameter_saturation(self,zold_unb,zupbd,zdownbd):
+        if zold_unb >= zupbd:
+            zold_bd = zupbd
+        elif zold_unb <= zdownbd:
+            zold_bd = zdownbd
+        else:
+            zold_bd = zold_unb
+        return zold_bd
+
+    def func_input_saturation(self,pdi_ub,up_bound):
         if pdi_ub <=0:
             pd =0
-        elif pdi_ub>=20:
-            pd =20
+        elif pdi_ub>=up_bound:
+            pd =up_bound
         else:
             pd = pdi_ub
         return pd
+
+    def func_torque_saturation(self,u_ub,uupbd,udownbd):
+        if u_ub >= uupbd:
+            ubd = uupbd
+        elif u_ub<= udownbd:
+            ubd = udownbd
+        else:
+            ubd = u_ub
+        return ubd
+    def func_saturation(self,e0i,sat_bound):
+        if np.absolute(e0i) <=sat_bound:
+            sat_e0i = e0i/sat_bound
+        elif np.absolute(e0i)>sat_bound:
+            sat_e0i = e0i
+        return sat_e0i
         
     def funcRK4_z_update(self,dt,li,e0i,etai):
         xold_k1 = e0i
