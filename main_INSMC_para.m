@@ -39,6 +39,7 @@ par_set.r0 = 0.043;% m distance between left and right encoder wires
 fprintf('System initialization done \n')
 %%% End %%%
 %% Mean std for data
+ctrl_flag =3;% 1:asmc 2:nsmc 3:inasmc
 if par_set.flag_read_exp==1
     for i = 1:7
         par_set= funcLoadExp2Seg(par_set,i);
@@ -110,6 +111,7 @@ theta1_mean = mean(theta1,2);
 L1_mean = mean(L1,2);
 theta2_mean = mean(theta2,2);
 L2_mean = mean(L2,2);
+x_mean = [theta1_mean,L1_mean,theta2_mean,L2_mean];
 
 theta1_upper = theta1_mean + std(theta1,0,2);
 L1_upper = L1_mean + std(L1,0,2);
@@ -120,14 +122,124 @@ theta1_lower = theta1_mean - std(theta1,0,2);
 L1_lower = L1_mean - std(L1,0,2);
 theta2_lower = theta2_mean - std(theta2,0,2);
 L2_lower = L2_mean - std(L2,0,2);
+
+close all
+ylabelvec={'rad';'m';'rad';'m';};
+title_array = {'$\theta_1$';'$L_1$';'$\theta_2$';'$L_2$'};
+spt =1;ept =1500;
+testData = par_set.trial1;
+figure(1)
+    for i =1:4
+    subplot(2,2,i)
+    plot(testData.time_stamp(spt:ept),testData.xd(spt:ept,i),LineStyle="-",LineWidth=2,Color='b')
+    hold on
+    plot(testData.time_stamp(spt:ept),x_mean(spt:ept,i),'r')
+    hold on
+    ylabel(ylabelvec{i})
+    title(title_array{i},Interpreter="latex",FontSize=12)
+    xlim([0,50])
+    % ylim([0 20])
+    if ctrl_flag ==1
+    legend('Ref','ASMC',Location='southeast')
+elseif ctrl_flag==2
+legend('Ref','NSMC',Location='southeast')
+else
+legend('Ref','INASMC',Location='southeast')
+    end
+%         
+        
+        
+    hold on
+    end
+% Get RMSE
+j =1;
+testData = par_set.trial1;
+for i =1:4
+ydi = testData.xd(spt:ept,i);
+y = testData.xm(spt:ept,i);
+rmse(j,i) = sqrt((ydi-y)'*(ydi-y)/ept);
+end
+
+j =2;
+testData = par_set.trial2;
+for i =1:4
+ydi = testData.xd(spt:ept,i);
+y = testData.xm(spt:ept,i);
+rmse(j,i) = sqrt((ydi-y)'*(ydi-y)/ept);
+end
+
+j =3;
+testData = par_set.trial3;
+for i =1:4
+ydi = testData.xd(spt:ept,i);
+y = testData.xm(spt:ept,i);
+rmse(j,i) = sqrt((ydi-y)'*(ydi-y)/ept);
+end
+
+j =4;
+testData = par_set.trial4;
+for i =1:4
+ydi = testData.xd(spt:ept,i);
+y = testData.xm(spt:ept,i);
+rmse(j,i) = sqrt((ydi-y)'*(ydi-y)/ept);
+end
+j =5;
+testData = par_set.trial5;
+for i =1:4
+ydi = testData.xd(spt:ept,i);
+y = testData.xm(spt:ept,i);
+rmse(j,i) = sqrt((ydi-y)'*(ydi-y)/ept);
+end
+j =6;
+testData = par_set.trial6;
+for i =1:4
+ydi = testData.xd(spt:ept,i);
+y = testData.xm(spt:ept,i);
+rmse(j,i) = sqrt((ydi-y)'*(ydi-y)/ept);
+end
+j =7;
+testData = par_set.trial7;
+for i =1:4
+ydi = testData.xd(spt:ept,i);
+y = testData.xm(spt:ept,i);
+rmse(j,i) = sqrt((ydi-y)'*(ydi-y)/ept);
+end
+%%%%%%%%%%%%%%%%%%%
+if ctrl_flag ==1
+    asmc_rmse = rmse;
+elseif ctrl_flag==2
+nsmc_rmse = rmse;
+else
+inasmc_rmse = rmse;
+end
 %%
 close all
+mean_asmc = mean(asmc_rmse,1);
+mean_nsmc = mean(nsmc_rmse,1);
+mean_inasmc = mean(inasmc_rmse,1);
+mean_all = [mean_asmc;mean_nsmc;mean_inasmc];
+std_all = [std(asmc_rmse,1);std(nsmc_rmse,1);std(inasmc_rmse,1);];
+low_all = mean_all
+x_bar_pos=categorical({'ASMC','NSMC','INASMC'});
+x_bar_pos=reordercats(x_bar_pos,{'ASMC','NSMC','INASMC'});
 figure(1)
-hold on
-% fill([testData.time_stamp(spt:ept)',fliplr(testData.time_stamp(spt:ept)')],[theta1_upper',fliplr(theta1_lower')],'b','EdgeColor','none')
-plot(testData.time_stamp(spt:ept),theta1_mean,'k')
-hold on
-plot(testData.time_stamp(spt:ept),testData.xd(1:1500),'r')
+    for i =1:4
+    subplot(2,2,i)
+    bar_obj = bar(x_bar_pos,mean_all(:,i));
+    bar_obj(1).FaceColor = 'flat';
+    bar_obj.CData(1,:)= [211 211 211]/255;
+    bar_obj.CData(2,:)= [128 128 128]/255;
+    bar_obj.CData(3,:)= [129 133 137]/255;
+    ylabel(ylabelvec{i})
+    title(title_array{i},Interpreter="latex",FontSize=12)
+%     xlim([0,4])       
+    hold on
+    er =errorbar(x_bar_pos,mean_all(:,i),-std_all(:,i), ...
+        +std_all(:,i));
+    er.Color = [0 0 0];                            
+    er.LineStyle = 'none'; 
+    hold on
+    end
 %%
 % z = linspace(1,101,101)';
 % 
