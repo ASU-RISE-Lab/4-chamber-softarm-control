@@ -65,14 +65,17 @@ end
     par.enco_volts = [];par.enco_volts = resampleData(:,13:16);
 
     par.rigid_1_pose = []; par.rigid_1_pose(:,1:3) = resampleData(:,17:19);
-    par.rigid_1_rot = []; par.rigid_1_rot(:,1:4) = resampleData(:,20:23);
+    par.rigid_1_rotq = []; par.rigid_1_rotq(:,1:4) = resampleData(:,20:23);
+    par.rigid_1_rote = []; par.rigid_1_rote(:,1:3) = quat2eul([resampleData(:,23),resampleData(:,20:22)]);
 
     par.rigid_2_pose = []; par.rigid_2_pose(:,1:3) = resampleData(:,24:26);
-    par.rigid_2_rot = []; par.rigid_2_rot(:,1:4) = resampleData(:,27:30);
+    par.rigid_2_rotq = []; par.rigid_2_rotq(:,1:4) = resampleData(:,27:30);
+        par.rigid_2_rote = []; par.rigid_2_rote(:,1:3) = quat2eul([resampleData(:,30),resampleData(:,27:29)]);
 
     par.rigid_3_pose = []; par.rigid_3_pose(:,1:3) = resampleData(:,31:33);
-    par.rigid_3_rot = []; par.rigid_3_rot(:,1:4) = resampleData(:,34:37);
-
+    par.rigid_3_rotq = []; par.rigid_3_rotq(:,1:4) = resampleData(:,34:37);
+        par.rigid_3_rote = []; par.rigid_3_rote(:,1:3) = quat2eul([resampleData(:,37),resampleData(:,34:36)]);
+    
     if size(resampleData,2) == 37+8+4+4
         par.xm = resampleData(:,38:38+4-1);
         par.xd = resampleData(:,38+4:38+8+4-1);

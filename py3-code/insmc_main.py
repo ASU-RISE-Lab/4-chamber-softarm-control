@@ -320,6 +320,7 @@ class pc_client(object):
                 self.x3 = (s2_l-s2_r)/self.act_r0
                 self.x4 = (s2_l+s2_r)/2
                 self.position_est_array = np.array([self.x1,self.x2,self.x3,self.x4])
+                
 
                 dt = time()-self.t_old
                 self.t_old = time()
