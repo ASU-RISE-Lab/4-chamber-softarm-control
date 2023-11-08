@@ -53,30 +53,72 @@ else
     load('raw_id_data.mat');
     fprintf( 'Data loaded \n' );
 end
-testData = par_set.trial1;
-close all
+% testData = par_set.trial1;
+% close all
+% 
+% figure(1)
+% testData = par_set.trial2;
+% for i  =1:4
+%     subplot(8,1,i)
+% plot(testData.xd(:,i),LineWidth=2)
+% hold on
+% subplot(8,1,i)
+% plot(testData.xm(:,i))
+% hold on
+% % subplot(8,1,i+4)
+% % plot(testData.d_est(:,i),'r')
+% % hold on
+% end
+% testData = par_set.trial1;
+% for i  =1:4
+%     subplot(8,1,i)
+% % plot(testData.xd(:,i),'k')
+% % hold on
+% subplot(8,1,i)
+% plot(testData.xm(:,i),'k')
+% hold on
+% % subplot(8,1,i+4)
+% % plot(testData.d_est(:,i),'k')
+% % hold on
+% end
+% 
+% testData = par_set.trial3;
+% for i  =1:4
+%     subplot(8,1,i)
+% % plot(testData.xd(:,i),'k')
+% % hold on
+% subplot(8,1,i)
+% plot(testData.xm(:,i),'g')
+% hold on
+% % subplot(8,1,i+4)
+% % plot(testData.d_est(:,i),'g')
+% % hold on
+% end
 
+close all
 figure(1)
-testData = par_set.trial2;
+testData = par_set.trial1;
 for i  =1:4
-    subplot(8,1,i)
+    subplot(4,1,i)
 plot(testData.xd(:,i),LineWidth=2)
 hold on
-subplot(8,1,i)
-plot(testData.xm(:,i))
+subplot(4,1,i)
+plot(testData.xm(:,i),'g')
 hold on
+xlim([1 1500])
 % subplot(8,1,i+4)
 % plot(testData.d_est(:,i),'r')
 % hold on
 end
-testData = par_set.trial1;
+testData = par_set.trial2;
 for i  =1:4
-    subplot(8,1,i)
+%     subplot(4,1,i)
 % plot(testData.xd(:,i),'k')
 % hold on
-subplot(8,1,i)
-plot(testData.xm(:,i),'k')
+subplot(4,1,i)
+plot(testData.xm(:,i),'r')
 hold on
+xlim([1 1500])
 % subplot(8,1,i+4)
 % plot(testData.d_est(:,i),'k')
 % hold on
@@ -84,16 +126,51 @@ end
 
 testData = par_set.trial3;
 for i  =1:4
-    subplot(8,1,i)
+%     subplot(4,1,i)
 % plot(testData.xd(:,i),'k')
 % hold on
-subplot(8,1,i)
-plot(testData.xm(:,i),'g')
+subplot(4,1,i)
+plot(testData.xm(:,i),'k')
 hold on
+xlim([1 1500])
 % subplot(8,1,i+4)
 % plot(testData.d_est(:,i),'g')
 % hold on
 end
+legend('ref','og','small',"large")
+ylim_i = [-1 1;-0.04 0.04;-1 1;-0.04 0.04;];
+figure(2)
+testData = par_set.trial1;
+for i  =1:4
+    subplot(4,1,i)
+% subplot(8,1,i+4)
+plot(testData.d_est(:,i),'g')
+xlim([1 1500])
+ylim (ylim_i(i,:))
+hold on
+end
+testData = par_set.trial2;
+for i  =1:4
+
+subplot(4,1,i)
+plot(testData.d_est(:,i),'r')
+xlim([1 1500])
+ylim (ylim_i(i,:))
+hold on
+end
+
+testData = par_set.trial3;
+for i  =1:4
+%     subplot(4,1,i)
+% plot(testData.xd(:,i),'k')
+% hold on
+subplot(4,1,i)
+plot(testData.d_est(:,i),'k')
+xlim([1 1500])
+ylim (ylim_i(i,:))
+hold on
+end
+legend('og','small',"large")
 %%
 close all
 figure(1)

@@ -21,7 +21,7 @@ from time import sleep
 def main():
     try:
         #### Select control method ####
-        flag_ctrl_mode=2
+        flag_ctrl_mode=1
         if flag_ctrl_mode==0:
             p_client=basesmc2_main.pc_client()
         elif flag_ctrl_mode==1:

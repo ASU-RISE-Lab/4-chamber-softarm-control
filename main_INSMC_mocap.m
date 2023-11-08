@@ -68,7 +68,7 @@ figure(1)
     hold on
     xlim([0,50])
 %% Mean std for data
-ctrl_flag =3;% 1:asmc 2:nsmc 3:inasmc
+ctrl_flag =2;% 1:asmc 2:nsmc 3:inasmc
 if par_set.flag_read_exp==1
     for i = 1:7
         par_set= funcLoadExp2Seg(par_set,i);

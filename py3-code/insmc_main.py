@@ -148,16 +148,60 @@ class pc_client(object):
         self.act_r0 = 0.043
         self.t_old = time()
         self.t_old_u = time()
+
         # INDOB parameters
-        self.l1 = 1*10**(0)
-        self.l2 = 1*10**(0)
-        self.l3 = 1*10**(0)
-        self.l4 = 1*10**(0)
+        # self.l1 = 1*10**(0)# og data1
+        # self.l2 = 1*10**(0)
+        # self.l3 = 1*10**(0)
+        # self.l4 = 1*10**(0)
 
         self.l12 = 1*10**(0)
         self.l22 = 1*10**(0)
         self.l32 = 1*10**(0)
         self.l42 = 1*10**(0)
+
+        self.eta01 = 1*10**(1)
+        self.eta02 = 1*10**(1)
+        self.eta03 = 1*10**(1)
+        self.eta04 = 1*10**(1)
+
+        self.l1 = 1*10**(-2)# data2
+        self.l2 = 1*10**(-2)
+        self.l3 = 1*10**(-2)
+        self.l4 = 1*10**(-2)
+
+        # self.eta01 = 1*10**(0)
+        # self.eta02 = 1*10**(0)
+        # self.eta03 = 1*10**(0)
+        # self.eta04 = 1*10**(0)
+
+        # self.l12 = 0*10**(-2)
+        # self.l22 = 0*10**(-2)
+        # self.l32 = 0*10**(-2)
+        # self.l42 = 0*10**(-2)
+
+        # self.eta01 = 1*10**(-3)
+        # self.eta02 = 1*10**(-3)
+        # self.eta03 = 1*10**(-3)
+        # self.eta04 = 1*10**(-3)
+
+
+
+
+        # self.l1 = 1*10**(2)#data3
+        # self.l2 = 1*10**(2)
+        # self.l3 = 1*10**(2)
+        # self.l4 = 1*10**(2)
+
+        self.l12 = 0.5*10**(1)
+        self.l22 = 0.5*10**(1)
+        self.l32 = 0.5*10**(1)
+        self.l42 = 5*10**(1)
+
+        # self.eta01 = 1*10**(3)
+        # self.eta02 = 1*10**(3)
+        # self.eta03 = 1*10**(3)
+        # self.eta04 = 1*10**(3)
 
         self.dtddmax1 = 1*10**(-1)
         self.dtddmax2 = 1*10**(-1)
@@ -170,10 +214,7 @@ class pc_client(object):
         self.eta4 = 1
 
 
-        self.eta01 = 1*10**1
-        self.eta02 = 1*10**1
-        self.eta03 = 1*10**1
-        self.eta04 = 1*10**1
+
 
         self.u1 = 0.
         self.u2 = 0.
@@ -222,7 +263,7 @@ class pc_client(object):
             self.t_old_u =time()
             try:
                 while(self.flag_end_test):
-                    td = 60
+                    td = 30
                     self.a_array = np.array([np.deg2rad(20),0.00,np.deg2rad(20),0.00])
                     self.b_array = np.array([np.deg2rad(0),0.015,np.deg2rad(0),0.015])
                     self.seg1and2_position_sin_square_response(td,time())
