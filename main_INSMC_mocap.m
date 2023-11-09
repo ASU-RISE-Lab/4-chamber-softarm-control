@@ -269,6 +269,36 @@ figure(1)
     er.LineStyle = 'none'; 
     hold on
     end
+
+    %%
+close all
+ylabelvec={'rad';'m';'rad';'m';};
+title_array = {'$\theta_1$';'$L_1$';'$\theta_2$';'$L_2$'};
+mean_asmc = mean(asmc_rmse,1);
+mean_nsmc = mean(nsmc_rmse,1);
+mean_inasmc = mean(inasmc_rmse,1);
+mean_all = [mean_asmc;mean_inasmc];
+std_all = [std(asmc_rmse,1);std(inasmc_rmse,1);];
+low_all = mean_all;
+x_bar_pos=categorical({'ASMC','INASMC'});
+x_bar_pos=reordercats(x_bar_pos,{'ASMC','INASMC'});
+figure(1)
+    for i =1:4
+    subplot(2,2,i)
+    bar_obj = bar(x_bar_pos,mean_all(:,i));
+    bar_obj(1).FaceColor = 'flat';
+    bar_obj.CData(1,:)= [211 211 211]/255;
+    bar_obj.CData(2,:)= [128 128 128]/255;
+    ylabel(ylabelvec{i})
+    title(title_array{i},Interpreter="latex",FontSize=12)
+%     xlim([0,4])       
+    hold on
+    er =errorbar(x_bar_pos,mean_all(:,i),-std_all(:,i), ...
+        +std_all(:,i));
+    er.Color = [0 0 0];                            
+    er.LineStyle = 'none'; 
+    hold on
+    end
 %%
 % z = linspace(1,101,101)';
 % 

@@ -97,7 +97,7 @@ end
 
 close all
 figure(1)
-testData = par_set.trial1;
+testData = par_set.trial2;
 for i  =1:4
     subplot(4,1,i)
 plot(testData.xd(:,i),LineWidth=2)
@@ -110,7 +110,7 @@ xlim([1 1500])
 % plot(testData.d_est(:,i),'r')
 % hold on
 end
-testData = par_set.trial2;
+testData = par_set.trial3;
 for i  =1:4
 %     subplot(4,1,i)
 % plot(testData.xd(:,i),'k')
@@ -123,54 +123,32 @@ xlim([1 1500])
 % plot(testData.d_est(:,i),'k')
 % hold on
 end
-
-testData = par_set.trial3;
-for i  =1:4
-%     subplot(4,1,i)
-% plot(testData.xd(:,i),'k')
-% hold on
-subplot(4,1,i)
-plot(testData.xm(:,i),'k')
-hold on
-xlim([1 1500])
-% subplot(8,1,i+4)
-% plot(testData.d_est(:,i),'g')
-% hold on
-end
-legend('ref','og','small',"large")
+legend('ref','ndob','indob')
 ylim_i = [-1 1;-0.04 0.04;-1 1;-0.04 0.04;];
 figure(2)
-testData = par_set.trial1;
-for i  =1:4
-    subplot(4,1,i)
-% subplot(8,1,i+4)
-plot(testData.d_est(:,i),'g')
-xlim([1 1500])
-ylim (ylim_i(i,:))
-hold on
-end
+title_array = {'$\theta_1$';'$L_1$';'$\theta_2$';'$L_2$'};
 testData = par_set.trial2;
 for i  =1:4
-
-subplot(4,1,i)
-plot(testData.d_est(:,i),'r')
-xlim([1 1500])
+    subplot(2,2,i)
+% subplot(8,1,i+4)
+plot(testData.time_stamp,testData.d_est(:,i),'k')
+xlim([0 30])
 ylim (ylim_i(i,:))
+title(title_array{i},Interpreter="latex",FontSize=12)
+legend('NDOB','INDOB',Location='southeast')
 hold on
 end
-
 testData = par_set.trial3;
 for i  =1:4
-%     subplot(4,1,i)
-% plot(testData.xd(:,i),'k')
-% hold on
-subplot(4,1,i)
-plot(testData.d_est(:,i),'k')
-xlim([1 1500])
+
+subplot(2,2,i)
+plot(testData.time_stamp,testData.d_est(:,i),'r')
+xlim([0 30])
 ylim (ylim_i(i,:))
+title(title_array{i},Interpreter="latex",FontSize=12)
+legend('NDOB','INDOB',Location='southeast')
 hold on
 end
-legend('og','small',"large")
 %%
 close all
 figure(1)
