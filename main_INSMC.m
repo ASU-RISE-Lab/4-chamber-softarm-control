@@ -1198,7 +1198,10 @@ l1 = 1;
 l2 = 1;
 l3 = 1;
 l4 = 1;
-
+        d1t0 = 1e-2; 
+        d2t0 = 1e-2; 
+        d3t0 = 1e-2; 
+        d4t0 = 1e-2;
 %%%%%%%%%%%
 for i = 1:length(xd)
 kk1 = -1.767*zold1^2 + 17.55*abs(zold1)+33.471;
@@ -1216,8 +1219,14 @@ d4= 4.34*zold4^2 - 155.21*zold4+2146;
     e03 = -xd(3,i) + xold(3);
     e04 = -xd(4,i) + xold(4);
 
+    
+     
+   
+   
+
     pxold1 = l1x*xold(1) + etalx1*xold(1)^2*sign(xold(1));
     l1 = l1x + 2*etalx1*abs(xold(1));
+    eta1 = d1t0*exp(-l1*h*i) + dtdestmax1/l1; 
 %     intvar1new = funcRK4fintvar_onestate_improve_v2( h,l1,dtdxd(1,i),eta01,eta1,e01);
     intvar1new = funcRK4fintvar_onestate_improve_v3( h,l1,dtdxd(1,i),eta01,eta1,e01);
     destnew1 = intvar1new + pxold1;
@@ -1226,12 +1235,14 @@ d4= 4.34*zold4^2 - 155.21*zold4+2146;
 
     pxold2 = l2x*xold(2) + etalx2*xold(2)^2*sign(xold(2));
     l2 = l2x + 2*etalx1*abs(xold(2));
+    eta2 = d2t0*exp(-l2*h*i) + dtdestmax2/l2; 
 %     intvar2new = funcRK4fintvar_onestate_improve_v2( h,l2,dtdxd(2,i),eta02,eta2,e02);
     intvar2new = funcRK4fintvar_onestate_improve_v3( h,l2,dtdxd(2,i),eta02,eta2,e02);
     destnew2 = intvar2new + pxold2;
 
     pxold3 = l3x*xold(3) + etalx3*xold(3)^2*sign(xold(3));
     l3 = l3x + 2*etalx3*abs(xold(3));
+     eta3 = d3t0*exp(-l3*h*i) + dtdestmax3/l3; 
 %     intvar3new = funcRK4fintvar_onestate_improve_v2( h,l3,dtdxd(3,i),eta03,eta3,e03);
     intvar3new = funcRK4fintvar_onestate_improve_v3( h,l3,dtdxd(3,i),eta03,eta3,e03);
     destnew3 = intvar3new + pxold3;
@@ -1239,24 +1250,18 @@ d4= 4.34*zold4^2 - 155.21*zold4+2146;
 
     pxold4 = l4x*xold(4) + etalx4*xold(4)^2*sign(xold(4));
     l4 = l4x + 2*etalx4*abs(xold(4));
+     eta4 = d4t0*exp(-l4*h*i) + dtdestmax4/l4;  
 %     intvar4new = funcRK4fintvar_onestate_improve_v2( h,l4,dtdxd(4,i),eta04,eta4,e04);
     intvar4new = funcRK4fintvar_onestate_improve_v3( h,l4,dtdxd(4,i),eta04,eta4,e04);
     destnew4 = intvar4new + pxold4;
 
-    eta1 = eta01*abs(e01) + dtdestmax1/l1; 
-    eta2 = eta02*abs(e02) + dtdestmax2/l2; 
-    eta3 = eta03*abs(e03) + dtdestmax3/l3; 
-    eta4 = eta04*abs(e04) + dtdestmax4/l4; 
-    if i ==1
-        d1t0 = abs(destnew1); 
-        d2t0 = abs(destnew1); 
-        d3t0 = abs(destnew1); 
-        d4t0 = abs(destnew1);
-    end
-    eta1 = d1t0*exp(-l1*h*i) + dtdestmax1/l1; 
-    eta2 = d2t0*exp(-l2*h*i) + dtdestmax2/l2;  
-    eta3 = d3t0*exp(-l3*h*i) + dtdestmax3/l3; 
-    eta4 = d4t0*exp(-l4*h*i) + dtdestmax4/l4;  
+%     eta1 = eta01*abs(e01) + dtdestmax1/l1; 
+%     eta2 = eta02*abs(e02) + dtdestmax2/l2; 
+%     eta3 = eta03*abs(e03) + dtdestmax3/l3; 
+%     eta4 = eta04*abs(e04) + dtdestmax4/l4; 
+
+ 
+
 
     u1 = d1*(dtdxd(1,i) + kk1/d1*xold(1) - (eta01*e01+eta1*sign(e01))-destnew1);
     u2 = d2*(dtdxd(2,i) + kk2/d2*xold(2) - (eta02*e02+eta2*sign(e02))-destnew2);
