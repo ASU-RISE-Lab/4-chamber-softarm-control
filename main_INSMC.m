@@ -1247,7 +1247,16 @@ d4= 4.34*zold4^2 - 155.21*zold4+2146;
     eta2 = eta02*abs(e02) + dtdestmax2/l2; 
     eta3 = eta03*abs(e03) + dtdestmax3/l3; 
     eta4 = eta04*abs(e04) + dtdestmax4/l4; 
-
+    if i ==1
+        d1t0 = abs(destnew1); 
+        d2t0 = abs(destnew1); 
+        d3t0 = abs(destnew1); 
+        d4t0 = abs(destnew1);
+    end
+    eta1 = d1t0*exp(-l1*h*i) + dtdestmax1/l1; 
+    eta2 = d2t0*exp(-l2*h*i) + dtdestmax2/l2;  
+    eta3 = d3t0*exp(-l3*h*i) + dtdestmax3/l3; 
+    eta4 = d4t0*exp(-l4*h*i) + dtdestmax4/l4;  
 
     u1 = d1*(dtdxd(1,i) + kk1/d1*xold(1) - (eta01*e01+eta1*sign(e01))-destnew1);
     u2 = d2*(dtdxd(2,i) + kk2/d2*xold(2) - (eta02*e02+eta2*sign(e02))-destnew2);
@@ -1347,6 +1356,320 @@ if u1 <=umint
     dest3(i) = destnew3;
     dest4(i) = destnew4;
 end
+title_array = {'$\theta_1$';'$L_1$';'$\theta_2$';'$L_2$'};
+close all
+figure(1)
+subplot(4,2,1)
+plot(xest(:,1))
+hold on
+plot(outputKnown.arc_state_wire(:,1))
+hold on
+title('$\theta_1$','Interpreter','latex')
+legend('exp','sim',Location='south')
+ylabel('rad')
+subplot(4,2,3)
+plot(xest(:,2))
+hold on
+plot(outputKnown.arc_state_wire(:,2))
+hold on
+title('$L_1$','Interpreter','latex')
+legend('exp','sim',Location='south')
+ylabel('m')
+subplot(4,2,2)
+plot(xest(:,3))
+hold on
+plot(outputKnown.arc_state_wire(:,3))
+hold on
+title('$\theta_2$','Interpreter','latex')
+legend('exp','sim',Location='south')
+ylabel('rad')
+subplot(4,2,4)
+plot(xest(:,4))
+hold on
+plot(outputKnown.arc_state_wire(:,4))
+title('$L_2$','Interpreter','latex')
+legend('exp','sim',Location='south')
+ylabel('m')
+subplot(4,2,5)
+plot(pd1)
+hold on
+plot(pm1)
+title('$p_1$','Interpreter','latex')
+legend('pd','pm')
+ylabel('psi')
+subplot(4,2,7)
+plot(pd2)
+hold on
+plot(pm2)
+title('$p_2$','Interpreter','latex')
+legend('pd','pm')
+ylabel('psi')
+subplot(4,2,6)
+plot(pd3)
+hold on
+plot(pm3)
+title(['$p_3$'],'Interpreter','latex')
+legend('pd','pm')
+ylabel('psi')
+subplot(4,2,8)
+plot(pd4)
+hold on
+plot(pm4)
+title(['$p_4$'],'Interpreter','latex')
+legend('pd','pm')
+ylabel('psi')
+sgtitle("INDOBASMC LPV at 40Hz")
+
+figure(2)
+subplot(4,1,1)
+plot(dest1)
+hold on
+title('$\theta_1$','Interpreter','latex')
+legend('d1',Location='south')
+subplot(4,1,2)
+plot(dest2)
+hold on
+title('$L_1$','Interpreter','latex')
+legend('d2',Location='south')
+subplot(4,1,3)
+plot(dest3)
+hold on
+title('$\theta_2$','Interpreter','latex')
+legend('d3',Location='south')
+subplot(4,1,4)
+plot(dest4)
+hold on
+title('$L_2$','Interpreter','latex')
+legend('d4',Location='south')
+sgtitle("INDOBASMC LPV at 40Hz")
+
+figure(3)
+    for i =1:4
+    subplot(2,2,i)
+    plot(testData.time_stamp(spt:ept),xest(spt:ept,i),LineStyle="-",LineWidth=1,Color='r')
+    hold on
+    plot(testData.time_stamp(spt:ept),outputKnown.arc_state_wire(spt:ept,i),LineStyle="-",LineWidth=2,Color='b')
+    hold on
+    ylabel(ylabelvec{i})
+    title(title_array{i},Interpreter="latex",FontSize=12)
+    xlim([0,50])
+    % ylim([0 20])
+        legend('INASMC','Ref',Location='southeast')
+    hold on
+    end
+%% theta1, lc1, theta2, lc2 NDOBASMC
+alpha = -0.9665; beta = 0.9698;
+xold = [outputKnown.arc_state_wire(1,1:4)]';
+h = 1/30
+
+xest=[]
+xd = [outputKnown.arc_state_wire(:,1:4)]';
+dtdxd = [outputKnown.arc_state_wire(:,5:8)]';
+pold1 = testData.pm_psi(1,1);
+pold2 = testData.pm_psi(1,2);
+pold3 = testData.pm_psi(1,4);
+pold4 = testData.pm_psi(1,5);
+
+zold1 = testData.pm_psi(1,2)-testData.pm_psi(1,1);
+zold2 = testData.pm_psi(1,2)+testData.pm_psi(1,1);
+zold3 = testData.pm_psi(1,5)-testData.pm_psi(1,4);
+zold4 = testData.pm_psi(1,5)+testData.pm_psi(1,4);
+
+umaxt =30;umint=-30;
+umaxf =30;uminf=0;
+pdmax =15;pdmin=0;
+%%%%%   NDOB  %%%%%%%
+
+l1x = 1e0;eta01 = 1e1; etalx1 =1e0;
+dtdestmax1 = 0.1;
+destold1 =0;
+destnew1=0;
+intvar1new =0;dtdintvar1 = 0;
+pxold1=0;
+
+l2x = 1e0;eta02 = 1e0;   etalx2 =1e0;
+dtdestmax2 = 0.1;
+destold2 =0;
+destnew2=0;
+intvar2new =0;dtdintvar2 = 0;
+pxold2=0;
+
+l3x = 1e0;eta03 = 1e1;   etalx3 =1e0;
+dtdestmax3 = 0.1;
+destold3 =0;
+destnew3=0;
+intvar3new =0;dtdintvar3 = 0;
+pxold3=0;
+
+l4x = 1e0;eta04 = 1e0;    etalx4 =1e0;
+dtdestmax4 = 0.1;
+destold4 =0;
+destnew4=0;
+intvar4new =0;dtdintvar4 = 0;
+pxold4=0;
+l1 = 1;
+l2 = 1;
+l3 = 1;
+l4 = 1;
+
+%%%%%%%%%%%
+for i = 1:length(xd)
+kk1 = -1.767*zold1^2 + 17.55*abs(zold1)+33.471;
+kk2 = 10.25*zold2^2 - 325.1*zold2+3299;
+kk3 =-1.013*zold3^2+11.55*abs(zold3)+4.419;
+kk4 = 15.34*zold4^2 - 474.1*zold4+4475;
+
+d1= 0.9725*zold1^2- 11.2*abs(zold1)+38.471;
+d2= -0.9725*zold2^2+ 30.23*zold2+435.471;
+d3=  0.1125*zold3^2- 1.2*abs(zold3)+14.471;
+d4= 4.34*zold4^2 - 155.21*zold4+2146;
+
+    e01 = -xd(1,i) + xold(1);
+    e02 = -xd(2,i) + xold(2);
+    e03 = -xd(3,i) + xold(3);
+    e04 = -xd(4,i) + xold(4);
+
+    pxold1 = l1x*xold(1) + etalx1*xold(1)^2*sign(xold(1));
+    l1 = l1x ;
+%     intvar1new = funcRK4fintvar_onestate_improve_v2( h,l1,dtdxd(1,i),eta01,eta1,e01);
+    intvar1new = funcRK4fintvar_onestate_improve_v3( h,l1,dtdxd(1,i),eta01,eta1,e01);
+    destnew1 = intvar1new + pxold1;
+
+
+
+    pxold2 = l2x*xold(2) + etalx2*xold(2)^2*sign(xold(2));
+    l2 = l2x ;
+%     intvar2new = funcRK4fintvar_onestate_improve_v2( h,l2,dtdxd(2,i),eta02,eta2,e02);
+    intvar2new = funcRK4fintvar_onestate_improve_v3( h,l2,dtdxd(2,i),eta02,eta2,e02);
+    destnew2 = intvar2new + pxold2;
+
+    pxold3 = l3x*xold(3) + etalx3*xold(3)^2*sign(xold(3));
+    l3 = l3x ;
+%     intvar3new = funcRK4fintvar_onestate_improve_v2( h,l3,dtdxd(3,i),eta03,eta3,e03);
+    intvar3new = funcRK4fintvar_onestate_improve_v3( h,l3,dtdxd(3,i),eta03,eta3,e03);
+    destnew3 = intvar3new + pxold3;
+
+
+    pxold4 = l4x*xold(4) + etalx4*xold(4)^2*sign(xold(4));
+    l4 = l4x ;
+%     intvar4new = funcRK4fintvar_onestate_improve_v2( h,l4,dtdxd(4,i),eta04,eta4,e04);
+    intvar4new = funcRK4fintvar_onestate_improve_v3( h,l4,dtdxd(4,i),eta04,eta4,e04);
+    destnew4 = intvar4new + pxold4;
+
+%     eta1 = eta01*abs(e01) + dtdestmax1/l1; 
+%     eta2 = eta02*abs(e02) + dtdestmax2/l2; 
+%     eta3 = eta03*abs(e03) + dtdestmax3/l3; 
+%     eta4 = eta04*abs(e04) + dtdestmax4/l4; 
+    if i ==1
+        d1t0 = abs(destnew1); 
+        d2t0 = abs(destnew1); 
+        d3t0 = abs(destnew1); 
+        d4t0 = abs(destnew1);
+    end
+    eta1 = d1t0*exp(-l1*h*i) + dtdestmax1/l1; 
+    eta2 = d2t0*exp(-l2*h*i) + dtdestmax2/l2;  
+    eta3 = d3t0*exp(-l3*h*i) + dtdestmax3/l3; 
+    eta4 = d4t0*exp(-l4*h*i) + dtdestmax4/l4;  
+
+    u1 = d1*(dtdxd(1,i) + kk1/d1*xold(1) - (eta01*e01+eta1*sign(e01))-destnew1);
+    u2 = d2*(dtdxd(2,i) + kk2/d2*xold(2) - (eta02*e02+eta2*sign(e02))-destnew2);
+    u3 = d3*(dtdxd(3,i) + kk3/d3*xold(1) - (eta03*e03+eta3*sign(e03))-destnew3);
+    u4 = d4*(dtdxd(4,i) + kk4/d4*xold(2) - (eta04*e04+eta4*sign(e04))-destnew4);
+
+if u1 <=umint
+        u1=umint;
+    elseif u1>=umaxt
+        u1=umaxt;
+    end
+    if u2 <=uminf
+        u2=uminf;
+    elseif u2>=umaxf
+        u2=umaxf;
+    end
+    if u3 <=umint
+        u3=umint;
+    elseif u3>=umaxt
+        u3=umaxt;
+    end
+    if u4 <=uminf
+        u4=uminf;
+    elseif u4>=umaxf
+        u4=umaxf;
+    end
+
+    x1new = funcRK4_one_state(xold(1),u1,kk1,d1,h);
+    x2new = funcRK4_one_state(xold(2),u2,kk2,d2,h);
+    x3new = funcRK4_one_state(xold(3),u3,kk3,d3,h);
+    x4new = funcRK4_one_state(xold(4),u4,kk4,d4,h);
+    xold =[x1new;x2new;x3new;x4new];
+    xest(i,:) =[x1new;x2new;x3new;x4new];
+    pd1(i) = (u2-u1)/2;
+    pd2(i) = (u2+u1)/2;
+    pd3(i) = (u4-u3)/2;
+    pd4(i) = (u4+u3)/2;
+    if pd1(i)<=pdmin
+        pd1(i) = pdmin;
+    elseif pd1(i)>=pdmax
+        pd1(i)=pdmax;
+    end
+    if pd2(i)<=pdmin
+        pd2(i) = pdmin;
+    elseif pd2(i)>=pdmax
+        pd2(i)=pdmax;
+    end
+    if pd3(i)<=pdmin
+        pd3(i) = pdmin;
+    elseif pd3(i)>=pdmax
+        pd3(i)=pdmax;
+    end
+    if pd4(i)<=pdmin
+        pd4(i) = pdmin;
+    elseif pd4(i)>=pdmax
+        pd4(i)=pdmax;
+    end
+    pnew1 = funcRK4pm4ch_m(pold1,alpha,beta,pd1(i),h);
+    pnew2 = funcRK4pm4ch_m(pold2,alpha,beta,pd2(i),h);
+    pnew3 = funcRK4pm4ch_m(pold3,alpha,beta,pd3(i),h);
+    pnew4 = funcRK4pm4ch_m(pold4,alpha,beta,pd4(i),h);
+    zold1 =pnew2-pnew1;
+    zold2 =pnew2+pnew1 ;
+    zold3 =pnew4-pnew3;
+    zold4 =pnew4+pnew3;
+        if zold1<=-20
+        zold1 = -20;
+    elseif zold1>=20
+        zold1 =20;
+    end
+    if zold2<=0
+        zold2 = 0;
+    elseif zold2>=20
+        zold2 =20;
+    end
+    if zold3<=-20
+        zold3 = -20;
+    elseif zold3>=20
+        zold3 =20;
+    end
+    if zold4<=0
+        zold4 = 0;
+    elseif zold4>=20
+        zold4 =20;
+    end
+    pold1=pnew1;
+    pold2=pnew2;
+    pold3=pnew3;
+    pold4=pnew4;
+    pm1(i)=pnew1;
+    pm2(i)=pnew2;
+    pm3(i)=pnew3;
+    pm4(i)=pnew4;
+
+    dest1(i) = destnew1;
+    dest2(i) = destnew2;
+    dest3(i) = destnew3;
+    dest4(i) = destnew4;
+end
+title_array = {'$\theta_1$';'$L_1$';'$\theta_2$';'$L_2$'};
 close all
 figure(1)
 subplot(4,2,1)
