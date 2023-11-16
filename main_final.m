@@ -901,28 +901,28 @@ umaxf =30;uminf=0;
 pdmax =15;pdmin=0;
 %%%%%   NDOB  %%%%%%%
 
-l1x = 1e0;eta01 = 1e1; etalx1 =1e0;
+l1x = 0;eta01 = 2; etalx1 =0.1;
 dtdestmax1 = 0.1;
 destold1 =0;
 destnew1=0;
 intvar1new =0;dtdintvar1 = 0;
 pxold1=0;
 
-l2x = 1e0;eta02 = 1e0;   etalx2 =1e0;
+l2x = 0;eta02 = 1e0;   etalx2 =0.1;
 dtdestmax2 = 0.1;
 destold2 =0;
 destnew2=0;
 intvar2new =0;dtdintvar2 = 0;
 pxold2=0;
 
-l3x = 1e0;eta03 = 1e1;   etalx3 =1e0;
+l3x = 0;eta03 = 2;   etalx3 =0.1;
 dtdestmax3 = 0.1;
 destold3 =0;
 destnew3=0;
 intvar3new =0;dtdintvar3 = 0;
 pxold3=0;
 
-l4x = 1e0;eta04 = 1e0;    etalx4 =1e0;
+l4x = 0;eta04 = 1e0;    etalx4 =0.1;
 dtdestmax4 = 0.1;
 destold4 =0;
 destnew4=0;
@@ -933,6 +933,10 @@ l2 = 1;
 l3 = 1;
 l4 = 1;
 
+        d1t0 = 1e-2; 
+        d2t0 = 1e-2; 
+        d3t0 = 1e-2; 
+        d4t0 = 1e-2;
 %%%%%%%%%%%
 for i = 1:length(xd)
 kk1 = -1.767*zold1^2 + 17.55*abs(zold1)+33.471;
@@ -952,6 +956,7 @@ d4= 4.34*zold4^2 - 155.21*zold4+2146;
 
     pxold1 = l1x*xold(1) + etalx1*xold(1)^2*sign(xold(1));
     l1 = l1x + 2*etalx1*abs(xold(1));
+    eta1 = d1t0*exp(-l1*h*i) + dtdestmax1/l1; 
 %     intvar1new = funcRK4fintvar_onestate_improve_v2( h,l1,dtdxd(1,i),eta01,eta1,e01);
     intvar1new = funcRK4fintvar_onestate_improve_v3( h,l1,dtdxd(1,i),eta01,eta1,e01);
     destnew1 = intvar1new + pxold1;
@@ -960,12 +965,14 @@ d4= 4.34*zold4^2 - 155.21*zold4+2146;
 
     pxold2 = l2x*xold(2) + etalx2*xold(2)^2*sign(xold(2));
     l2 = l2x + 2*etalx1*abs(xold(2));
+    eta2 = d2t0*exp(-l2*h*i) + dtdestmax2/l2; 
 %     intvar2new = funcRK4fintvar_onestate_improve_v2( h,l2,dtdxd(2,i),eta02,eta2,e02);
     intvar2new = funcRK4fintvar_onestate_improve_v3( h,l2,dtdxd(2,i),eta02,eta2,e02);
     destnew2 = intvar2new + pxold2;
 
     pxold3 = l3x*xold(3) + etalx3*xold(3)^2*sign(xold(3));
     l3 = l3x + 2*etalx3*abs(xold(3));
+     eta3 = d3t0*exp(-l3*h*i) + dtdestmax3/l3; 
 %     intvar3new = funcRK4fintvar_onestate_improve_v2( h,l3,dtdxd(3,i),eta03,eta3,e03);
     intvar3new = funcRK4fintvar_onestate_improve_v3( h,l3,dtdxd(3,i),eta03,eta3,e03);
     destnew3 = intvar3new + pxold3;
@@ -973,20 +980,16 @@ d4= 4.34*zold4^2 - 155.21*zold4+2146;
 
     pxold4 = l4x*xold(4) + etalx4*xold(4)^2*sign(xold(4));
     l4 = l4x + 2*etalx4*abs(xold(4));
+     eta4 = d4t0*exp(-l4*h*i) + dtdestmax4/l4;  
 %     intvar4new = funcRK4fintvar_onestate_improve_v2( h,l4,dtdxd(4,i),eta04,eta4,e04);
     intvar4new = funcRK4fintvar_onestate_improve_v3( h,l4,dtdxd(4,i),eta04,eta4,e04);
     destnew4 = intvar4new + pxold4;
 
-    eta1 = eta01*abs(e01) + dtdestmax1/l1; 
-    eta2 = eta02*abs(e02) + dtdestmax2/l2; 
-    eta3 = eta03*abs(e03) + dtdestmax3/l3; 
-    eta4 = eta04*abs(e04) + dtdestmax4/l4; 
 
-
-    u1 = d1*(dtdxd(1,i) + kk1/d1*xold(1) - (eta01*e01+eta1*sign(e01))-destnew1);
-    u2 = d2*(dtdxd(2,i) + kk2/d2*xold(2) - (eta02*e02+eta2*sign(e02))-destnew2);
-    u3 = d3*(dtdxd(3,i) + kk3/d3*xold(1) - (eta03*e03+eta3*sign(e03))-destnew3);
-    u4 = d4*(dtdxd(4,i) + kk4/d4*xold(2) - (eta04*e04+eta4*sign(e04))-destnew4);
+    u1 = -d1*(-dtdxd(1,i) + kk1/d1*xold(1) + (eta01*e01+eta1*sign(e01)) + destnew1);
+    u2 = -d2*(-dtdxd(2,i) + kk2/d2*xold(2) + (eta02*e02+eta2*sign(e02))+ destnew2);
+    u3 = -d3*(-dtdxd(3,i) + kk3/d3*xold(1) + (eta03*e03+eta3*sign(e03))+ destnew3);
+    u4 = -d4*(-dtdxd(4,i) + kk4/d4*xold(2) + (eta04*e04+eta4*sign(e04))+ destnew4);
 
 if u1 <=umint
         u1=umint;
