@@ -59,6 +59,7 @@ def main():
                 # sleep(0.01)
                 told=time()
     except KeyboardInterrupt:
+        print (file_name)
         print("Data Recording Finished.")
         exit()
 

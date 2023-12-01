@@ -41,6 +41,7 @@ else
     load('raw_id_data.mat');
     fprintf( 'Data loaded \n' );
 end
+%%
 spt =1;ept =1500;
 close all
 theta1 =[];L1 =[];theta2=[];L2=[];
