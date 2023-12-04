@@ -50,8 +50,8 @@ s1.red_r = s1.r_t0 - green_t0;
 %     d_y = testData.rigid_2_pose(:,2) - testData.rigid_1_pose(:,2);
 %     d_z = testData.rigid_2_pose(:,3) - testData.rigid_1_pose(:,3) + par_set.R1_stand_off;
 %     s1.theta_mocap_rad = -(2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2)));
-    quat_array(:,1) = testData.rigid_2_rot(:,4);
-    quat_array(:,2:4) = testData.rigid_2_rot(:,1:3);
+    quat_array(:,1) = testData.rigid_2_rotq(:,4);
+    quat_array(:,2:4) = testData.rigid_2_rotq(:,1:3);
     rpy = quat2eul(quat_array,'XYZ');
     s1.theta_mocap_rad = rpy(:,2);
 
@@ -61,8 +61,8 @@ s1.red_r = s1.r_t0 - green_t0;
 %     s2.theta_mocap_rad = -(2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2))) - s1.theta_mocap_rad;
 %     s2.theta_mocap_rad = 2 *asin(d_x./sqrt(d_x.^2 + d_y.^2 + d_z.^2));
 
-    quat_array(:,1) = testData.rigid_3_rot(:,4);
-    quat_array(:,2:4) = testData.rigid_3_rot(:,1:3);
+    quat_array(:,1) = testData.rigid_3_rotq(:,4);
+    quat_array(:,2:4) = testData.rigid_3_rotq(:,1:3);
     rpy = quat2eul(quat_array,'XYZ');
     s2.theta_mocap_rad = rpy(:,2);
     s2.theta_wire_rad = (s2.r_t - s2.l_t)/(r0);

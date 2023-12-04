@@ -29,6 +29,562 @@ else
     fprintf( 'Data loaded \n' );
 end
 %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+outputKnown = [];
+testData = par_set.trial1;
+outputKnown =funcComputeStateVar_v3(testData,par_set);
+j=1;%%
+q1x =[];q1y=[];q1z=[];q2x =[];q2y=[];q2z=[];
+q3x =[];q3y=[];q3z=[];q4x =[];q4y=[];q4z=[];
+spt =1;ept =600;
+i=1
+q1x = outputKnown.state_array_wire(spt:ept,i);
+q1y = outputKnown.state_array_wire(spt:ept,i+4);
+q1z = outputKnown.u_pm_psi(spt:ept,i);
+i=2
+q2x = outputKnown.state_array_wire(spt:ept,i);
+q2y = outputKnown.state_array_wire(spt:ept,i+4);
+q2z = outputKnown.u_pm_psi(spt:ept,i);
+i=3
+q3x = outputKnown.state_array_wire(spt:ept,i);
+q3y = outputKnown.state_array_wire(spt:ept,i+4);
+q3z = outputKnown.u_pm_psi(spt:ept,i);
+i=4
+q4x = outputKnown.state_array_wire(spt:ept,i);
+q4y = outputKnown.state_array_wire(spt:ept,i+4);
+q4z = outputKnown.u_pm_psi(spt:ept,i);
+ft =fittype('poly11')
+options = fitoptions(ft)
+options.Lower = [0 0 0];
+options.Upper = [0 Inf Inf];
+fitobj1 = fit([q1x,q1y],q1z,ft,options)
+fitobj2 = fit([q2x,q2y],q2z,ft,options)
+fitobj3 = fit([q3x,q3y],q3z,ft,options)
+fitobj4 = fit([q4x,q4y],q4z,ft,options)
+pa_i = [fitobj1.p10,fitobj2.p10,fitobj3.p10,fitobj4.p10,fitobj1.p01,fitobj2.p01,fitobj3.p01,fitobj4.p01]; 
+para_array(j,:) = pa_i;
+j=j+1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+outputKnown = [];
+testData = par_set.trial2;
+outputKnown =funcComputeStateVar_v3(testData,par_set);
+q1x =[];q1y=[];q1z=[];q2x =[];q2y=[];q2z=[];
+q3x =[];q3y=[];q3z=[];q4x =[];q4y=[];q4z=[];
+spt =1;ept =600;
+i=1
+q1x = outputKnown.state_array_wire(spt:ept,i);
+q1y = outputKnown.state_array_wire(spt:ept,i+4);
+q1z = outputKnown.u_pm_psi(spt:ept,i);
+i=2
+q2x = outputKnown.state_array_wire(spt:ept,i);
+q2y = outputKnown.state_array_wire(spt:ept,i+4);
+q2z = outputKnown.u_pm_psi(spt:ept,i);
+i=3
+q3x = outputKnown.state_array_wire(spt:ept,i);
+q3y = outputKnown.state_array_wire(spt:ept,i+4);
+q3z = outputKnown.u_pm_psi(spt:ept,i);
+i=4
+q4x = outputKnown.state_array_wire(spt:ept,i);
+q4y = outputKnown.state_array_wire(spt:ept,i+4);
+q4z = outputKnown.u_pm_psi(spt:ept,i);
+ft =fittype('poly11')
+options = fitoptions(ft)
+options.Lower = [0 0 0];
+options.Upper = [0 Inf Inf];
+fitobj1 = fit([q1x,q1y],q1z,ft,options)
+fitobj2 = fit([q2x,q2y],q2z,ft,options)
+fitobj3 = fit([q3x,q3y],q3z,ft,options)
+fitobj4 = fit([q4x,q4y],q4z,ft,options)
+pa_i = [fitobj1.p10,fitobj2.p10,fitobj3.p10,fitobj4.p10,fitobj1.p01,fitobj2.p01,fitobj3.p01,fitobj4.p01]; 
+para_array(j,:) = pa_i;
+j=j+1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+outputKnown = [];
+testData = par_set.trial3;
+outputKnown =funcComputeStateVar_v3(testData,par_set);
+q1x =[];q1y=[];q1z=[];q2x =[];q2y=[];q2z=[];
+q3x =[];q3y=[];q3z=[];q4x =[];q4y=[];q4z=[];
+spt =1;ept =600;
+i=1
+q1x = outputKnown.state_array_wire(spt:ept,i);
+q1y = outputKnown.state_array_wire(spt:ept,i+4);
+q1z = outputKnown.u_pm_psi(spt:ept,i);
+i=2
+q2x = outputKnown.state_array_wire(spt:ept,i);
+q2y = outputKnown.state_array_wire(spt:ept,i+4);
+q2z = outputKnown.u_pm_psi(spt:ept,i);
+i=3
+q3x = outputKnown.state_array_wire(spt:ept,i);
+q3y = outputKnown.state_array_wire(spt:ept,i+4);
+q3z = outputKnown.u_pm_psi(spt:ept,i);
+i=4
+q4x = outputKnown.state_array_wire(spt:ept,i);
+q4y = outputKnown.state_array_wire(spt:ept,i+4);
+q4z = outputKnown.u_pm_psi(spt:ept,i);
+ft =fittype('poly11')
+options = fitoptions(ft)
+options.Lower = [0 0 0];
+options.Upper = [0 Inf Inf];
+fitobj1 = fit([q1x,q1y],q1z,ft,options)
+fitobj2 = fit([q2x,q2y],q2z,ft,options)
+fitobj3 = fit([q3x,q3y],q3z,ft,options)
+fitobj4 = fit([q4x,q4y],q4z,ft,options)
+pa_i = [fitobj1.p10,fitobj2.p10,fitobj3.p10,fitobj4.p10,fitobj1.p01,fitobj2.p01,fitobj3.p01,fitobj4.p01]; 
+para_array(j,:) = pa_i;
+j=j+1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+outputKnown = [];
+testData = par_set.trial4;
+outputKnown =funcComputeStateVar_v3(testData,par_set);
+q1x =[];q1y=[];q1z=[];q2x =[];q2y=[];q2z=[];
+q3x =[];q3y=[];q3z=[];q4x =[];q4y=[];q4z=[];
+spt =1;ept =600;
+i=1
+q1x = outputKnown.state_array_wire(spt:ept,i);
+q1y = outputKnown.state_array_wire(spt:ept,i+4);
+q1z = outputKnown.u_pm_psi(spt:ept,i);
+i=2
+q2x = outputKnown.state_array_wire(spt:ept,i);
+q2y = outputKnown.state_array_wire(spt:ept,i+4);
+q2z = outputKnown.u_pm_psi(spt:ept,i);
+i=3
+q3x = outputKnown.state_array_wire(spt:ept,i);
+q3y = outputKnown.state_array_wire(spt:ept,i+4);
+q3z = outputKnown.u_pm_psi(spt:ept,i);
+i=4
+q4x = outputKnown.state_array_wire(spt:ept,i);
+q4y = outputKnown.state_array_wire(spt:ept,i+4);
+q4z = outputKnown.u_pm_psi(spt:ept,i);
+ft =fittype('poly11')
+options = fitoptions(ft)
+options.Lower = [0 0 0];
+options.Upper = [0 Inf Inf];
+fitobj1 = fit([q1x,q1y],q1z,ft,options)
+fitobj2 = fit([q2x,q2y],q2z,ft,options)
+fitobj3 = fit([q3x,q3y],q3z,ft,options)
+fitobj4 = fit([q4x,q4y],q4z,ft,options)
+pa_i = [fitobj1.p10,fitobj2.p10,fitobj3.p10,fitobj4.p10,fitobj1.p01,fitobj2.p01,fitobj3.p01,fitobj4.p01]; 
+para_array(j,:) = pa_i;
+j=j+1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+outputKnown = [];
+testData = par_set.trial5;
+outputKnown =funcComputeStateVar_v3(testData,par_set);
+% j=1;%%
+q1x =[];q1y=[];q1z=[];q2x =[];q2y=[];q2z=[];
+q3x =[];q3y=[];q3z=[];q4x =[];q4y=[];q4z=[];
+spt =1;ept =600;
+i=1
+q1x = outputKnown.state_array_wire(spt:ept,i);
+q1y = outputKnown.state_array_wire(spt:ept,i+4);
+q1z = outputKnown.u_pm_psi(spt:ept,i);
+i=2
+q2x = outputKnown.state_array_wire(spt:ept,i);
+q2y = outputKnown.state_array_wire(spt:ept,i+4);
+q2z = outputKnown.u_pm_psi(spt:ept,i);
+i=3
+q3x = outputKnown.state_array_wire(spt:ept,i);
+q3y = outputKnown.state_array_wire(spt:ept,i+4);
+q3z = outputKnown.u_pm_psi(spt:ept,i);
+i=4
+q4x = outputKnown.state_array_wire(spt:ept,i);
+q4y = outputKnown.state_array_wire(spt:ept,i+4);
+q4z = outputKnown.u_pm_psi(spt:ept,i);
+ft =fittype('poly11')
+options = fitoptions(ft)
+options.Lower = [0 0 0];
+options.Upper = [0 Inf Inf];
+fitobj1 = fit([q1x,q1y],q1z,ft,options)
+fitobj2 = fit([q2x,q2y],q2z,ft,options)
+fitobj3 = fit([q3x,q3y],q3z,ft,options)
+fitobj4 = fit([q4x,q4y],q4z,ft,options)
+pa_i = [fitobj1.p10,fitobj2.p10,fitobj3.p10,fitobj4.p10,fitobj1.p01,fitobj2.p01,fitobj3.p01,fitobj4.p01]; 
+para_array(j,:) = pa_i;
+j=j+1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+outputKnown = [];
+testData = par_set.trial6;
+outputKnown =funcComputeStateVar_v3(testData,par_set);
+% j=1;%%
+q1x =[];q1y=[];q1z=[];q2x =[];q2y=[];q2z=[];
+q3x =[];q3y=[];q3z=[];q4x =[];q4y=[];q4z=[];
+spt =1;ept =600;
+i=1
+q1x = outputKnown.state_array_wire(spt:ept,i);
+q1y = outputKnown.state_array_wire(spt:ept,i+4);
+q1z = outputKnown.u_pm_psi(spt:ept,i);
+i=2
+q2x = outputKnown.state_array_wire(spt:ept,i);
+q2y = outputKnown.state_array_wire(spt:ept,i+4);
+q2z = outputKnown.u_pm_psi(spt:ept,i);
+i=3
+q3x = outputKnown.state_array_wire(spt:ept,i);
+q3y = outputKnown.state_array_wire(spt:ept,i+4);
+q3z = outputKnown.u_pm_psi(spt:ept,i);
+i=4
+q4x = outputKnown.state_array_wire(spt:ept,i);
+q4y = outputKnown.state_array_wire(spt:ept,i+4);
+q4z = outputKnown.u_pm_psi(spt:ept,i);
+ft =fittype('poly11')
+options = fitoptions(ft)
+options.Lower = [0 0 0];
+options.Upper = [0 Inf Inf];
+fitobj1 = fit([q1x,q1y],q1z,ft,options)
+fitobj2 = fit([q2x,q2y],q2z,ft,options)
+fitobj3 = fit([q3x,q3y],q3z,ft,options)
+fitobj4 = fit([q4x,q4y],q4z,ft,options)
+pa_i = [fitobj1.p10,fitobj2.p10,fitobj3.p10,fitobj4.p10,fitobj1.p01,fitobj2.p01,fitobj3.p01,fitobj4.p01]; 
+para_array(j,:) = pa_i;
+j=j+1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+outputKnown = [];
+testData = par_set.trial7;
+outputKnown =funcComputeStateVar_v3(testData,par_set);
+% j=1;%%
+q1x =[];q1y=[];q1z=[];q2x =[];q2y=[];q2z=[];
+q3x =[];q3y=[];q3z=[];q4x =[];q4y=[];q4z=[];
+spt =1;ept =600;
+i=1
+q1x = outputKnown.state_array_wire(spt:ept,i);
+q1y = outputKnown.state_array_wire(spt:ept,i+4);
+q1z = outputKnown.u_pm_psi(spt:ept,i);
+i=2
+q2x = outputKnown.state_array_wire(spt:ept,i);
+q2y = outputKnown.state_array_wire(spt:ept,i+4);
+q2z = outputKnown.u_pm_psi(spt:ept,i);
+i=3
+q3x = outputKnown.state_array_wire(spt:ept,i);
+q3y = outputKnown.state_array_wire(spt:ept,i+4);
+q3z = outputKnown.u_pm_psi(spt:ept,i);
+i=4
+q4x = outputKnown.state_array_wire(spt:ept,i);
+q4y = outputKnown.state_array_wire(spt:ept,i+4);
+q4z = outputKnown.u_pm_psi(spt:ept,i);
+ft =fittype('poly11')
+options = fitoptions(ft)
+options.Lower = [0 0 0];
+options.Upper = [0 Inf Inf];
+fitobj1 = fit([q1x,q1y],q1z,ft,options)
+fitobj2 = fit([q2x,q2y],q2z,ft,options)
+fitobj3 = fit([q3x,q3y],q3z,ft,options)
+fitobj4 = fit([q4x,q4y],q4z,ft,options)
+pa_i = [fitobj1.p10,fitobj2.p10,fitobj3.p10,fitobj4.p10,fitobj1.p01,fitobj2.p01,fitobj3.p01,fitobj4.p01]; 
+para_array(j,:) = pa_i;
+j=j+1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+outputKnown = [];
+testData = par_set.trial8;
+outputKnown =funcComputeStateVar_v3(testData,par_set);
+% j=1;%%
+q1x =[];q1y=[];q1z=[];q2x =[];q2y=[];q2z=[];
+q3x =[];q3y=[];q3z=[];q4x =[];q4y=[];q4z=[];
+spt =1;ept =600;
+i=1
+q1x = outputKnown.state_array_wire(spt:ept,i);
+q1y = outputKnown.state_array_wire(spt:ept,i+4);
+q1z = outputKnown.u_pm_psi(spt:ept,i);
+i=2
+q2x = outputKnown.state_array_wire(spt:ept,i);
+q2y = outputKnown.state_array_wire(spt:ept,i+4);
+q2z = outputKnown.u_pm_psi(spt:ept,i);
+i=3
+q3x = outputKnown.state_array_wire(spt:ept,i);
+q3y = outputKnown.state_array_wire(spt:ept,i+4);
+q3z = outputKnown.u_pm_psi(spt:ept,i);
+i=4
+q4x = outputKnown.state_array_wire(spt:ept,i);
+q4y = outputKnown.state_array_wire(spt:ept,i+4);
+q4z = outputKnown.u_pm_psi(spt:ept,i);
+ft =fittype('poly11')
+options = fitoptions(ft)
+options.Lower = [0 0 0];
+options.Upper = [0 Inf Inf];
+fitobj1 = fit([q1x,q1y],q1z,ft,options)
+fitobj2 = fit([q2x,q2y],q2z,ft,options)
+fitobj3 = fit([q3x,q3y],q3z,ft,options)
+fitobj4 = fit([q4x,q4y],q4z,ft,options)
+pa_i = [fitobj1.p10,fitobj2.p10,fitobj3.p10,fitobj4.p10,fitobj1.p01,fitobj2.p01,fitobj3.p01,fitobj4.p01]; 
+para_array(j,:) = pa_i;
+j=j+1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+outputKnown = [];
+testData = par_set.trial9;
+outputKnown =funcComputeStateVar_v3(testData,par_set);
+% j=1;%%
+q1x =[];q1y=[];q1z=[];q2x =[];q2y=[];q2z=[];
+q3x =[];q3y=[];q3z=[];q4x =[];q4y=[];q4z=[];
+spt =1;ept =600;
+i=1
+q1x = outputKnown.state_array_wire(spt:ept,i);
+q1y = outputKnown.state_array_wire(spt:ept,i+4);
+q1z = outputKnown.u_pm_psi(spt:ept,i);
+i=2
+q2x = outputKnown.state_array_wire(spt:ept,i);
+q2y = outputKnown.state_array_wire(spt:ept,i+4);
+q2z = outputKnown.u_pm_psi(spt:ept,i);
+i=3
+q3x = outputKnown.state_array_wire(spt:ept,i);
+q3y = outputKnown.state_array_wire(spt:ept,i+4);
+q3z = outputKnown.u_pm_psi(spt:ept,i);
+i=4
+q4x = outputKnown.state_array_wire(spt:ept,i);
+q4y = outputKnown.state_array_wire(spt:ept,i+4);
+q4z = outputKnown.u_pm_psi(spt:ept,i);
+ft =fittype('poly11')
+options = fitoptions(ft)
+options.Lower = [0 0 0];
+options.Upper = [0 Inf Inf];
+fitobj1 = fit([q1x,q1y],q1z,ft,options)
+fitobj2 = fit([q2x,q2y],q2z,ft,options)
+fitobj3 = fit([q3x,q3y],q3z,ft,options)
+fitobj4 = fit([q4x,q4y],q4z,ft,options)
+pa_i = [fitobj1.p10,fitobj2.p10,fitobj3.p10,fitobj4.p10,fitobj1.p01,fitobj2.p01,fitobj3.p01,fitobj4.p01]; 
+para_array(j,:) = pa_i;
+j=j+1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+outputKnown = [];
+testData = par_set.trial10;
+outputKnown =funcComputeStateVar_v3(testData,par_set);
+% j=1;%%
+q1x =[];q1y=[];q1z=[];q2x =[];q2y=[];q2z=[];
+q3x =[];q3y=[];q3z=[];q4x =[];q4y=[];q4z=[];
+spt =1;ept =600;
+i=1
+q1x = outputKnown.state_array_wire(spt:ept,i);
+q1y = outputKnown.state_array_wire(spt:ept,i+4);
+q1z = outputKnown.u_pm_psi(spt:ept,i);
+i=2
+q2x = outputKnown.state_array_wire(spt:ept,i);
+q2y = outputKnown.state_array_wire(spt:ept,i+4);
+q2z = outputKnown.u_pm_psi(spt:ept,i);
+i=3
+q3x = outputKnown.state_array_wire(spt:ept,i);
+q3y = outputKnown.state_array_wire(spt:ept,i+4);
+q3z = outputKnown.u_pm_psi(spt:ept,i);
+i=4
+q4x = outputKnown.state_array_wire(spt:ept,i);
+q4y = outputKnown.state_array_wire(spt:ept,i+4);
+q4z = outputKnown.u_pm_psi(spt:ept,i);
+ft =fittype('poly11')
+options = fitoptions(ft)
+options.Lower = [0 0 0];
+options.Upper = [0 Inf Inf];
+fitobj1 = fit([q1x,q1y],q1z,ft,options)
+fitobj2 = fit([q2x,q2y],q2z,ft,options)
+fitobj3 = fit([q3x,q3y],q3z,ft,options)
+fitobj4 = fit([q4x,q4y],q4z,ft,options)
+pa_i = [fitobj1.p10,fitobj2.p10,fitobj3.p10,fitobj4.p10,fitobj1.p01,fitobj2.p01,fitobj3.p01,fitobj4.p01]; 
+para_array(j,:) = pa_i;
+j=j+1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+outputKnown = [];
+testData = par_set.trial11;
+outputKnown =funcComputeStateVar_v3(testData,par_set);
+% j=1;%%
+q1x =[];q1y=[];q1z=[];q2x =[];q2y=[];q2z=[];
+q3x =[];q3y=[];q3z=[];q4x =[];q4y=[];q4z=[];
+spt =1;ept =600;
+i=1
+q1x = outputKnown.state_array_wire(spt:ept,i);
+q1y = outputKnown.state_array_wire(spt:ept,i+4);
+q1z = outputKnown.u_pm_psi(spt:ept,i);
+i=2
+q2x = outputKnown.state_array_wire(spt:ept,i);
+q2y = outputKnown.state_array_wire(spt:ept,i+4);
+q2z = outputKnown.u_pm_psi(spt:ept,i);
+i=3
+q3x = outputKnown.state_array_wire(spt:ept,i);
+q3y = outputKnown.state_array_wire(spt:ept,i+4);
+q3z = outputKnown.u_pm_psi(spt:ept,i);
+i=4
+q4x = outputKnown.state_array_wire(spt:ept,i);
+q4y = outputKnown.state_array_wire(spt:ept,i+4);
+q4z = outputKnown.u_pm_psi(spt:ept,i);
+ft =fittype('poly11')
+options = fitoptions(ft)
+options.Lower = [0 0 0];
+options.Upper = [0 Inf Inf];
+fitobj1 = fit([q1x,q1y],q1z,ft,options)
+fitobj2 = fit([q2x,q2y],q2z,ft,options)
+fitobj3 = fit([q3x,q3y],q3z,ft,options)
+fitobj4 = fit([q4x,q4y],q4z,ft,options)
+pa_i = [fitobj1.p10,fitobj2.p10,fitobj3.p10,fitobj4.p10,fitobj1.p01,fitobj2.p01,fitobj3.p01,fitobj4.p01]; 
+para_array(j,:) = pa_i;
+j=j+1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+outputKnown = [];
+testData = par_set.trial12;
+outputKnown =funcComputeStateVar_v3(testData,par_set);
+% j=1;%%
+q1x =[];q1y=[];q1z=[];q2x =[];q2y=[];q2z=[];
+q3x =[];q3y=[];q3z=[];q4x =[];q4y=[];q4z=[];
+spt =1;ept =600;
+i=1
+q1x = outputKnown.state_array_wire(spt:ept,i);
+q1y = outputKnown.state_array_wire(spt:ept,i+4);
+q1z = outputKnown.u_pm_psi(spt:ept,i);
+i=2
+q2x = outputKnown.state_array_wire(spt:ept,i);
+q2y = outputKnown.state_array_wire(spt:ept,i+4);
+q2z = outputKnown.u_pm_psi(spt:ept,i);
+i=3
+q3x = outputKnown.state_array_wire(spt:ept,i);
+q3y = outputKnown.state_array_wire(spt:ept,i+4);
+q3z = outputKnown.u_pm_psi(spt:ept,i);
+i=4
+q4x = outputKnown.state_array_wire(spt:ept,i);
+q4y = outputKnown.state_array_wire(spt:ept,i+4);
+q4z = outputKnown.u_pm_psi(spt:ept,i);
+ft =fittype('poly11')
+options = fitoptions(ft)
+options.Lower = [0 0 0];
+options.Upper = [0 Inf Inf];
+fitobj1 = fit([q1x,q1y],q1z,ft,options)
+fitobj2 = fit([q2x,q2y],q2z,ft,options)
+fitobj3 = fit([q3x,q3y],q3z,ft,options)
+fitobj4 = fit([q4x,q4y],q4z,ft,options)
+pa_i = [fitobj1.p10,fitobj2.p10,fitobj3.p10,fitobj4.p10,fitobj1.p01,fitobj2.p01,fitobj3.p01,fitobj4.p01]; 
+para_array(j,:) = pa_i;
+j=j+1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+outputKnown = [];
+testData = par_set.trial13;
+outputKnown =funcComputeStateVar_v3(testData,par_set);
+% j=1;%%
+q1x =[];q1y=[];q1z=[];q2x =[];q2y=[];q2z=[];
+q3x =[];q3y=[];q3z=[];q4x =[];q4y=[];q4z=[];
+spt =1;ept =600;
+i=1
+q1x = outputKnown.state_array_wire(spt:ept,i);
+q1y = outputKnown.state_array_wire(spt:ept,i+4);
+q1z = outputKnown.u_pm_psi(spt:ept,i);
+i=2
+q2x = outputKnown.state_array_wire(spt:ept,i);
+q2y = outputKnown.state_array_wire(spt:ept,i+4);
+q2z = outputKnown.u_pm_psi(spt:ept,i);
+i=3
+q3x = outputKnown.state_array_wire(spt:ept,i);
+q3y = outputKnown.state_array_wire(spt:ept,i+4);
+q3z = outputKnown.u_pm_psi(spt:ept,i);
+i=4
+q4x = outputKnown.state_array_wire(spt:ept,i);
+q4y = outputKnown.state_array_wire(spt:ept,i+4);
+q4z = outputKnown.u_pm_psi(spt:ept,i);
+ft =fittype('poly11')
+options = fitoptions(ft)
+options.Lower = [0 0 0];
+options.Upper = [0 Inf Inf];
+fitobj1 = fit([q1x,q1y],q1z,ft,options)
+fitobj2 = fit([q2x,q2y],q2z,ft,options)
+fitobj3 = fit([q3x,q3y],q3z,ft,options)
+fitobj4 = fit([q4x,q4y],q4z,ft,options)
+pa_i = [fitobj1.p10,fitobj2.p10,fitobj3.p10,fitobj4.p10,fitobj1.p01,fitobj2.p01,fitobj3.p01,fitobj4.p01]; 
+para_array(j,:) = pa_i;
+j=j+1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+outputKnown = [];
+testData = par_set.trial14;
+outputKnown =funcComputeStateVar_v3(testData,par_set);
+% j=1;%%
+q1x =[];q1y=[];q1z=[];q2x =[];q2y=[];q2z=[];
+q3x =[];q3y=[];q3z=[];q4x =[];q4y=[];q4z=[];
+spt =1;ept =600;
+i=1
+q1x = outputKnown.state_array_wire(spt:ept,i);
+q1y = outputKnown.state_array_wire(spt:ept,i+4);
+q1z = outputKnown.u_pm_psi(spt:ept,i);
+i=2
+q2x = outputKnown.state_array_wire(spt:ept,i);
+q2y = outputKnown.state_array_wire(spt:ept,i+4);
+q2z = outputKnown.u_pm_psi(spt:ept,i);
+i=3
+q3x = outputKnown.state_array_wire(spt:ept,i);
+q3y = outputKnown.state_array_wire(spt:ept,i+4);
+q3z = outputKnown.u_pm_psi(spt:ept,i);
+i=4
+q4x = outputKnown.state_array_wire(spt:ept,i);
+q4y = outputKnown.state_array_wire(spt:ept,i+4);
+q4z = outputKnown.u_pm_psi(spt:ept,i);
+ft =fittype('poly11')
+options = fitoptions(ft)
+options.Lower = [0 0 0];
+options.Upper = [0 Inf Inf];
+fitobj1 = fit([q1x,q1y],q1z,ft,options)
+fitobj2 = fit([q2x,q2y],q2z,ft,options)
+fitobj3 = fit([q3x,q3y],q3z,ft,options)
+fitobj4 = fit([q4x,q4y],q4z,ft,options)
+pa_i = [fitobj1.p10,fitobj2.p10,fitobj3.p10,fitobj4.p10,fitobj1.p01,fitobj2.p01,fitobj3.p01,fitobj4.p01]; 
+para_array(j,:) = pa_i;
+j=j+1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+outputKnown = [];
+testData = par_set.trial15;
+outputKnown =funcComputeStateVar_v3(testData,par_set);
+% j=1;%%
+q1x =[];q1y=[];q1z=[];q2x =[];q2y=[];q2z=[];
+q3x =[];q3y=[];q3z=[];q4x =[];q4y=[];q4z=[];
+spt =1;ept =600;
+i=1
+q1x = outputKnown.state_array_wire(spt:ept,i);
+q1y = outputKnown.state_array_wire(spt:ept,i+4);
+q1z = outputKnown.u_pm_psi(spt:ept,i);
+i=2
+q2x = outputKnown.state_array_wire(spt:ept,i);
+q2y = outputKnown.state_array_wire(spt:ept,i+4);
+q2z = outputKnown.u_pm_psi(spt:ept,i);
+i=3
+q3x = outputKnown.state_array_wire(spt:ept,i);
+q3y = outputKnown.state_array_wire(spt:ept,i+4);
+q3z = outputKnown.u_pm_psi(spt:ept,i);
+i=4
+q4x = outputKnown.state_array_wire(spt:ept,i);
+q4y = outputKnown.state_array_wire(spt:ept,i+4);
+q4z = outputKnown.u_pm_psi(spt:ept,i);
+ft =fittype('poly11')
+options = fitoptions(ft)
+options.Lower = [0 0 0];
+options.Upper = [0 Inf Inf];
+fitobj1 = fit([q1x,q1y],q1z,ft,options)
+fitobj2 = fit([q2x,q2y],q2z,ft,options)
+fitobj3 = fit([q3x,q3y],q3z,ft,options)
+fitobj4 = fit([q4x,q4y],q4z,ft,options)
+pa_i = [fitobj1.p10,fitobj2.p10,fitobj3.p10,fitobj4.p10,fitobj1.p01,fitobj2.p01,fitobj3.p01,fitobj4.p01]; 
+para_array(j,:) = pa_i;
+j=j+1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+
+%%
+figure(1)
+plot(para_array(:,4))
+%%
 % calculate par_set.enco_volt_p0 
 testData = par_set.trial1;
 spt = 1; ept = 600;
@@ -129,7 +685,7 @@ for i =1:4
     yyaxis right
     plot(outputKnown.u_pm_tf(:,i))
     hold on
-    plot(outputKnown.u_pm_tf(:,i)-outputKnown.Mddtdq(:,i))
+    plot(outputKnown.u_pm_tf(:,i))
     hold on
 end
 %%
