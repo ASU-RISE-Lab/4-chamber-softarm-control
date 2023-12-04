@@ -193,10 +193,10 @@ class pc_client(object):
         # self.l3 = 1*10**(2)
         # self.l4 = 1*10**(2)
 
-        self.l12 = 0.5*10**(1)
-        self.l22 = 0.5*10**(1)
-        self.l32 = 0.5*10**(1)
-        self.l42 = 5*10**(1)
+        self.l12 = 1*10**(1)
+        self.l22 = 1*10**(1)
+        self.l32 = 1*10**(1)
+        self.l42 = 1*10**(1)
 
         # self.eta01 = 1*10**(3)
         # self.eta02 = 1*10**(3)
@@ -228,10 +228,13 @@ class pc_client(object):
 
         # self.a_array = np.array([-np.deg2rad(30),0.005,-np.deg2rad(30),0.005])
         # self.b_array = np.array([0.0,0.005,0.0,0.005])
+        #OG
         self.a_array = np.array([-np.deg2rad(0),0.00,-np.deg2rad(0),0.00])
         self.b_array = np.array([-np.deg2rad(-20),0.008,-np.deg2rad(20),0.008])
         self.freq = 1.0/30
 
+        # New
+        self.freq = 1.0/20
         # self.sat_bound1 = np.deg2rad(1)
         # self.sat_bound2 = 0.0001
         # self.sat_bound3 = np.deg2rad(1)
@@ -263,7 +266,7 @@ class pc_client(object):
             self.t_old_u =time()
             try:
                 while(self.flag_end_test):
-                    td = 30
+                    td = 60
                     self.a_array = np.array([np.deg2rad(20),0.00,np.deg2rad(20),0.00])
                     self.b_array = np.array([np.deg2rad(0),0.015,np.deg2rad(0),0.015])
                     self.seg1and2_position_sin_square_response(td,time())
@@ -519,6 +522,10 @@ class pc_client(object):
                 pd2 = self.func_input_saturation(pd2_ub,15)
                 pd3 = self.func_input_saturation(pd3_ub,15)
                 pd4 = self.func_input_saturation(pd4_ub,15)
+                # pd1 = self.func_input_saturation(pd1_ub,25)
+                # pd2 = self.func_input_saturation(pd2_ub,25)
+                # pd3 = self.func_input_saturation(pd3_ub,25)
+                # pd4 = self.func_input_saturation(pd4_ub,25)
 
                 self.pd_pm_array_1[0] = pd1
                 self.pd_pm_array_1[1] = pd2

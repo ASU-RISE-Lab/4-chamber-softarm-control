@@ -41,6 +41,75 @@ else
     load('raw_id_data.mat');
     fprintf( 'Data loaded \n' );
 end
+%% Plot for exp result
+spt =1;ept =1000;
+close all
+theta1 =[];L1 =[];theta2=[];L2=[];
+
+j=1;
+testData = par_set.trial1;
+theta1(:,j) = testData.xm(spt:ept,1);
+L1(:,j) = testData.xm(spt:ept,2);
+theta2(:,j) = testData.xm(spt:ept,3);
+L2(:,j) = testData.xm(spt:ept,4);
+
+j=2;
+testData = par_set.trial1;
+theta1(:,j) = testData.xm(spt:ept,1);
+L1(:,j) = testData.xm(spt:ept,2);
+theta2(:,j) = testData.xm(spt:ept,3);
+L2(:,j) = testData.xm(spt:ept,4);
+
+j=3;
+testData = par_set.trial1;
+theta1(:,j) = testData.xm(spt:ept,1);
+L1(:,j) = testData.xm(spt:ept,2);
+theta2(:,j) = testData.xm(spt:ept,3);
+L2(:,j) = testData.xm(spt:ept,4);
+
+theta1_mean = mean(theta1,2);
+L1_mean = mean(L1,2);
+theta2_mean = mean(theta2,2);
+L2_mean = mean(L2,2);
+x_mean = [theta1_mean,L1_mean,theta2_mean,L2_mean];
+
+theta1_upper = theta1_mean + std(theta1,0,2);
+L1_upper = L1_mean + std(L1,0,2);
+theta2_upper = theta2_mean + std(theta2,0,2);
+L2_upper = L2_mean + std(L2,0,2);
+
+theta1_lower = theta1_mean - std(theta1,0,2);
+L1_lower = L1_mean - std(L1,0,2);
+theta2_lower = theta2_mean - std(theta2,0,2);
+L2_lower = L2_mean - std(L2,0,2);
+close all
+ylabelvec={'rad';'m';'rad';'m';};
+title_array = {'$\theta_1$';'$L_1$';'$\theta_2$';'$L_2$'};
+% spt =1;ept =1500;
+ctrl_flag = 3
+testData = par_set.trial1;
+figure(1)
+    for i =1:4
+    subplot(2,2,i)
+    plot(testData.time_stamp(spt:ept),testData.xd(spt:ept,i),LineStyle="-",LineWidth=2,Color='b')
+    hold on
+    plot(testData.time_stamp(spt:ept),x_mean(spt:ept,i),'r')
+    hold on
+    ylabel(ylabelvec{i})
+    title(title_array{i},Interpreter="latex",FontSize=12)
+    xlim([0,50])
+    % ylim([0 20])
+    if ctrl_flag ==1
+    legend('Ref','ASMC',Location='southeast')
+elseif ctrl_flag==2
+legend('Ref','NSMC',Location='southeast')
+else
+legend('Ref','INASMC',Location='southeast')
+    end
+%              
+        
+    hold on
+    end
 %%
 spt =1;ept =1500;
 close all
