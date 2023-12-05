@@ -155,20 +155,30 @@ class pc_client(object):
         # self.l3 = 1*10**(0)
         # self.l4 = 1*10**(0)
 
-        self.l12 = 1*10**(0)
-        self.l22 = 1*10**(0)
-        self.l32 = 1*10**(0)
-        self.l42 = 1*10**(0)
+        # self.l12 = 1*10**(0)
+        # self.l22 = 1*10**(0)
+        # self.l32 = 1*10**(0)
+        # self.l42 = 1*10**(0)
 
         self.eta01 = 1*10**(1)
         self.eta02 = 1*10**(1)
         self.eta03 = 1*10**(1)
         self.eta04 = 1*10**(1)
 
+        self.ed01 = 1*10**(1)
+        self.ed02 = 1*10**(1)
+        self.ed03 = 1*10**(1)
+        self.ed04 = 1*10**(1)
+
         self.l1 = 1*10**(-2)# data2
         self.l2 = 1*10**(-2)
         self.l3 = 1*10**(-2)
         self.l4 = 1*10**(-2)
+
+        self.L1 = self.l1
+        self.L2 = self.l2
+        self.L3 = self.l3
+        self.L4 = self.l4
 
         # self.eta01 = 1*10**(0)
         # self.eta02 = 1*10**(0)
@@ -193,10 +203,17 @@ class pc_client(object):
         # self.l3 = 1*10**(2)
         # self.l4 = 1*10**(2)
 
-        self.l12 = 1*10**(1)
-        self.l22 = 1*10**(1)
-        self.l32 = 1*10**(1)
-        self.l42 = 1*10**(1)
+        # self.l12 = 1*10**(2)
+        # self.l22 = 1*10**(2)
+        # self.l32 = 1*10**(2)
+        # self.l42 = 1*10**(2)
+
+        self.l12 = 0*10**(1)
+        self.l22 = 0*10**(1)
+        self.l32 = 0*10**(1)
+        self.l42 = 0*10**(1)
+
+
 
         # self.eta01 = 1*10**(3)
         # self.eta02 = 1*10**(3)
@@ -234,7 +251,7 @@ class pc_client(object):
         self.freq = 1.0/30
 
         # New
-        self.freq = 1.0/20
+        # self.freq = 1.0/20
         # self.sat_bound1 = np.deg2rad(1)
         # self.sat_bound2 = 0.0001
         # self.sat_bound3 = np.deg2rad(1)
@@ -338,10 +355,6 @@ class pc_client(object):
     def th_data_exchange(self):# thread config of read data from mocap and send packed msg to record file.
         self.t_old = time()
         dt =1/30
-        l1 =self.l1
-        l2 =self.l2
-        l3 =self.l3
-        l4 =self.l4
         z_new1 =0
         z_new2 =0
         z_new3 =0
@@ -387,32 +400,32 @@ class pc_client(object):
                 e02 = -x2d + x2
                 e03 = -x3d + x3
                 e04 = -x4d + x4
-                self.eta1 = self.eta01*np.absolute(e01) +self.dtddmax1/l1
-                self.eta2 = self.eta02*np.absolute(e02) +self.dtddmax2/l2
-                self.eta3 = self.eta03*np.absolute(e03) +self.dtddmax3/l3
-                self.eta4 = self.eta04*np.absolute(e04) +self.dtddmax4/l4
+                self.eta1 = self.ed01 +self.dtddmax1/self.L1
+                self.eta2 = self.ed02 +self.dtddmax2/self.L2
+                self.eta3 = self.ed03 +self.dtddmax3/self.L3
+                self.eta4 = self.ed04 +self.dtddmax4/self.L4
 
                 ########### NDOB Update ############
 
                 pxold1 = self.l1*x1 +self.l12*x1**2*np.sign(x1)
-                l1 = self.l1 + self.l12*np.absolute(x1)
-                z_new1 = self.funcRK4_z_update_improve(dt,l1,self.eta01,self.eta1,dtdx1d,e01)
+                self.L1 = self.l1 + self.l12*np.absolute(x1)
+                z_new1 = self.funcRK4_z_update_improve(dt,self.L1,self.eta01,self.eta1,dtdx1d,e01)
                 self.d_est_old[0] = z_new1 + pxold1
 
 
                 pxold2 = self.l2*x2 +self.l22*x2**2*np.sign(x2)
-                l2 = self.l2 + self.l22*np.absolute(x2)
-                z_new2 = self.funcRK4_z_update_improve(dt,l1,self.eta02,self.eta2,dtdx2d,e02)
+                self.L2 = self.l2 + self.l22*np.absolute(x2)
+                z_new2 = self.funcRK4_z_update_improve(dt,self.L2,self.eta02,self.eta2,dtdx2d,e02)
                 self.d_est_old[1] = z_new2 + pxold2
 
                 pxold3 = self.l3*x3 +self.l32*x3**2*np.sign(x3)
-                l3 = self.l3 + self.l32*np.absolute(x3)
-                z_new3 = self.funcRK4_z_update_improve(dt,l3,self.eta03,self.eta3,dtdx3d,e03)
+                self.L3 = self.l3 + self.l32*np.absolute(x3)
+                z_new3 = self.funcRK4_z_update_improve(dt,self.L3,self.eta03,self.eta3,dtdx3d,e03)
                 self.d_est_old[2] = z_new3 + pxold3
 
                 pxold4 = self.l4*x4 +self.l42*x4**2*np.sign(x4)
-                l4 = self.l4 + self.l42*np.absolute(x4)
-                z_new4 = self.funcRK4_z_update_improve(dt,l4,self.eta04,self.eta4,dtdx4d,e04)
+                self.L4 = self.l4 + self.l42*np.absolute(x4)
+                z_new4 = self.funcRK4_z_update_improve(dt,self.L4,self.eta04,self.eta4,dtdx4d,e04)
                 self.d_est_old[3] = z_new4 + pxold4
 
             except KeyboardInterrupt:

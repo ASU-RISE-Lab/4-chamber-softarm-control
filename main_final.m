@@ -41,8 +41,8 @@ else
     load('raw_id_data.mat');
     fprintf( 'Data loaded \n' );
 end
-%% Plot for exp result
-spt =1;ept =1000;
+%% Plot for exp result 3 set
+spt =1;ept =1500;
 close all
 theta1 =[];L1 =[];theta2=[];L2=[];
 
@@ -86,7 +86,7 @@ close all
 ylabelvec={'rad';'m';'rad';'m';};
 title_array = {'$\theta_1$';'$L_1$';'$\theta_2$';'$L_2$'};
 % spt =1;ept =1500;
-ctrl_flag = 3
+% ctrl_flag = 1
 testData = par_set.trial1;
 figure(1)
     for i =1:4
@@ -110,7 +110,39 @@ legend('Ref','INASMC',Location='southeast')
         
     hold on
     end
-%%
+    % Get RMSE
+j =1;
+testData = par_set.trial1;
+for i =1:4
+ydi = testData.xd(spt:ept,i);
+y = testData.xm(spt:ept,i);
+rmse(j,i) = sqrt((ydi-y)'*(ydi-y)/ept);
+end
+
+j =2;
+testData = par_set.trial2;
+for i =1:4
+ydi = testData.xd(spt:ept,i);
+y = testData.xm(spt:ept,i);
+rmse(j,i) = sqrt((ydi-y)'*(ydi-y)/ept);
+end
+
+j =3;
+testData = par_set.trial3;
+for i =1:4
+ydi = testData.xd(spt:ept,i);
+y = testData.xm(spt:ept,i);
+rmse(j,i) = sqrt((ydi-y)'*(ydi-y)/ept);
+end
+
+    if ctrl_flag ==1
+    asmc_rmse = rmse;
+elseif ctrl_flag==2
+nsmc_rmse = rmse;
+else
+inasmc_rmse = rmse;
+end
+%% 7 set
 spt =1;ept =1500;
 close all
 theta1 =[];L1 =[];theta2=[];L2=[];
@@ -301,7 +333,38 @@ figure(1)
     er.LineStyle = 'none'; 
     hold on
     end
-
+%% Plot bar plot
+%%%
+% Need to run previous section 
+% Or directly load rmse.mat
+%%%
+close all
+mean_asmc = mean(asmc_rmse,1);
+mean_nsmc = mean(nsmc_rmse,1);
+mean_inasmc = mean(inasmc_rmse,1);
+mean_all = [mean_asmc;mean_nsmc;mean_inasmc];
+std_all = [std(asmc_rmse,1);std(nsmc_rmse,1);std(inasmc_rmse,1);];
+low_all = mean_all
+x_bar_pos=categorical({'l_(2,i)','NSMC','INASMC'});
+x_bar_pos=reordercats(x_bar_pos,{'l_(2,i)','NSMC','INASMC'});
+figure(1)
+    for i =1:4
+    subplot(2,2,i)
+    bar_obj = bar(x_bar_pos,mean_all(:,i));
+    bar_obj(1).FaceColor = 'flat';
+    bar_obj.CData(1,:)= [211 211 211]/255;
+    bar_obj.CData(2,:)= [128 128 128]/255;
+    bar_obj.CData(3,:)= [129 133 137]/255;
+    ylabel(ylabelvec{i})
+    title(title_array{i},Interpreter="latex",FontSize=12)
+%     xlim([0,4])       
+    hold on
+    er =errorbar(x_bar_pos,mean_all(:,i),-std_all(:,i), ...
+        +std_all(:,i));
+    er.Color = [0 0 0];                            
+    er.LineStyle = 'none'; 
+    hold on
+    end
 %% Plot bar plot with only ASMC and INASMC
 close all
 ylabelvec={'rad';'m';'rad';'m';};

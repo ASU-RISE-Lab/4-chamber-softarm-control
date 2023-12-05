@@ -169,6 +169,11 @@ class pc_client(object):
         self.dmax3 = 1*10**(4)
         self.dmax4 = 1*10**(6)
 
+        self.dmax1 = 1*10**(6)
+        self.dmax2 = 1*10**(6)
+        self.dmax3 = 1*10**(6)
+        self.dmax4 = 1*10**(6)
+
         self.eta1 = 1
         self.eta2 = 1
         self.eta3 = 1
@@ -422,14 +427,14 @@ class pc_client(object):
                 u3ub = d3*(dtdx3d + kk3/d3*x3 - (self.eta03*e03+self.eta3*sat_e03))
                 u4ub = d4*(dtdx4d + kk4/d4*x4 - (self.eta04*e04+self.eta4*sat_e04))
 
-                u1 = self.func_torque_saturation(u1ub,30,-30)
-                u2 = self.func_torque_saturation(u2ub,30,-30)
-                u3 = self.func_torque_saturation(u3ub,30,-30)
-                u4 = self.func_torque_saturation(u4ub,30,-30)
-                # u1 =u1ub
-                # u2 =u2ub
-                # u3 =u3ub
-                # u4 =u4ub
+                # u1 = self.func_torque_saturation(u1ub,30,-30)
+                # u2 = self.func_torque_saturation(u2ub,30,-30)
+                # u3 = self.func_torque_saturation(u3ub,30,-30)
+                # u4 = self.func_torque_saturation(u4ub,30,-30)
+                u1 =u1ub
+                u2 =u2ub
+                u3 =u3ub
+                u4 =u4ub
                 # self.u1 = d1*(dtdx1d - kk1*x1 +self.eta01*e01+self.eta1*sat_e01-self.d_est_old[0])
                 # self.u2 = d2*(dtdx2d - kk2*x2 +self.eta02*e02+self.eta2*sat_e02-self.d_est_old[1])
                 # self.u3 = d3*(dtdx3d - kk3*x3 +self.eta03*e03+self.eta3*sat_e03-self.d_est_old[2])
