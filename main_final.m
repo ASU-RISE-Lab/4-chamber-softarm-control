@@ -339,14 +339,16 @@ figure(1)
 % Or directly load rmse.mat
 %%%
 close all
+ylabelvec={'rad';'m';'rad';'m';};
+title_array = {'$\theta_1$';'$L_1$';'$\theta_2$';'$L_2$'};
 mean_asmc = mean(asmc_rmse,1);
 mean_nsmc = mean(nsmc_rmse,1);
 mean_inasmc = mean(inasmc_rmse,1);
 mean_all = [mean_asmc;mean_nsmc;mean_inasmc];
 std_all = [std(asmc_rmse,1);std(nsmc_rmse,1);std(inasmc_rmse,1);];
 low_all = mean_all
-x_bar_pos=categorical({'l_(2,i)','NSMC','INASMC'});
-x_bar_pos=reordercats(x_bar_pos,{'l_(2,i)','NSMC','INASMC'});
+x_bar_pos=categorical({'0','100','0.01'});
+x_bar_pos=reordercats(x_bar_pos,{'0','100','0.01'});
 figure(1)
     for i =1:4
     subplot(2,2,i)
