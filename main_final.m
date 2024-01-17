@@ -5,7 +5,7 @@ clc;close all;clear all;
 %%%% Initialize the system %%%
 par_set=[];
 % fprintf( 'Loading... \n' );
-load('trainData4.mat','par_set');
+% load('trainData4.mat','par_set');
 % 
 % fprintf( 'Data loaded \n' );
 
