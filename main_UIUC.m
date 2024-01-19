@@ -105,6 +105,8 @@ load_400g.exp4.pm_psi = testData.pm_psi(:,4:6);
 load('uiuc_bend_noload.mat','noload');
 load('uiuc_bend_400g.mat','load_400g');
 
+load('uiuc_bend_noload2.mat','noload2');
+load('uiuc_bend_400g2.mat','load_400g2');
 spt =600;ept = 700;
 testData1 = [];testData2=[];
 testData1 = noload.exp1;
@@ -178,20 +180,106 @@ plot(ext_tqr(spt:ept)./(testData1.angle_rad(spt:ept) - testData2.angle_rad(spt:e
 
 exp4.theta = testData1.angle_rad(spt:ept);
 exp4.k_value = ext_tqr(spt:ept)./(testData1.angle_rad(spt:ept) - testData2.angle_rad(spt:ept));
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+testData1 = [];testData2=[];
+testData1 = noload2.exp1;
+testData2 = load_400g2.exp1;
+ext_tqr = -0.4*9.8*sin(testData1.angle_rad)*0.05;
+
+close all
+figure(1)
+subplot(3,1,1)
+plot(rad2deg(testData1.angle_rad(spt:ept) - testData2.angle_rad(spt:ept)))
+subplot(3,1,2)
+plot(rad2deg(testData1.angle_rad(spt:ept)));
+hold on
+plot(rad2deg(testData2.angle_rad(spt:ept)));
+subplot(3,1,3)
+plot(ext_tqr(spt:ept)./(testData1.angle_rad(spt:ept) - testData2.angle_rad(spt:ept)))
+
+exp5.theta = testData1.angle_rad(spt:ept);
+exp5.k_value = ext_tqr(spt:ept)./(testData1.angle_rad(spt:ept) - testData2.angle_rad(spt:ept));
+
+testData1 = [];testData2=[];
+testData1 = noload2.exp2;
+testData2 = load_400g2.exp2;
+ext_tqr = -0.4*9.8*sin(testData1.angle_rad)*0.05;
+close all
+figure(1)
+subplot(3,1,1)
+plot(rad2deg(testData1.angle_rad(spt:ept) - testData2.angle_rad(spt:ept)))
+subplot(3,1,2)
+plot(rad2deg(testData1.angle_rad(spt:ept)));
+hold on
+plot(rad2deg(testData2.angle_rad(spt:ept)));
+subplot(3,1,3)
+plot(ext_tqr(spt:ept)./(testData1.angle_rad(spt:ept) - testData2.angle_rad(spt:ept)))
+
+exp6.theta = testData1.angle_rad(spt:ept);
+exp6.k_value = ext_tqr(spt:ept)./(testData1.angle_rad(spt:ept) - testData2.angle_rad(spt:ept));
+
+testData1 = [];testData2=[];
+testData1 = noload2.exp3;
+testData2 = load_400g2.exp3;
+ext_tqr = -0.4*9.8*sin(testData1.angle_rad)*0.05;
+close all
+figure(1)
+subplot(3,1,1)
+plot(rad2deg(testData1.angle_rad(spt:ept) - testData2.angle_rad(spt:ept)))
+subplot(3,1,2)
+plot(rad2deg(testData1.angle_rad(spt:ept)));
+hold on
+plot(rad2deg(testData2.angle_rad(spt:ept)));
+subplot(3,1,3)
+plot(ext_tqr(spt:ept)./(testData1.angle_rad(spt:ept) - testData2.angle_rad(spt:ept)))
+
+exp7.theta = testData1.angle_rad(spt:ept);
+exp7.k_value = ext_tqr(spt:ept)./(testData1.angle_rad(spt:ept) - testData2.angle_rad(spt:ept));
+
+testData1 = [];testData2=[];
+testData1 = noload2.exp4;
+testData2 = load_400g2.exp4;
+ext_tqr = -0.4*9.8*sin(testData1.angle_rad)*0.05;
+close all
+figure(1)
+subplot(3,1,1)
+plot(rad2deg(testData1.angle_rad(spt:ept) - testData2.angle_rad(spt:ept)))
+subplot(3,1,2)
+plot(rad2deg(testData1.angle_rad(spt:ept)));
+hold on
+
+plot(rad2deg(testData2.angle_rad(spt:ept)));
+subplot(3,1,3)
+plot(ext_tqr(spt:ept)./(testData1.angle_rad(spt:ept) - testData2.angle_rad(spt:ept)))
+
+exp8.theta = testData1.angle_rad(spt:ept);
+exp8.k_value = ext_tqr(spt:ept)./(testData1.angle_rad(spt:ept) - testData2.angle_rad(spt:ept));
+
 close all
 %%
 close all
 figure(1)
+scatter(rad2deg(exp5.theta),exp5.k_value)
+hold on
 scatter(rad2deg(exp1.theta),exp1.k_value)
+hold on
+scatter(rad2deg(exp6.theta),exp6.k_value)
 hold on
 scatter(rad2deg(exp2.theta),exp2.k_value)
 hold on
+scatter(rad2deg(exp7.theta),exp7.k_value)
+hold on
 scatter(rad2deg(exp3.theta),exp3.k_value)
+hold on
+scatter(rad2deg(exp8.theta),exp8.k_value)
 hold on
 scatter(rad2deg(exp4.theta),exp4.k_value)
 hold on
 xlabel('Angle(deg)')
 ylabel('Stiffness (Nm/rad)')
+legend('2psi','3psi','4psi','5psi','6psi','7psi','8psi')
 %%
 close all
 figure(1)
