@@ -28,7 +28,7 @@ fprintf('System initialization done \n')
 %%%
 ctrl_flag =2;% 1:asmc 2:nsmc 3:inasmc
 if par_set.flag_read_exp==1
-    for i = 1:7
+    for i = 1:7% up to 15 data sets
         par_set= funcLoadExp2Seg(par_set,i);
     end
     %     par_set= funcLoadExp2Seg(par_set,1);
