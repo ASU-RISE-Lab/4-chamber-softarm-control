@@ -399,6 +399,7 @@ figure(1)
 
 %% RK4 simulation with mean model and LPV
 h=1/30
+% testData = par_set.trial1;
 spt =1;ept =length(testData.enco_volts);
 x4x1 = [outputKnown.arc_state_wire(spt,1:4)]';
 x4x1mean=[outputKnown.arc_state_wire(spt,1:4)]';
@@ -410,7 +411,7 @@ for i = spt:ept
     x4x1 = x_pred(i,:)';
     x4x1mean = x_pred2(i,:)';
 end
-h=1/30
+
 % spt =1;ept =length(testData.enco_volts);
 % x8x1 = [outputKnown.arc_state_wire(spt,1:8)]';
 % for i = spt:ept
@@ -434,7 +435,12 @@ figure(1)
     hold on
     plot(testData.time_stamp(spt:ept),x_pred(spt:ept,i),LineStyle="-",LineWidth=2,Color='r')
     hold on
-
+    rmse_sim_mean(i) = ...
+        sqrt(sum((outputKnown.arc_state_wire(spt:ept,i)-x_pred2(spt:ept,i)).^2) ... 
+        /length(x_pred2(spt:ept,i))); 
+    rmse_sim_lpv(i) = ...
+        sqrt(sum((outputKnown.arc_state_wire(spt:ept,i)-x_pred(spt:ept,i)).^2) ... 
+        /length(x_pred(spt:ept,i))); 
     ylabel(ylabelvec{i})
     title(title_array{i},Interpreter="latex",FontSize=12)
     xlim([0,50])
@@ -670,6 +676,9 @@ figure(2)
     hold on
     plot(testData.time_stamp(spt:ept),outputKnown.arc_state_wire(spt:ept,i),LineStyle="-",LineWidth=2,Color='b')
     hold on
+    rmse_sim_asmc(i) = ...
+        sqrt(sum((outputKnown.arc_state_wire(spt:ept,i)-xest(spt:ept,i)).^2) ... 
+        /length(xest(spt:ept,i))); 
     ylabel(ylabelvec{i})
     title(title_array{i},Interpreter="latex",FontSize=12)
     xlim([0,50])
@@ -1013,7 +1022,8 @@ figure(2)
     hold on
     end
 
-%% simulation of INDOBASMC
+%% simulation of INASMC
+title_array = {'$\theta_1$';'$L_1$';'$\theta_2$';'$L_2$'};
 alpha = -0.9665; beta = 0.9698;
 xold = [outputKnown.arc_state_wire(1,1:4)]';
 h = 1/30
@@ -1033,10 +1043,10 @@ zold4 = testData.pm_psi(1,5)+testData.pm_psi(1,4);
 
 umaxt =30;umint=-30;
 umaxf =30;uminf=0;
-pdmax =15;pdmin=0;
+pdmax =20;pdmin=0;
 %%%%%   NDOB  %%%%%%%
 
-l1x = 0;eta01 = 2; etalx1 =0.1;
+l1x = 1;eta01 = 20; etalx1 =0.1;
 dtdestmax1 = 0.1;
 destold1 =0;
 destnew1=0;
@@ -1050,7 +1060,7 @@ destnew2=0;
 intvar2new =0;dtdintvar2 = 0;
 pxold2=0;
 
-l3x = 0;eta03 = 2;   etalx3 =0.1;
+l3x = 1;eta03 = 20;   etalx3 =0.1;
 dtdestmax3 = 0.1;
 destold3 =0;
 destnew3=0;
@@ -1319,4 +1329,21 @@ figure(3)
         legend('INASMC','Ref',Location='southeast')
     hold on
     end
+%% open asmc fig file manully
 
+obj_all = findobj(gcf,'Type','line');
+ref_l2 = obj_all(1).YData;
+asmc_l2 = obj_all(2).YData;
+
+ref_theta2 = obj_all(3).YData;
+asmc_theta2 = obj_all(4).YData;
+
+ref_l1 = obj_all(5).YData;
+asmc_l1 = obj_all(6).YData;
+
+ref_theta1 = obj_all(7).YData;
+asmc_theta1 = obj_all(8).YData;
+
+rmse_sim_inasmc(1) = ...
+        sqrt(sum((outputKnown.arc_state_wire(spt:ept,i)-xest(spt:ept,i)).^2) ... 
+        /length(xest(spt:ept,i))); 
